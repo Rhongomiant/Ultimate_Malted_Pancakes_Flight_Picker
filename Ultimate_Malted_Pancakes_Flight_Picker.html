@@ -142,8 +142,14 @@
     <div class="opts" id="size-opts"></div>
   </div>
 
+  <div class="card" id="caramel-card" style="display:none">
+    <h2>4. Caramel preparation</h2>
+    <div class="opts" id="caramel-opts"></div>
+    <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the griddle temperature. Hard-frozen caramel takes longer to melt and survives lower heat better; flash-frozen behaves more like room-temp candy and cooks at the normal 375°F.</p>
+  </div>
+
   <div class="card">
-    <h2>4. Starting from</h2>
+    <h2 id="bulk-step-num">5. Starting from</h2>
     <label class="toggle">
       <input type="checkbox" id="bulk-toggle">
       <span>I'm using the bulk dry pantry mix from the jar (instead of measuring each dry ingredient)</span>
@@ -480,9 +486,14 @@ const FLAVORS = [
     strategy: 'Sprinkle pine nuts first, then lay thin banana discs.',
     spices: [
       { name: 'Cinnamon', amounts: SPICE.cinnamon },
-      { name: 'Nutmeg',   amounts: SPICE.nutmeg, note: 'OR' },
-      { name: 'Cardamom (instead of nutmeg)', amounts: SPICE.cardamom },
     ],
+    pickOneSpices: {
+      label: 'Plus ONE of (your choice)',
+      options: [
+        { name: 'Nutmeg (traditional bakery)', amounts: SPICE.nutmeg },
+        { name: 'Cardamom (exotic café)',      amounts: SPICE.cardamom },
+      ],
+    },
     fat: 'Melted Ghee',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Dark Robust',
@@ -578,6 +589,7 @@ const FLAVORS = [
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
     shield: true,
+    hasCaramel: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Frozen Baking Caramel Bits'],
       good: ['Grade A Dark Robust', 'Micro-chopped Kraft Caramel Bits'],
@@ -588,7 +600,7 @@ const FLAVORS = [
   {
     id: 'toffee_caramel',
     label: 'Toffee + Caramel',
-    strategy: 'BATTER SHIELD required. Lower griddle to 325°F.',
+    strategy: 'BATTER SHIELD required.',
     spices: [
       { name: 'Nutmeg', amounts: SPICE.nutmeg },
     ],
@@ -596,7 +608,7 @@ const FLAVORS = [
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
     shield: true,
-    lowHeat: true,
+    hasCaramel: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Micro-candy + Fresh Nutmeg'],
       good: ['Grade A Dark Robust', 'Standard candy + Jar Nutmeg'],
@@ -633,6 +645,7 @@ const FLAVORS = [
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
     shield: true,
+    hasCaramel: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Frozen Caramel + Dark Chips'],
       good: ['Grade A Dark Robust', 'Store Caramel + Semi-Sweet'],
@@ -643,7 +656,7 @@ const FLAVORS = [
   {
     id: 'triple',
     label: 'Toffee + Caramel + Chocolate',
-    strategy: 'DOUBLE SHIELD required. Heat low: 300–325°F.',
+    strategy: 'DOUBLE SHIELD required.',
     spices: [
       { name: 'Espresso Powder', amounts: SPICE.espresso },
       { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt },
@@ -653,7 +666,7 @@ const FLAVORS = [
     syrup: 'Grade A Very Dark Strong',
     shield: true,
     doubleShield: true,
-    lowHeat: true,
+    hasCaramel: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Micro-candy + Avocado Oil Base'],
       good: ['Grade A Dark Robust', 'Standard candy + Ghee Base'],
@@ -749,7 +762,12 @@ const TOPPINGS = {
   ],
 };
 
-const state = { batch: 1, flavor: 'plain', size: 1, bulk: false };
+const CARAMEL_PREPS = [
+  { id: 'flash', label: 'Flash-frozen (10 min)', desc: 'Behaves like room-temp candy — normal heat 375°F' },
+  { id: 'deep',  label: 'Deep-frozen (long-term)', desc: 'Takes longer to melt — lower heat 325°F (300–325°F for Triple)' },
+];
+
+const state = { batch: 1, flavor: 'plain', size: 1, bulk: false, caramelPrep: 'flash' };
 
 function render() {
   document.getElementById('batch-opts').innerHTML = BATCHES.map((b, i) =>
@@ -763,6 +781,20 @@ function render() {
   document.getElementById('size-opts').innerHTML = SIZES.map((s, i) =>
     `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
   ).join('');
+
+  // Caramel prep picker (only for flavors with caramel)
+  const flavor = FLAVORS.find(f => f.id === state.flavor);
+  const caramelCard = document.getElementById('caramel-card');
+  if (flavor && flavor.hasCaramel) {
+    caramelCard.style.display = '';
+    document.getElementById('caramel-opts').innerHTML = CARAMEL_PREPS.map(p =>
+      `<div class="opt ${state.caramelPrep === p.id ? 'active' : ''}" data-caramel="${p.id}" title="${p.desc}">${p.label}</div>`
+    ).join('');
+    document.getElementById('bulk-step-num').textContent = '5. Starting from';
+  } else {
+    caramelCard.style.display = 'none';
+    document.getElementById('bulk-step-num').textContent = '4. Starting from';
+  }
 
   document.getElementById('bulk-toggle').checked = state.bulk;
   renderOutput();
@@ -798,14 +830,23 @@ function renderOutput() {
 
   // Spices block
   let spicesHtml;
-  if (!flavor.spices.length) {
+  if (!flavor.spices.length && !flavor.pickOneSpices) {
     spicesHtml = `<p style="margin:4px 0;color:var(--muted);font-size:.92rem">No additional spices for plain.</p>`;
   } else {
-    spicesHtml = `<ul class="list">` + flavor.spices.map(s =>
-      `<li><span class="k">${s.note ? '<i>' + s.note + '</i> ' : ''}${s.name}</span><span class="v">${s.amounts[b]}</span></li>`
-    ).join('') + `</ul>`;
-    if (flavor.id === 'bnut') {
-      spicesHtml += `<p style="margin:8px 0 0;color:var(--muted);font-size:.85rem">Cinnamon is always added. Choose <b>either</b> Nutmeg <b>or</b> Cardamom — not both.</p>`;
+    spicesHtml = '';
+    if (flavor.spices.length) {
+      spicesHtml += `<ul class="list">` + flavor.spices.map(s =>
+        `<li><span class="k">${s.name}</span><span class="v">${s.amounts[b]}</span></li>`
+      ).join('') + `</ul>`;
+    }
+    if (flavor.pickOneSpices) {
+      const grp = flavor.pickOneSpices;
+      spicesHtml += `
+        <p style="margin:10px 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700">${grp.label}</p>
+        <ul class="list">` + grp.options.map(o =>
+          `<li><span class="k">${o.name}</span><span class="v">${o.amounts[b]}</span></li>`
+        ).join('') + `</ul>
+        <p style="margin:6px 0 0;color:var(--muted);font-size:.82rem">Add <b>one</b> of these to the wet bowl — not both.</p>`;
     }
   }
 
@@ -823,6 +864,10 @@ function renderOutput() {
     toppingsHtml = `<div class="block"><h4>Toppings per pancake</h4><p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p></div>`;
   }
 
+  // Compute effective low-heat from caramel preparation state
+  const useLowHeat = flavor.hasCaramel && state.caramelPrep === 'deep';
+  const lowHeatTempLabel = flavor.id === 'triple' ? '300–325°F' : '325°F';
+
   // Cooking callouts
   const callouts = [];
   if (flavor.doubleShield) {
@@ -830,8 +875,10 @@ function renderOutput() {
   } else if (flavor.shield) {
     callouts.push(`<div class="callout warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the pan otherwise.</div>`);
   }
-  if (flavor.lowHeat) {
-    callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle:</b> ${flavor.id === 'triple' ? '300–325°F' : '325°F'} (not the usual 375°F).</div>`);
+  if (useLowHeat) {
+    callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle to ${lowHeatTempLabel}</b> — you picked deep-frozen caramel, which takes longer to melt and burns at the normal 375°F.</div>`);
+  } else if (flavor.hasCaramel) {
+    callouts.push(`<div class="callout info">🌡 Normal griddle temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
   }
   if (flavor.fat.toLowerCase().includes('butter')) {
     callouts.push(`<div class="callout info">🧈 Use <b>unsalted</b> butter. The dry base is already salt-balanced.</div>`);
@@ -843,8 +890,12 @@ function renderOutput() {
     callouts.push(`<div class="callout info">🍌 Slice bananas ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
     callouts.push(`<div class="callout info">🌰 Toast pine nuts in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
   }
-  if (flavor.id === 'caramel' || flavor.id === 'caramel_choc' || flavor.id === 'toffee_caramel' || flavor.id === 'triple') {
-    callouts.push(`<div class="callout info">🧊 Buy <b>baking</b> caramel bits, micro-chop them, and use deep-frozen (or 10-min flash-frozen) so they don't melt too fast on the griddle.</div>`);
+  if (flavor.hasCaramel) {
+    if (state.caramelPrep === 'flash') {
+      callouts.push(`<div class="callout info">🧊 Caramel prep: micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.</div>`);
+    } else {
+      callouts.push(`<div class="callout info">🧊 Caramel prep: micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.</div>`);
+    }
   }
 
   // Quality Tier
@@ -857,8 +908,8 @@ function renderOutput() {
   </div>`;
 
   // Steps
-  const heatLine = flavor.lowHeat
-    ? (flavor.id === 'triple' ? '300–325°F (very low for the Triple)' : '325°F (low for caramel/toffee combo)')
+  const heatLine = useLowHeat
+    ? (flavor.id === 'triple' ? '300–325°F (low — deep-frozen Triple)' : '325°F (low — deep-frozen caramel)')
     : '375°F (Med-Low / Med on most stoves)';
   const bakeBaconStep = (flavor.id === 'bacon' || flavor.id === 'bnut_bacon')
     ? 'Cook bacon now (during the rest).'
@@ -927,6 +978,12 @@ document.getElementById('size-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-size]');
   if (!opt) return;
   state.size = +opt.dataset.size;
+  render();
+});
+document.getElementById('caramel-opts').addEventListener('click', e => {
+  const opt = e.target.closest('[data-caramel]');
+  if (!opt) return;
+  state.caramelPrep = opt.dataset.caramel;
   render();
 });
 document.getElementById('bulk-toggle').addEventListener('change', e => {
