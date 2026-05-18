@@ -292,6 +292,47 @@
     font-family: inherit; }
   .theme-switcher .ts-btn.active { background: var(--accent); color: var(--on-accent);
     font-weight: 600; }
+  /* === Card-scale switcher (re-uses layout-switcher visual language) === */
+  .cardscale-switcher { display: inline-flex; gap: 4px; align-items: center;
+    flex-wrap: wrap; background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 10px 4px 12px; font-size: 0.78rem;
+    color: var(--muted); margin: 0 0 24px 8px; }
+  .cardscale-switcher .cs-label { letter-spacing: 0.04em; text-transform: uppercase;
+    font-weight: 600; font-size: 0.7rem; margin-right: 2px; }
+  .cardscale-switcher .cs-btn { border: 0; background: transparent; padding: 6px 10px;
+    border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.78rem;
+    font-family: inherit; }
+  .cardscale-switcher .cs-btn:hover { color: var(--ink); }
+  .cardscale-switcher .cs-btn.active { background: var(--accent); color: var(--on-accent);
+    font-weight: 600; }
+  .cardscale-switcher .cs-slider { -webkit-appearance: none; appearance: none;
+    width: 96px; height: 4px; background: var(--line); border-radius: 999px;
+    outline: none; margin: 0 6px; cursor: pointer; padding: 0; }
+  .cardscale-switcher .cs-slider:focus { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
+  .cardscale-switcher .cs-slider::-webkit-slider-thumb { -webkit-appearance: none;
+    appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; border: 0; }
+  .cardscale-switcher .cs-slider::-moz-range-thumb { width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent); cursor: pointer; border: 0; }
+  .cardscale-switcher .cs-value { min-width: 3.2em; text-align: right;
+    font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink);
+    font-size: 0.82rem; padding-right: 2px; }
+  .cardscale-switcher .cs-sep { width: 1px; height: 18px; background: var(--line);
+    margin: 0 4px; align-self: center; }
+  .cardscale-switcher .cs-step-label { font-size: 0.68rem;
+    text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600;
+    color: var(--muted); margin-right: 2px; }
+
+  /* Recipe-card scale variable — applied via CSS `zoom` so layout, fonts, and
+     padding all scale proportionally (rem-based child sizes wouldn't respond
+     to font-size scaling on a parent). */
+  .out-card { --card-scale: 1; zoom: var(--card-scale); }
+
+  /* Hide card-scale switcher on narrow viewports — browser zoom does this job better. */
+  @media (max-width: 600px) {
+    .cardscale-switcher { display: none; }
+  }
+
   .controls-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
   body[data-layout="side"] .controls-row { margin-bottom: 8px; }
 
@@ -324,7 +365,8 @@
     body { background: #fff; }
     .picker-pane, .card:not(.out-card) { display: none; }
     .footer, .print-btn { display: none; }
-    .sub, .section-title, .layout-switcher { display: none; }
+    .sub, .section-title, .layout-switcher, .cardscale-switcher { display: none; }
+    .out-card { zoom: 1 !important; }
     details { page-break-inside: avoid; }
     details:not([open]) { display: none; }
   }
@@ -345,6 +387,22 @@
       <button type="button" data-theme="auto"  class="ts-btn active">Auto</button>
       <button type="button" data-theme="light" class="ts-btn">Light</button>
       <button type="button" data-theme="dark"  class="ts-btn">Dark</button>
+    </div>
+    <div class="cardscale-switcher" id="cardscale-switcher">
+      <span class="cs-label">Card size</span>
+      <button type="button" data-preset="0.80" class="cs-btn">80%</button>
+      <button type="button" data-preset="1.00" class="cs-btn active">100%</button>
+      <button type="button" data-preset="1.20" class="cs-btn">120%</button>
+      <button type="button" data-preset="1.40" class="cs-btn">140%</button>
+      <input type="range" class="cs-slider" id="cs-slider"
+             min="80" max="140" step="5" value="100"
+             aria-label="Recipe card size (percent)">
+      <span class="cs-value" id="cs-value">100%</span>
+      <span class="cs-sep" aria-hidden="true"></span>
+      <span class="cs-step-label">Step</span>
+      <button type="button" data-step="1"  class="cs-btn">1%</button>
+      <button type="button" data-step="5"  class="cs-btn active">5%</button>
+      <button type="button" data-step="10" class="cs-btn">10%</button>
     </div>
   </div>
 
@@ -667,7 +725,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.15.1</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.0.0</div>
 </div>
 
 <script>
@@ -725,6 +783,76 @@
     });
     try { localStorage.setItem(KEY, mode); } catch (_) {}
   }
+})();
+
+// === Card-scale switcher (preset pills + continuous slider + step selector, persisted) ===
+(function() {
+  const SCALE_KEY = 'pancakeFlightCardScale';     // decimal 0.80..1.40
+  const STEP_KEY  = 'pancakeFlightCardScaleStep'; // integer percent: 1, 5, or 10
+  const sw = document.getElementById('cardscale-switcher');
+  if (!sw) return;
+  const slider  = document.getElementById('cs-slider');
+  const valueEl = document.getElementById('cs-value');
+  const outCard = document.querySelector('.out-card');
+  const MIN = 0.80, MAX = 1.40;
+
+  let scale = 1.00;
+  let step  = 5;
+
+  try {
+    const savedScale = parseFloat(localStorage.getItem(SCALE_KEY));
+    if (!isNaN(savedScale) && savedScale >= MIN && savedScale <= MAX) scale = savedScale;
+    const savedStep = parseInt(localStorage.getItem(STEP_KEY), 10);
+    if ([1, 5, 10].includes(savedStep)) step = savedStep;
+  } catch (_) {}
+
+  function clamp(v) { return Math.max(MIN, Math.min(MAX, v)); }
+
+  function apply() {
+    outCard.style.setProperty('--card-scale', scale.toFixed(2));
+    const pct = Math.round(scale * 100);
+    slider.step = step;
+    slider.value = pct;
+    valueEl.textContent = pct + '%';
+    // Highlight preset pills only when scale matches exactly
+    sw.querySelectorAll('[data-preset]').forEach(function(b) {
+      b.classList.toggle('active', Math.abs(parseFloat(b.dataset.preset) - scale) < 0.005);
+    });
+    // Highlight active step
+    sw.querySelectorAll('[data-step]').forEach(function(b) {
+      b.classList.toggle('active', parseInt(b.dataset.step, 10) === step);
+    });
+    try {
+      localStorage.setItem(SCALE_KEY, scale.toFixed(2));
+      localStorage.setItem(STEP_KEY, String(step));
+    } catch (_) {}
+  }
+
+  sw.addEventListener('click', function(e) {
+    const presetBtn = e.target.closest('[data-preset]');
+    if (presetBtn) {
+      scale = clamp(parseFloat(presetBtn.dataset.preset));
+      apply();
+      return;
+    }
+    const stepBtn = e.target.closest('[data-step]');
+    if (stepBtn) {
+      step = parseInt(stepBtn.dataset.step, 10);
+      // Snap current scale to a multiple of the new step
+      const pct = Math.round(scale * 100);
+      const snapped = Math.round(pct / step) * step;
+      scale = clamp(snapped / 100);
+      apply();
+      return;
+    }
+  });
+
+  slider.addEventListener('input', function() {
+    scale = clamp(parseInt(slider.value, 10) / 100);
+    apply();
+  });
+
+  apply();
 })();
 
 const BATCHES = [
