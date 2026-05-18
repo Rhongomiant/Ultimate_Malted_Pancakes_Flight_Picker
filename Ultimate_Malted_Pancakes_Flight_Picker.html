@@ -37,8 +37,6 @@
     transition: all .12s; user-select: none; }
   .opt:hover { border-color: var(--accent); }
   .opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .toggle { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.95rem; cursor: pointer; }
-  .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
   .out { background: #fff; border: 1px solid var(--line); border-radius: 14px;
     padding: 20px; margin-top: 8px; }
   .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
@@ -151,13 +149,10 @@
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
 
   <div class="card">
-    <h2>1. Batch size &amp; starting from</h2>
+    <h2>1. Batch size &amp; dry mix source</h2>
     <div class="opts" id="batch-opts"></div>
-    <h3 class="sub-h">Starting from</h3>
-    <label class="toggle">
-      <input type="checkbox" id="bulk-toggle">
-      <span>I'm using the bulk dry pantry mix from the jar (instead of measuring each dry ingredient)</span>
-    </label>
+    <h3 class="sub-h">Dry mix source</h3>
+    <div class="opts" id="bulk-opts"></div>
   </div>
 
   <div class="card">
@@ -412,7 +407,7 @@
     </div>
   </details>
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.7.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.8.0</div>
 </div>
 
 <script>
@@ -421,6 +416,11 @@ const BATCHES = [
   { id: 'half',    label: 'Half',    desc: '2 portions', oz: 8 },
   { id: 'three',   label: 'Three-Quarter', desc: '3 portions', oz: 12 },
   { id: 'full',    label: 'Full',    desc: '4 portions', oz: 16 },
+];
+
+const BULK_OPTS = [
+  { id: 'measure', label: 'Measure each ingredient', bulk: false },
+  { id: 'bulk',    label: 'Use bulk dry mix from jar', bulk: true },
 ];
 
 const SIZES = [
@@ -727,6 +727,10 @@ function render() {
     `<div class="opt ${state.batch === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
   ).join('');
 
+  document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
+    `<div class="opt ${state.bulk === o.bulk ? 'active' : ''}" data-bulk="${o.bulk}">${o.label}</div>`
+  ).join('');
+
   document.getElementById('flavor-opts').innerHTML = FLAVORS.map(f =>
     `<div class="opt ${state.flavor === f.id ? 'active' : ''}" data-flavor="${f.id}">${f.label}</div>`
   ).join('');
@@ -746,7 +750,6 @@ function render() {
     caramelInline.style.display = 'none';
   }
 
-  document.getElementById('bulk-toggle').checked = state.bulk;
   renderOutput();
 }
 
@@ -763,8 +766,7 @@ function renderOutput() {
   const yieldCount = Math.max(1, Math.round(batchInfo.oz / sizeInfo.oz));
   const yieldText = `Yields ~${yieldCount} pancake${yieldCount === 1 ? '' : 's'}`;
 
-  // Prep notes — anything that has to happen BEFORE the pancake hits the cooking surface.
-  // Goes directly under the Yields line.
+  // Prep notes
   const prepNotes = [];
   if (hasBanana) {
     prepNotes.push(`<div class="callout info">🌰 <b>Toast pine nuts</b> in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
@@ -847,18 +849,16 @@ function renderOutput() {
     toppingsInner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
   }
 
-  // Single Batter Shield
+  // Shield + caramel notes inside toppings
   if (flavor.shield && !flavor.doubleShield) {
     toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the cooking surface otherwise.</div>`;
   }
-  // Caramel prep
   if (flavor.hasCaramel) {
     const prepText = state.caramelPrep === 'flash'
       ? `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
       : `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
     toppingsInner += `<div class="topping-note info">${prepText}</div>`;
   }
-  // Double Batter Shield
   if (flavor.doubleShield) {
     toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the cooking surface otherwise.</div>`;
   }
@@ -867,8 +867,7 @@ function renderOutput() {
     ? `<div class="block full-row"><h4>Toppings per pancake</h4>${toppingsInner}</div>`
     : '';
 
-  // Below-grid callouts (only butter advice + normal-temp confirmation if applicable).
-  // Pine-nut and banana prep moved above; bacon timing moved into cooking steps.
+  // Below-grid callouts
   const callouts = [];
   if (flavor.hasCaramel && state.caramelPrep === 'flash' && flavor.id !== 'triple') {
     callouts.push(`<div class="callout info">🌡 Normal cooking-surface temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
@@ -886,20 +885,45 @@ function renderOutput() {
     <div class="tier tier-bad"><div class="tier-h">❌ Avoid</div><span class="syr">${t.bad[0]}</span><span class="ing">${t.bad[1]}</span></div>
   </div>`;
 
-  // Cooking steps — "Rest" now expands into sub-bullets; ladle prep absorbed into the pour step.
+  // ===== Cooking steps =====
+  const cookingSteps = [];
+
+  cookingSteps.push(`<li>Measure dry ingredients into one bowl. In a second bowl, combine the wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()}. Frother on lowest to emulsify the wet mix only.</li>`);
+
+  cookingSteps.push(`<li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix</b> or pancakes turn rubbery.</li>`);
+
+  // Rest with sub-bullets
   const restSubSteps = [];
-  restSubSteps.push(`<li>Fill a bowl (or any container that fits your ladles) with ice and water. Submerge the ladle scoops in the bowl to keep them ice-cold.</li>`);
+  restSubSteps.push(`<li>Fill a bowl (or any container that fits your ladles) with ice and water. Submerge the ladle scoops to keep them ice-cold.</li>`);
   if (isBacon) {
     restSubSteps.push(`<li>Cook the bacon crisp — its rendered grease becomes your cooking-surface grease.</li>`);
-  }
-  if (isBacon) {
     restSubSteps.push(`<li>At the <b>7-min mark</b>, prep the cooking surface to cook pancakes in the bacon grease.</li>`);
   } else {
     restSubSteps.push(`<li>At the <b>7-min mark</b>, heat the cooking surface and apply the grease.</li>`);
   }
+  cookingSteps.push(`<li><b>Rest the batter 10 minutes, undisturbed.</b> During the rest:<ul class="sub-steps">${restSubSteps.join('')}</ul></li>`);
 
-  const shieldStep = flavor.doubleShield ? ' Apply <b>double</b> Batter Shield (two layers of plain batter over toppings).' :
-                     flavor.shield ? ' Apply Batter Shield (drizzle plain batter over toppings).' : '';
+  // Scoop step (with sub-bullets)
+  const scoopSubSteps = [];
+  scoopSubSteps.push(`<li>2–3 quick pours can be done in succession before you need to chill the ladle again.</li>`);
+  scoopSubSteps.push(`<li>Drop toppings tightly in the center.</li>`);
+  cookingSteps.push(`<li><b>When ready to scoop:</b> pull a ${sizeInfo.oz} oz ladle from the ice bath (it must have soaked for <b>at least a few seconds</b>), tap it once on a clean towel to drop loose water, wipe the inside with a tiny dot of avocado oil. Scoop the batter quickly and pour it straight onto the heated grease.<ul class="sub-steps">${scoopSubSteps.join('')}</ul></li>`);
+
+  // Apply toppings step (skip for plain)
+  if (flavor.id !== 'plain') {
+    cookingSteps.push(`<li><b>Apply toppings:</b> place the items from the <i>Toppings per pancake</i> chart above onto the wet pancake top, tightly clustered in the dead center. Stay under the Max Combined Volume Limit and leave a clean batter perimeter — that ring is the seal zone for the Batter Shield.</li>`);
+  }
+
+  // Batter Shield / Double Shield step
+  if (flavor.doubleShield) {
+    cookingSteps.push(`<li><b>Apply Double Batter Shield:</b> drizzle plain batter over the toppings <b>twice</b> (two layered coats) to fully cover them. Triple-Threat candies will weld to the cooking surface during the flip if you skip the second coat — it's non-negotiable for this combination.</li>`);
+  } else if (flavor.shield) {
+    cookingSteps.push(`<li><b>Apply Batter Shield:</b> drizzle a small amount of plain batter over the toppings to fully cover them. This locks the sugars inside the dough so they melt smoothly during the flip instead of welding to the cooking surface.</li>`);
+  }
+
+  cookingSteps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
+
+  cookingSteps.push(`<li>Between every pancake: scrape → use the ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>`);
 
   const out = document.getElementById('output');
   out.innerHTML = `
@@ -944,14 +968,7 @@ function renderOutput() {
 
     <h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Cooking Steps</h4>
     <ol class="steps">
-      <li>Measure dry ingredients into one bowl. In a second bowl, combine the wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()}. Frother on lowest to emulsify the wet mix only.</li>
-      <li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix</b> or pancakes turn rubbery.</li>
-      <li><b>Rest the batter 10 minutes, undisturbed.</b> During the rest:
-        <ul class="sub-steps">${restSubSteps.join('')}</ul>
-      </li>
-      <li><b>When ready to scoop:</b> pull a ladle from the ice bath, tap it once on a clean towel to drop loose water, wipe the inside with a tiny dot of avocado oil. Scoop the batter quickly and pour it straight onto the heated grease in ${sizeInfo.detail.split('·')[0].trim()} portions. Drop toppings tightly in the center.${shieldStep}</li>
-      <li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>
-      <li>Between every pancake: scrape → ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>
+      ${cookingSteps.join('')}
     </ol>
   `;
 }
@@ -960,6 +977,12 @@ document.getElementById('batch-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-batch]');
   if (!opt) return;
   state.batch = +opt.dataset.batch;
+  render();
+});
+document.getElementById('bulk-opts').addEventListener('click', e => {
+  const opt = e.target.closest('[data-bulk]');
+  if (!opt) return;
+  state.bulk = opt.dataset.bulk === 'true';
   render();
 });
 document.getElementById('flavor-opts').addEventListener('click', e => {
@@ -978,10 +1001,6 @@ document.getElementById('caramel-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-caramel]');
   if (!opt) return;
   state.caramelPrep = opt.dataset.caramel;
-  render();
-});
-document.getElementById('bulk-toggle').addEventListener('change', e => {
-  state.bulk = e.target.checked;
   render();
 });
 
