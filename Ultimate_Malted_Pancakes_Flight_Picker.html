@@ -571,6 +571,129 @@
     .controls-row, .controls-toggle { display: none !important; }
   }
 
+  /* === v3.0.0-rc.2: picker UI consolidation, horizontal scroll, category sections === */
+  /* Combined row in Batch card: dry-mix-source + Batch Quantity + multi-batch toggle. */
+  .batch-combined-row {
+    display: flex; gap: 18px; flex-wrap: wrap;
+    align-items: flex-start; margin-top: 10px;
+  }
+  .bcr-group {
+    flex: 0 1 auto; min-width: 140px;
+  }
+  .bcr-group .bcr-label {
+    display: block; margin: 0 0 5px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .bcr-group .bcr-label[title] {
+    border-bottom: 1px dotted var(--line);
+    cursor: help; padding-bottom: 1px;
+  }
+  /* Override the standalone styling of count-stepper + multi-batch toggle
+     when they live inside the combined row. */
+  .bcr-group .batch-count-row,
+  .bcr-group .multi-batch-toggle-row {
+    margin-top: 0; padding: 0;
+    background: transparent; border: none;
+  }
+  .bcr-group .multi-batch-toggle-pill {
+    /* Slightly larger when standalone (no surrounding label text). */
+    padding: 4px 12px;
+  }
+
+  /* Reset button in controls row. */
+  .reset-btn {
+    display: inline-flex; align-items: center;
+    padding: 6px 12px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--card);
+    cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--ink); font-family: inherit;
+    margin-left: 4px;
+  }
+  .reset-btn:hover {
+    background: var(--warn-bg); color: var(--warn);
+    border-color: var(--warn);
+  }
+
+  /* Horizontal-scrolling batches row (replaces the grid layout). */
+  .batches-row {
+    display: flex; gap: 14px; margin-bottom: 6px;
+    overflow-x: auto; overflow-y: visible;
+    padding-bottom: 8px; align-items: stretch;
+    scrollbar-width: thin;
+  }
+  .batches-row::-webkit-scrollbar { height: 8px; }
+  .batches-row::-webkit-scrollbar-track { background: var(--bg); }
+  .batches-row::-webkit-scrollbar-thumb {
+    background: var(--line); border-radius: 4px;
+  }
+  .batches-row::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  .batches-row > .batch-column {
+    flex: 0 0 auto; min-width: 320px;
+    /* Width grows with content based on internal F&S/Toppings layout. */
+  }
+  .scroll-hint {
+    text-align: center; padding: 6px 0;
+    font-size: 11px; color: var(--muted);
+    font-style: italic; margin: 0 0 12px;
+  }
+  .scroll-hint .arrow { font-style: normal; padding: 0 4px; }
+
+  /* Category section wrappers under recommended order with multi-category. */
+  .category-section {
+    margin-bottom: 18px;
+    border-top: 2px solid var(--accent);
+    padding-top: 12px;
+  }
+  .category-section:first-of-type { border-top: 0; padding-top: 4px; }
+  .category-section-header {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .category-section-header h3 {
+    margin: 0; font-size: 15px;
+    color: var(--accent-strong);
+  }
+  .category-section-header .cs-temp {
+    font-size: 12px; color: var(--muted); font-weight: 500;
+  }
+  .category-section-header .cs-blurb {
+    font-size: 12px; color: var(--muted); font-style: italic;
+  }
+
+  /* Setup-phase F&S / Toppings layout switchers in the options band. */
+  .setup-layout-toggles {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap; padding: 6px 0;
+  }
+  .setup-layout-toggles .slt-label {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  /* Disabled stepper styling. */
+  .batch-count-stepper.disabled,
+  .batch-count-stepper button:disabled {
+    opacity: 0.4;
+  }
+  .batch-count-stepper.disabled .bc-val {
+    color: var(--muted);
+  }
+
+  /* In Mode B (category-grouped), batch columns inside category sections
+     get a slim category accent strip on their left edge. */
+  .category-section .batch-column {
+    border-left: 3px solid var(--accent);
+  }
+
+  @media print {
+    .reset-btn, .scroll-hint { display: none !important; }
+    .batches-row { display: block; overflow: visible; }
+    .category-section { page-break-inside: avoid; }
+  }
+
   /* === v3.0.0-rc: per-batch column grid + active-category filter === */
   .batches-row {
     display: grid; gap: 14px; margin-bottom: 14px;
@@ -1193,6 +1316,10 @@
       <button type="button" data-step="5"  class="cs-btn active">5%</button>
       <button type="button" data-step="10" class="cs-btn">10%</button>
     </div>
+    <button type="button" class="reset-btn" id="reset-btn"
+            title="Reset all content (mode, batches, flavors, preps, order, layouts) back to defaults. Display preferences (theme, layout, card size) are preserved.">
+      Reset
+    </button>
   </div><!-- /controls-row -->
 
   <div class="picker-region" id="picker-region">
@@ -1208,11 +1335,22 @@
     </div>
     <div class="card-body">
       <div class="batch-tabs-strip" id="batch-tabs-strip" hidden></div>
-      <p class="batch-active-label" id="batch-active-label" hidden>Active batch · size &amp; count</p>
+      <p class="batch-active-label" id="batch-active-label" hidden>Active batch · size</p>
       <div class="opts" id="batch-opts"></div>
-      <div class="batch-count-row" id="batch-count-row" hidden></div>
-      <h3 class="sub-h">Dry mix source</h3>
-      <div class="opts" id="bulk-opts"></div>
+      <div class="batch-combined-row" id="batch-combined-row">
+        <div class="bcr-group">
+          <span class="bcr-label">Dry mix source</span>
+          <div class="opts" id="bulk-opts"></div>
+        </div>
+        <div class="bcr-group" id="batch-quantity-group" hidden>
+          <span class="bcr-label" title="Number of cloned copies of this batch to make. Requires 'Allow same flavor in multiple batches'.">Batch Quantity</span>
+          <div class="batch-count-row" id="batch-count-row"></div>
+        </div>
+        <div class="bcr-group" id="multi-batch-group" hidden>
+          <span class="bcr-label">Allow same flavor in multiple batches</span>
+          <div class="multi-batch-toggle-row" id="multi-batch-toggle-row"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1233,7 +1371,6 @@
       <div class="opts" id="flavor-opts"></div>
       <p class="picker-hint" id="flavor-hint" hidden></p>
       <div class="flavor-block-msg" id="flavor-block-msg" hidden></div>
-      <div class="multi-batch-toggle-row" id="multi-batch-toggle-row" hidden></div>
       <div class="candy-row">
         <div id="caramel-inline" class="candy-cell" style="display:none;">
           <h3 class="sub-h">Caramel preparation</h3>
@@ -1564,7 +1701,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.2</div>
 </div>
 
 <script>
@@ -2339,6 +2476,11 @@ function syncActiveBatchToLegacyState() {
   if (state.batches.length === 0) {
     addBatch();
   }
+  // v3.0.0-rc.2: normalize batch counts when multi-flavor is disabled.
+  // Catches URL/localStorage loads where the two would otherwise drift.
+  if (!state.allowMultiBatchFlavor) {
+    state.batches.forEach(b => { b.count = 1; });
+  }
   const ab = getActiveBatch();
   if (!ab) return;
   // Active batch's batch size: null is allowed (empty/new batch). When null,
@@ -2953,22 +3095,29 @@ function render() {
     `<div class="opt ${renderedBatchIdx === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
   ).join('');
 
-  // --- v3.0.0-beta: count stepper for active batch (Flight mode only) ---
+  // --- v3.0.0-rc.2: count stepper for active batch (Flight mode only). ---
+  // Stepper is disabled when allowMultiBatchFlavor is false (count is gated
+  // on the multi-batch affordance). Label is rendered outside in .bcr-label.
+  const batchQuantityGroup = document.getElementById('batch-quantity-group');
+  const multiBatchGroup = document.getElementById('multi-batch-group');
   if (state.mode === 'flight') {
     const ab = getActiveBatch();
     const cnt = ab ? (ab.count || 1) : 1;
+    const isStepperDisabled = !state.allowMultiBatchFlavor;
     batchCountRow.innerHTML =
-      `<span class="bc-label">Make this batch</span>` +
-      `<span class="batch-count-stepper">` +
-        `<button type="button" data-bc-step="-1" ${cnt <= 1 ? 'disabled' : ''} aria-label="Decrease count">−</button>` +
+      `<span class="batch-count-stepper ${isStepperDisabled ? 'disabled' : ''}">` +
+        `<button type="button" data-bc-step="-1" ${(isStepperDisabled || cnt <= 1) ? 'disabled' : ''} aria-label="Decrease count">−</button>` +
         `<span class="bc-val">${cnt}</span>` +
-        `<button type="button" data-bc-step="1" ${cnt >= 99 ? 'disabled' : ''} aria-label="Increase count">+</button>` +
-      `</span>` +
-      `<span style="font-size:11px;color:var(--muted);">×${cnt > 1 ? ' (each at the size above)' : ''}</span>`;
+        `<button type="button" data-bc-step="1" ${(isStepperDisabled || cnt >= 99) ? 'disabled' : ''} aria-label="Increase count">+</button>` +
+      `</span>`;
     batchCountRow.hidden = false;
+    batchQuantityGroup.hidden = false;
+    multiBatchGroup.hidden = false;
   } else {
     batchCountRow.hidden = true;
     batchCountRow.innerHTML = '';
+    batchQuantityGroup.hidden = true;
+    multiBatchGroup.hidden = true;
   }
 
   document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
@@ -3023,11 +3172,10 @@ function render() {
     blockMsgEl.textContent = '';
   }
 
-  // --- v3.0.0-beta: "Allow same flavor in multiple batches" toggle (Flight) ---
+  // --- v3.0.0-rc.2: multi-batch toggle (label is in .bcr-label outside now). ---
   const multiToggleRow = document.getElementById('multi-batch-toggle-row');
   if (state.mode === 'flight') {
     multiToggleRow.innerHTML =
-      `<span style="flex:1;">Allow the same flavor in multiple batches</span>` +
       `<button type="button" class="multi-batch-toggle-pill ${state.allowMultiBatchFlavor ? 'active' : ''}" id="multi-batch-toggle-pill">` +
         (state.allowMultiBatchFlavor ? 'On' : 'Off') +
       `</button>`;
@@ -3341,11 +3489,21 @@ function renderFlightOutput() {
   // now render their own placeholder cards in the per-batch column loop.
 
   // -------------------------------------------------------------------
-  // Setup phase — per-batch columns side by side.
+  // Setup phase — per-batch columns. Either:
+  //  (a) Mode B: category-grouped sections (recommended order + multi-cat), or
+  //  (b) Mode A: single horizontal-scroll row of all batches.
+  //
+  // Each .batch-column is rendered by renderBatchColumnHtml(idx, opts). The
+  // categoryFilter option restricts the column's flavor list to one cookGroup
+  // for Mode B's per-category sections.
   // -------------------------------------------------------------------
-  const batchColumnsHtml = visibleBatchIdxs.map(idx => {
+  const sizeLabelOf = b => (b.batch !== null && b.batch !== undefined) ? BATCHES[b.batch].label : null;
+
+  function renderBatchColumnHtml(idx, opts) {
+    opts = opts || {};
+    const categoryFilter = opts.categoryFilter || null;
     const b = state.batches[idx];
-    const sizeLabel = (b.batch !== null && b.batch !== undefined) ? BATCHES[b.batch].label : null;
+    const sizeLabel = sizeLabelOf(b);
     const countLabel = (b.count > 1) ? ` × ${b.count}` : '';
     const headerInner = `Batch ${idx + 1}` +
       (sizeLabel ? ` · ${sizeLabel}${countLabel}` : '') +
@@ -3367,15 +3525,17 @@ function renderFlightOutput() {
       return `<div class="batch-column">${colHeaderHtml}<div class="batch-empty-state">${msg}</div></div>`;
     }
 
-    // Filter to visible flavors in this batch.
-    const flavorIds = b.flavors.filter(flavorIsActive);
-    if (flavorIds.length === 0) {
-      // Batch has flavors but none active — shouldn't happen because batchHasActiveFlavor
-      // returned true to include this batch. Defensive: skip the column.
-      return '';
+    // Filter to visible flavors in this batch (active-category + optional cat filter).
+    let flavorIds = b.flavors.filter(flavorIsActive);
+    if (categoryFilter) {
+      flavorIds = flavorIds.filter(fid => {
+        const f = flavorById(fid);
+        return f && f.cookGroup === categoryFilter;
+      });
     }
+    if (flavorIds.length === 0) return '';
 
-    // Order flavors within the batch column according to orderMode.
+    // Order flavors within the column according to orderMode.
     let orderedIds;
     if (isRecommended) {
       const grouped = groupSelectedByCooking(flavorIds, state.recommendedSubOrder);
@@ -3383,11 +3543,10 @@ function renderFlightOutput() {
     } else if (state.orderMode === 'menu') {
       orderedIds = flavorIds.slice().sort((x, y) => FLAVOR_INDEX[x] - FLAVOR_INDEX[y]);
     } else {
-      orderedIds = flavorIds.slice(); // selection — preserves picker order
+      orderedIds = flavorIds.slice();
     }
     const orderedFlavors = orderedIds.map(flavorById);
 
-    // Dry + Wet pair (50/50).
     const dryWetPair = `<div class="setup-row-pair">
       <div class="block">
         <h4>Dry Bowl${b.count > 1 ? ` × ${b.count}` : ''}</h4>
@@ -3399,19 +3558,28 @@ function renderFlightOutput() {
       </div>
     </div>`;
 
-    // Fat & Spices (per flavor in the column).
+    // Apply session-wide F&S / Toppings layout (side / stack / grid).
+    const spicesLayoutAttr = `data-subcard-layout="${state.spicesLayout}"`;
+    const toppingsLayoutAttr = `data-subcard-layout="${state.toppingsLayout}"`;
+    const spicesSideStyle = (state.spicesLayout === 'side' && orderedFlavors.length > 1)
+      ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(180px, 1fr))"` : '';
+    const toppingsSideStyle = (state.toppingsLayout === 'side' && orderedFlavors.length > 1)
+      ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(180px, 1fr))"` : '';
+
     const spicesBlock = `<div class="block">
       <h4>FAT &amp; Spices${flavorIds.length > 1 ? ' (per flavor)' : ''}</h4>
-      ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${fatAndSpicesHtml(f, b.batch)}</div>`).join('')}
+      <div class="subcards-grid" ${spicesLayoutAttr}${spicesSideStyle}>
+        ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${fatAndSpicesHtml(f, b.batch)}</div>`).join('')}
+      </div>
     </div>`;
 
-    // Toppings (per flavor).
     const toppingsBlock = `<div class="block">
       <h4>Toppings per pancake</h4>
-      ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${toppingsInnerHtml(f, sizeIdx, { includeCandyPrep: false })}</div>`).join('')}
+      <div class="subcards-grid" ${toppingsLayoutAttr}${toppingsSideStyle}>
+        ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${toppingsInnerHtml(f, sizeIdx, { includeCandyPrep: false })}</div>`).join('')}
+      </div>
     </div>`;
 
-    // Grease for this batch only.
     const groupedForGrease = groupSelectedByCooking(flavorIds, 'menu');
     const greases = distinctGreasesByGroup(groupedForGrease);
     const greaseBlock = `<div class="grease-lines">
@@ -3430,12 +3598,64 @@ function renderFlightOutput() {
       ${toppingsBlock}
       ${greaseBlock}
     </div>`;
-  }).filter(h => h).join('');
+  }
 
-  const renderedBatchCount = visibleBatchIdxs.filter(idx => {
-    const b = state.batches[idx];
-    return !(b.batch === null && b.flavors.length === 0) ? true : true;
-  }).length;
+  // Determine visible categories (categories that have at least one visible flavor).
+  const visibleCategoriesSet = new Set();
+  visibleTuples.forEach(t => visibleCategoriesSet.add(t.flavor.cookGroup));
+  const visibleCategoriesOrdered = COOK_GROUP_ORDER.filter(g => visibleCategoriesSet.has(g));
+  const useCategorySections = isRecommended && visibleCategoriesOrdered.length > 1;
+
+  // Build the Setup phase body.
+  let setupBodyHtml;
+  if (useCategorySections) {
+    // Mode B: one section per visible category.
+    setupBodyHtml = visibleCategoriesOrdered.map(cat => {
+      const idxsInCat = visibleBatchIdxs.filter(idx => {
+        const b = state.batches[idx];
+        if (b.batch === null) return false;
+        return b.flavors.some(fid => {
+          const f = flavorById(fid);
+          return f && f.cookGroup === cat && flavorIsActive(fid);
+        });
+      });
+      if (idxsInCat.length === 0) return '';
+      const heat = effectiveHeatForGroup(cat, visibleTuples.filter(t => t.flavor.cookGroup === cat).map(t => t.flavor.id));
+      const columnsHtml = idxsInCat.map(idx => renderBatchColumnHtml(idx, { categoryFilter: cat })).filter(h => h).join('');
+      const scrollHintHtml = idxsInCat.length > 1
+        ? `<p class="scroll-hint" data-scroll-hint-for="cat-${cat}" hidden><span class="arrow">←</span> scroll horizontally to see all batches <span class="arrow">→</span></p>`
+        : '';
+      return `<div class="category-section">
+        <div class="category-section-header">
+          <h3>${COOK_GROUP_LABEL[cat]}</h3>
+          <span class="cs-temp">${heat.temp}</span>
+          <span class="cs-blurb">${COOK_GROUP_BLURB[cat]}</span>
+        </div>
+        <div class="batches-row" data-batches-row="cat-${cat}">${columnsHtml}</div>
+        ${scrollHintHtml}
+      </div>`;
+    }).join('');
+  } else {
+    // Mode A: single horizontal-scroll row.
+    const columnsHtml = visibleBatchIdxs.map(idx => renderBatchColumnHtml(idx)).filter(h => h).join('');
+    const scrollHintHtml = visibleBatchIdxs.length > 1
+      ? `<p class="scroll-hint" data-scroll-hint-for="all" hidden><span class="arrow">←</span> scroll horizontally to see all batches <span class="arrow">→</span></p>`
+      : '';
+    setupBodyHtml = `<div class="batches-row" data-batches-row="all">${columnsHtml}</div>${scrollHintHtml}`;
+  }
+
+  // Layout switchers for F&S and Toppings (session-wide), only shown when
+  // there are 2+ visible flavors total (otherwise nothing to lay out).
+  const layoutSwitchersHtml = visibleFlavorCount > 1
+    ? `<div class="setup-layout-toggles">
+        <span class="slt-label">Spices:</span>
+        ${layoutSwitcherHtml('spices', state.spicesLayout)}
+        <span class="slt-label">Toppings:</span>
+        ${layoutSwitcherHtml('toppings', state.toppingsLayout)}
+      </div>`
+    : '';
+
+  const renderedBatchCount = visibleBatchIdxs.length;
 
   // -------------------------------------------------------------------
   // Cook phase + Tier + Shopping list — only render when flavors exist.
@@ -3656,11 +3876,9 @@ function renderFlightOutput() {
       <span class="phase-sub">${renderedBatchCount} batch${renderedBatchCount === 1 ? '' : 'es'} visible</span>
     </div>
     <div class="phase-section">
-      <div class="phase-options">${orderToggleSetupHtml}</div>
+      <div class="phase-options">${orderToggleSetupHtml}${layoutSwitchersHtml}</div>
       ${activeCategoryPillsHtml}
-      <div class="batches-row" data-batch-count="${renderedBatchCount}">
-        ${batchColumnsHtml}
-      </div>
+      ${setupBodyHtml}
     </div>
 
     ${cookPhaseHtml}
@@ -3795,15 +4013,73 @@ document.getElementById('batch-count-row').addEventListener('click', e => {
   render();
 });
 
-// v3.0.0-beta: multi-batch toggle handler.
+// v3.0.0-beta/rc.2: multi-batch toggle handler. When toggling OFF, force all
+// batch counts to 1 so the data model matches the gated Batch Quantity UI.
 document.getElementById('multi-batch-toggle-row').addEventListener('click', e => {
   if (!e.target.closest('#multi-batch-toggle-pill')) return;
   state.allowMultiBatchFlavor = !state.allowMultiBatchFlavor;
+  if (!state.allowMultiBatchFlavor) {
+    state.batches.forEach(b => { b.count = 1; });
+  }
   try {
     localStorage.setItem('pancakeFlightAllowMultiBatchFlavor', state.allowMultiBatchFlavor ? '1' : '0');
   } catch (_) {}
   render();
 });
+
+// v3.0.0-rc.2: Reset button — clears content state + content localStorage,
+// preserves display preferences (theme, layout, card size, collapse states).
+function resetToDefaults() {
+  if (!confirm("Reset all content to defaults?\n\nThis clears mode, batches, flavors, preps, order, and layouts. Display preferences (theme, page layout, card size) are preserved.")) return;
+
+  const contentKeys = [
+    'pancakeFlightMode', 'pancakeFlightSize', 'pancakeFlightBatch',
+    'pancakeFlightFlavor', 'pancakeFlightSelectedFlavors',
+    'pancakeFlightOrderMode', 'pancakeFlightRecommendedSubOrder',
+    'pancakeFlightSpicesLayout', 'pancakeFlightToppingsLayout',
+    'pancakeFlightCookLayout', 'pancakeFlightTierLayout',
+    'pancakeFlightWetLayout',
+    'pancakeFlightCaramelPrep', 'pancakeFlightToffeePrep',
+    'pancakeFlightBulk',
+    'pancakeFlightBatches', 'pancakeFlightActiveBatchIdx',
+    'pancakeFlightActiveCategories', 'pancakeFlightAllowMultiBatchFlavor',
+    'pancakeFlightShoppingListExpanded',
+  ];
+  contentKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+
+  // Clear URL state.
+  try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
+
+  // Reset in-memory state to initial defaults.
+  state.mode = 'single';
+  state.size = 1;
+  state.batch = 1;
+  state.flavor = 'plain';
+  state.selectedFlavors = ['plain'];
+  state.bulk = false;
+  state.caramelPrep = 'flash';
+  state.toffeePrep = 'flash';
+  state.orderMode = 'recommended';
+  state.recommendedSubOrder = 'menu';
+  state.tierLayout = 'side';
+  state.wetLayout = 'grid';
+  state.spicesLayout = 'grid';
+  state.toppingsLayout = 'grid';
+  state.cookLayout = 'grid';
+  state.batches = [];
+  state.activeBatchIdx = 0;
+  state.activeCategories = ['clean', 'savory', 'candy'];
+  state.allowMultiBatchFlavor = false;
+  state.shoppingListExpanded = false;
+
+  // Reflect Single mode in the switcher UI.
+  const ms = document.getElementById('mode-switcher');
+  if (ms) ms.querySelectorAll('[data-mode-pick]').forEach(b =>
+    b.classList.toggle('active', b.dataset.modePick === 'single'));
+
+  render();
+}
+document.getElementById('reset-btn').addEventListener('click', resetToDefaults);
 
 // v3.0.0-rc: active-category pill handlers (delegated on #output).
 document.getElementById('output').addEventListener('click', e => {
@@ -3929,7 +4205,19 @@ document.getElementById('output').addEventListener('click', e => {
 // toggles users reported as unresponsive (cook layout, sub-order). Called after
 // every render. Direct binding bypasses any delegation/closest() quirks and
 // always wins over delegated listeners.
+// v3.0.0-rc.2: scroll-hint update — shows the hint below a .batches-row only
+// when its content actually overflows horizontally. Called after every render.
+function updateScrollHints() {
+  document.querySelectorAll('.batches-row').forEach(row => {
+    const overflows = row.scrollWidth > row.clientWidth + 2;  // 2px tolerance
+    const hint = document.querySelector(`[data-scroll-hint-for="${row.dataset.batchesRow}"]`);
+    if (hint) hint.hidden = !overflows;
+  });
+}
+
 function attachToggleHandlers() {
+  // v3.0.0-rc.2: scroll-hint update after every render.
+  updateScrollHints();
   // Order mode (in both Setup and Cook phase headers)
   document.querySelectorAll('#output button[data-order-mode]').forEach(btn => {
     btn.onclick = (e) => {
