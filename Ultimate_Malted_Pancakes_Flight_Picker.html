@@ -37,6 +37,8 @@
     transition: all .12s; user-select: none; }
   .opt:hover { border-color: var(--accent); }
   .opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .candy-row { display: flex; flex-wrap: wrap; gap: 0 24px; align-items: flex-start; }
+  .candy-cell { flex: 1 1 240px; min-width: 0; }
   .out { background: #fff; border: 1px solid var(--line); border-radius: 14px;
     padding: 20px; margin-top: 8px; }
   .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
@@ -158,16 +160,17 @@
   <div class="card">
     <h2>2. Flavor combination</h2>
     <div class="opts" id="flavor-opts"></div>
-    <div id="caramel-inline" style="display:none;">
-      <h3 class="sub-h">Caramel preparation</h3>
-      <div class="opts" id="caramel-opts"></div>
-      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the cooking-surface temperature: deep-frozen takes longer to melt and needs lower heat; flash-frozen behaves more like room-temp candy.</p>
+    <div class="candy-row">
+      <div id="caramel-inline" class="candy-cell" style="display:none;">
+        <h3 class="sub-h">Caramel preparation</h3>
+        <div class="opts" id="caramel-opts"></div>
+      </div>
+      <div id="toffee-inline" class="candy-cell" style="display:none;">
+        <h3 class="sub-h">Toffee preparation</h3>
+        <div class="opts" id="toffee-opts"></div>
+      </div>
     </div>
-    <div id="toffee-inline" style="display:none;">
-      <h3 class="sub-h">Toffee preparation</h3>
-      <div class="opts" id="toffee-opts"></div>
-      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Toffee prep affects heat the same way as caramel. <b>When both candies are present, either being deep-frozen forces the lower temp.</b></p>
-    </div>
+    <p id="candy-hint" style="display:none;margin:10px 0 0;color:var(--muted);font-size:.85rem"></p>
   </div>
 
   <div class="card">
@@ -416,7 +419,7 @@
     </div>
   </details>
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.9.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.10.0</div>
 </div>
 
 <script>
@@ -772,6 +775,21 @@ function render() {
     toffeeInline.style.display = 'none';
   }
 
+  // Single shared hint covering whichever candy selectors are visible
+  const candyHint = document.getElementById('candy-hint');
+  if (flavor && flavor.hasCaramel && flavor.hasToffee) {
+    candyHint.innerHTML = 'Caramel and toffee prep affect the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat. <b>When both candies are present, either being deep-frozen forces the lower temp.</b>';
+    candyHint.style.display = '';
+  } else if (flavor && flavor.hasCaramel) {
+    candyHint.innerHTML = 'Caramel prep affects the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat.';
+    candyHint.style.display = '';
+  } else if (flavor && flavor.hasToffee) {
+    candyHint.innerHTML = 'Toffee prep affects the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat.';
+    candyHint.style.display = '';
+  } else {
+    candyHint.style.display = 'none';
+  }
+
   renderOutput();
 }
 
@@ -897,16 +915,16 @@ function renderOutput() {
   if (flavor.hasCaramel && flavor.hasToffee) {
     const cState = state.caramelPrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
     const tState = state.toffeePrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
-    toppingsInner += `<div class="topping-note info">🧊 <b>Candy prep:</b> chop both micro-fine and freeze before scattering onto wet batter. <b>Caramel:</b> ${cState}. <b>Toffee:</b> ${tState}.</div>`;
+    toppingsInner += `<div class="topping-note info">🧊 <b>Candy prep:</b> chop caramel and toffee micro-fine and freeze before scattering onto wet batter. <b>Caramel:</b> ${cState}. <b>Toffee:</b> ${tState}.</div>`;
   } else if (flavor.hasCaramel) {
     const text = state.caramelPrep === 'flash'
-      ? `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
-      : `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
+      ? `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+      : `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
     toppingsInner += `<div class="topping-note info">${text}</div>`;
   } else if (flavor.hasToffee) {
     const text = state.toffeePrep === 'flash'
-      ? `🧊 <b>Toffee prep:</b> micro-chop toffee bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
-      : `🧊 <b>Toffee prep:</b> micro-chop toffee bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
+      ? `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+      : `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
     toppingsInner += `<div class="topping-note info">${text}</div>`;
   }
 
