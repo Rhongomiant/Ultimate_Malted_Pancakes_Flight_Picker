@@ -506,6 +506,13 @@
   .controls-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
   body[data-layout="side"] .controls-row { margin-bottom: 8px; }
 
+  /* v2.8.0: center the main four switchers. .controls-actions has margin-left:auto
+     (line ~775) which pushes it right; pairing margin-left:auto on the first switcher
+     (.mode-switcher) splits the remaining space evenly on both sides, centering the
+     middle group. When .controls-collapsed hides the switchers, only the actions are
+     left and they remain right-aligned via their own auto-margin. */
+  .controls-row .mode-switcher { margin-left: auto; }
+
   /* In print, force the light palette regardless of theme */
   @media print {
     body[data-theme="dark"] {
@@ -760,6 +767,16 @@
   body[data-print-alert="1"] .print-alert { display: block; }
   @media print {
     .print-alert { display: none !important; }
+  }
+
+  /* === v2.8.0: phase-options band — sits between key cards inside a phase-section ===
+     Setup: between dryWetPair and spicesBlock. Cook: between sharedCookCard and cookGroupsHtml. */
+  .phase-options { display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin: 14px 0; padding: 10px 14px; border: 1px solid var(--line);
+    border-radius: 12px; background: var(--block-bg, var(--card)); }
+  .phase-options > * { margin: 0 !important; }
+  @media print {
+    .phase-options { background: #fff; border-color: #ddd; }
   }
 
   /* === v2.3.0: Order toggle group + sub-order (#4) === */
@@ -1281,7 +1298,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.7.1</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.8.0</div>
 </div>
 
 <script>
@@ -2820,17 +2837,17 @@ function renderFlightOutput() {
   // --- Header (written to OUTSIDE-the-card element) ---
   header.innerHTML = `<h3>${titleText}</h3><p class="yield">${yieldText}</p>`;
 
-  // --- Final body assembly (NOTE: order changed in v2.3.0 — Quality Tier now at the END) ---
+  // --- Final body assembly (v2.8.0: phase options moved out of headers into in-section bands) ---
   out.innerHTML = `
     ${prepHtml}
 
     <div class="phase-header">
       <h3>Setup phase</h3>
       <span class="phase-sub">Measure everything. No cooking yet.</span>
-      ${orderToggleSetupHtml}
     </div>
     <div class="phase-section">
       ${dryWetPair}
+      <div class="phase-options">${orderToggleSetupHtml}</div>
       ${spicesBlock}
       ${toppingsBlock}
       ${greaseBlock}
@@ -2840,11 +2857,10 @@ function renderFlightOutput() {
 
     <div class="phase-header">
       <h3>Cook phase</h3>
-      ${orderToggleCookHtml}
-      ${cookLayoutSwitcher}
     </div>
     <div class="phase-section">
       ${sharedCookCard}
+      <div class="phase-options">${orderToggleCookHtml}${cookLayoutSwitcher}</div>
       ${cookGroupsHtml}
     </div>
 
@@ -3035,6 +3051,26 @@ function attachToggleHandlers() {
       }
     };
   });
+  // v2.8.0: same direct-binding for tier / wet / spices / toppings layouts.
+  // The shared helper builds an onclick that mirrors the delegation handler so
+  // these toggles behave identically whether delegation fires or not.
+  const bindLayoutPills = (attr, stateKey, storageKey) => {
+    document.querySelectorAll(`#output button[${attr}]`).forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const v = btn.dataset[stateKey];
+        if (v === 'side' || v === 'stack' || v === 'grid') {
+          state[stateKey] = v;
+          try { localStorage.setItem(storageKey, v); } catch (_) {}
+          render();
+        }
+      };
+    });
+  };
+  bindLayoutPills('data-tier-layout',     'tierLayout',     'pancakeFlightTierLayout');
+  bindLayoutPills('data-wet-layout',      'wetLayout',      'pancakeFlightWetLayout');
+  bindLayoutPills('data-spices-layout',   'spicesLayout',   'pancakeFlightSpicesLayout');
+  bindLayoutPills('data-toppings-layout', 'toppingsLayout', 'pancakeFlightToppingsLayout');
 }
 
 // v2.7.0: ResizeObserver keeps --picker-region-h, --psb-h, --controls-h fresh
