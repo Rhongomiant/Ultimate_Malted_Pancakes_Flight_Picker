@@ -614,8 +614,13 @@
   /* Batches-row layout variants — data-batch-layout overrides the default
      flex+overflow behavior from rc.2. */
   .batches-row[data-batch-layout="grid"] {
-    display: grid !important; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    overflow-x: visible;
+    display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-x: visible; gap: 14px;
+  }
+  /* rc.5: 2 per row in grid mode (was auto-fit producing too many columns
+     on wide screens). Drop to 1 per row only on truly narrow viewports. */
+  @media (max-width: 700px) {
+    .batches-row[data-batch-layout="grid"] { grid-template-columns: 1fr; }
   }
   .batches-row[data-batch-layout="stack"] {
     display: flex; flex-direction: column; overflow-x: visible;
@@ -727,6 +732,13 @@
   .output-grouping-row button.active {
     background: var(--accent); color: var(--on-accent);
   }
+  /* rc.5: placeholder pills — visually muted, not clickable. */
+  .output-grouping-row button.placeholder {
+    opacity: 0.7; cursor: not-allowed;
+  }
+  .output-grouping-row button.placeholder.active {
+    opacity: 0.9;
+  }
 
   /* Reset button in controls row. */
   .reset-btn {
@@ -756,8 +768,11 @@
   }
   .batches-row::-webkit-scrollbar-thumb:hover { background: var(--accent); }
   .batches-row > .batch-column {
-    flex: 0 0 auto; min-width: 320px;
-    /* Width grows with content based on internal F&S/Toppings layout. */
+    flex: 0 0 auto; min-width: 320px; max-width: 480px;
+    /* rc.5: cap max-width so columns stay readable instead of ballooning
+       with their inner content (F&S sub-cards stretching to 1fr would
+       otherwise expand the column to fit). */
+    overflow: hidden;
   }
   .scroll-hint {
     text-align: center; padding: 6px 0;
@@ -1460,10 +1475,6 @@
           <span class="bcr-label">Allow same flavor in multiple batches</span>
           <div class="multi-batch-toggle-row" id="multi-batch-toggle-row"></div>
         </div>
-        <div class="bcr-group" id="output-grouping-group" hidden>
-          <span class="bcr-label" title="Switch between batch-first (single horizontal row of full batch columns with separate Cook + Quality Tier sections below) and category-first (per-category sections, each containing filtered prep batches, cook flavor cards, and quality tier cards).">Group output by</span>
-          <div class="output-grouping-row" id="output-grouping-row"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -1485,6 +1496,10 @@
       <div class="opts" id="flavor-opts"></div>
       <p class="picker-hint" id="flavor-hint" hidden></p>
       <div class="flavor-block-msg" id="flavor-block-msg" hidden></div>
+      <div class="bcr-group" id="output-grouping-group" hidden style="margin-top:12px;">
+        <span class="bcr-label" title="Coming soon. For now, this auto-tracks Recommended Order: multi-category recommended order → By Category; menu/selection order → By Batch.">Group output by</span>
+        <div class="output-grouping-row" id="output-grouping-row"></div>
+      </div>
       <div class="candy-row">
         <div id="caramel-inline" class="candy-cell" style="display:none;">
           <h3 class="sub-h">Caramel preparation</h3>
@@ -1815,7 +1830,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.4</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.5</div>
 </div>
 
 <script>
@@ -3266,10 +3281,26 @@ function render() {
     batchCountRow.hidden = false;
     batchQuantityGroup.hidden = false;
     multiBatchGroup.hidden = false;
-    // rc.4: output-grouping toggle
+    // rc.5: output-grouping is a UI placeholder. Pills are disabled and the
+    // active pill tracks the auto-derived useCategorySections state, so the
+    // user can see the current grouping but cannot override it yet.
+    // (We compute the same condition here that renderFlightOutput uses
+    // — it depends on the picker state, not state.outputGrouping.)
+    const wouldUseCatHere = state.orderMode === 'recommended' && (function() {
+      const cats = new Set();
+      state.batches.forEach(b => {
+        if (b.batch === null) return;
+        b.flavors.forEach(fid => {
+          const f = flavorById(fid);
+          if (f) cats.add(f.cookGroup);
+        });
+      });
+      return cats.size > 1;
+    })();
+    const effectiveGrouping = wouldUseCatHere ? 'category' : 'batch';
     outputGroupingRow.innerHTML =
-      `<button type="button" data-output-grouping="batch" class="${state.outputGrouping === 'batch' ? 'active' : ''}">By Batch</button>` +
-      `<button type="button" data-output-grouping="category" class="${state.outputGrouping === 'category' ? 'active' : ''}">By Category</button>`;
+      `<button type="button" data-output-grouping="batch" disabled class="${effectiveGrouping === 'batch' ? 'active' : ''} placeholder">By Batch</button>` +
+      `<button type="button" data-output-grouping="category" disabled class="${effectiveGrouping === 'category' ? 'active' : ''} placeholder">By Category</button>`;
     outputGroupingGroup.hidden = false;
   } else {
     batchCountRow.hidden = true;
@@ -3730,12 +3761,14 @@ function renderFlightOutput() {
     </div>`;
 
     // Apply session-wide F&S / Toppings layout (side / stack / grid).
+    // rc.5: use minmax(0, 1fr) instead of minmax(180px, 1fr) so sub-cards
+    // shrink to fit narrow batch columns instead of overflowing.
     const spicesLayoutAttr = `data-subcard-layout="${state.spicesLayout}"`;
     const toppingsLayoutAttr = `data-subcard-layout="${state.toppingsLayout}"`;
     const spicesSideStyle = (state.spicesLayout === 'side' && orderedFlavors.length > 1)
-      ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(180px, 1fr))"` : '';
+      ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(0, 1fr))"` : '';
     const toppingsSideStyle = (state.toppingsLayout === 'side' && orderedFlavors.length > 1)
-      ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(180px, 1fr))"` : '';
+      ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(0, 1fr))"` : '';
 
     // rc.4: restore v2.10.1 "(into wet bowl[s])" wording — clarifies that
     // these go into the wet bowl(s) before adding to dry.
@@ -3777,10 +3810,11 @@ function renderFlightOutput() {
   const visibleCategoriesSet = new Set();
   visibleTuples.forEach(t => visibleCategoriesSet.add(t.flavor.cookGroup));
   const visibleCategoriesOrdered = COOK_GROUP_ORDER.filter(g => visibleCategoriesSet.has(g));
-  // rc.4: user-controlled. Mode B (category sections) runs when outputGrouping
-  // is 'category' and there's at least one visible category with flavors.
-  // Mode A (single batch row + standalone Cook/Tier sections) runs otherwise.
-  const useCategorySections = state.outputGrouping === 'category' && visibleCategoriesOrdered.length > 0;
+  // rc.5: restore the rc.3 auto-derivation. Mode B runs when recommended
+  // order has 2+ visible categories. The outputGrouping toggle (rc.4) is
+  // kept as a UI placeholder for future explicit override but is currently
+  // disabled and does not drive layout.
+  const useCategorySections = isRecommended && visibleCategoriesOrdered.length > 1;
 
   // Build the Setup phase body.
   let setupBodyHtml;
@@ -3935,15 +3969,12 @@ function renderFlightOutput() {
   let cookPhaseHtml = '';
   let tierSectionHtml = '';
   let masterShoppingListHtml = '';
+  // rc.5 fix #1: sharedCookCard is universal — render once at the top of the
+  // output in both Mode A and Mode B (in Mode B it sits above the .groups-row).
+  let sharedCookCardHtml = '';
 
-  if (visibleFlavorCount > 0 && !useCategorySections) {
-    // Mode A only — in Mode B, Cook + Tier content is rendered inside
-    // each .category-section by the Setup-body code above.
-    // Collect all candy flavor ids across visible tuples for heat computation.
-    const allVisibleFlavorIds = visibleTuples.map(t => t.flavor.id);
+  if (visibleFlavorCount > 0) {
     const allVisibleFlavors = visibleTuples.map(t => t.flavor);
-
-    // Combined syrup groupings across all visible flavors (deduped by syrup).
     const syrupGroupings = getSyrupGroupings(allVisibleFlavors);
     const sharedSyrupHtml = syrupGroupings.length > 0 ? `<div class="cook-shared-syrups">
       <h5>Recommended syrups (one line per distinct syrup)</h5>
@@ -3953,12 +3984,18 @@ function renderFlightOutput() {
         ).join('')}
       </ul>
     </div>` : '';
-
-    const sharedCookCard = `<div class="cook-shared">
+    sharedCookCardHtml = `<div class="cook-shared">
       <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
       <ol class="steps">${sharedCookingFlowHtml(allVisibleFlavors, sizeIdx)}</ol>
       ${sharedSyrupHtml}
     </div>`;
+  }
+
+  if (visibleFlavorCount > 0 && !useCategorySections) {
+    // Mode A only — in Mode B, Cook + Tier content is rendered inside
+    // each .category-section by the Setup-body code above.
+    const allVisibleFlavorIds = visibleTuples.map(t => t.flavor.id);
+    const allVisibleFlavors = visibleTuples.map(t => t.flavor);
 
     const cookGridAttr = `data-cook-layout="${state.cookLayout}"`;
     const cookSideStyleN = m => state.cookLayout === 'side'
@@ -4035,7 +4072,6 @@ function renderFlightOutput() {
       <h3>Cook phase</h3>
     </div>
     <div class="phase-section">
-      ${sharedCookCard}
       <div class="phase-options">${buildOrderToggle('cook')}${cookLayoutSwitcher}</div>
       ${cookGroupsHtml}
     </div>`;
@@ -4132,10 +4168,13 @@ function renderFlightOutput() {
   const orderToggleSetupHtml = buildOrderToggle('setup');
 
   // -------------------------------------------------------------------
-  // Final assembly.
+  // Final assembly. rc.5: sharedCookCardHtml shows once between the prep
+  // callouts and Setup phase, in both Mode A and Mode B.
   // -------------------------------------------------------------------
   out.innerHTML = `
     ${prepHtml}
+
+    ${sharedCookCardHtml}
 
     <div class="phase-header">
       <h3>Setup phase</h3>
