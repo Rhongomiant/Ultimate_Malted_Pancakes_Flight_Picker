@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.10.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -74,6 +74,18 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v2.10.0 — Single-row controls (actions to the left, wider page)
+
+The controls-row was wrapping to two lines on some viewport widths, eating vertical real estate. v2.8.0 had centered the four main switchers (Mode / Layout / Theme / Card Size) with paired `margin-left: auto` rules — on `.mode-switcher` (leftmost) and `.controls-actions` (rightmost). That centering worked but consumed space the actions could have used.
+
+**v2.10.0 unwinds the centering trick.** The Hide Options + Hide Controls buttons (`.controls-actions`) move to the **leftmost** position of the row, ahead of the Mode pill. Removing both auto-margins lets all six elements (Hide Options, Hide Controls, Mode, Layout, Theme, Card Size) flow left-to-right as a single inline-flex group with their natural widths.
+
+**Page max-width bumped from 1600 px to 1800 px** (both default and `body[data-layout="side"]` variants of `.wrap`). At 1800 px the full controls row fits without `flex-wrap: wrap` kicking in on any common 1920 px-wide display. Narrower viewports still wrap as before — the `flex-wrap: wrap` declaration on `.controls-row` is unchanged.
+
+When **Hide Controls** is clicked (`body[data-controls-collapsed="1"]`), the rule `body[data-controls-collapsed="1"] .controls-row > :not(.controls-actions) { display: none }` continues to hide every switcher except the actions group. Since the actions group is now leftmost by default, the previously-needed `body[data-controls-collapsed="1"] .controls-actions { margin-left: auto }` rule is gone — actions stay where they are.
+
+**Net effect**: one less line of vertical chrome on viewports between 1300 px and 1800 px wide (where the row used to wrap), and a generally cleaner controls layout. No behavioral changes to any of the switchers' click handlers or persistence keys.
 
 ### v2.9.0 — Candy-combo recipe data corrections + Trace Dusting vocabulary
 
@@ -253,12 +265,12 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.10.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.10.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.10.0.html   # Windows
 ```
 
-That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3245 lines as of v2.9.0) with inline CSS and vanilla JS.
+That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3245 lines as of v2.10.0) with inline CSS and vanilla JS.
 
 The companion `.html` manual opens the same way in a browser. To import into Word: File → Open → select the manual HTML; Word preserves the tables, headers, and bullet hierarchy.
 
@@ -266,7 +278,7 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.10.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
@@ -425,7 +437,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins. Current: **v2.9.0** (recipe-data corrections for the 4 candy-combo flavors — tightened TOPPINGS quantities across all 5 pancake sizes, replaced generic SPICE references with inline arrays following clean Quarter-Batch × 2/3/4 multiplication, and a new "Trace Dusting" measurement vocabulary entry = 1/256 tsp = half a Hint). **v2.8.0** introduced direct-bind for all layout switchers, centered controls-row, and relocated phase options into dedicated `.phase-options` bands. **v2.7.1** fixed the v2.2.0 specificity-bug sticky Batch. **v2.7.0** introduced unconditional layouts (compact-mode removed). Earlier releases: v2.6.0 picker-region wrapper, v2.5.0 stacked width parity, v2.4.0 eight-item polish pass, v2.3.0 12-item refinement, v2.2.0 10-item layout overhaul, v2.1.1 URL state + sticky chrome, v2.1.0 Flight mode, v2.0.0 card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; **v3** (mixed batch sizes per flavor + master shopping list) is specified in `v3_HANDOFF.md`. The companion manual update (matching v2.9.0 recipe values + Trace Dusting vocab) is queued for a dedicated next session.
+`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins. Current: **v2.10.0** (single-row controls: Hide Options + Hide Controls moved to leftmost position, removed v2.8.0's centering auto-margins, bumped page max-width 1600→1800px so the full row fits without wrapping on 1920px-wide displays). **v2.9.0** corrected candy-combo recipe data and added Trace Dusting vocab. **v2.8.0** introduced direct-bind for all layout switchers, centered controls-row, and relocated phase options into dedicated `.phase-options` bands. **v2.7.1** fixed the v2.2.0 specificity-bug sticky Batch. **v2.7.0** introduced unconditional layouts (compact-mode removed). Earlier releases: v2.6.0 picker-region wrapper, v2.5.0 stacked width parity, v2.4.0 eight-item polish, v2.3.0 12-item refinement, v2.2.0 10-item layout overhaul, v2.1.1 URL state + sticky chrome, v2.1.0 Flight mode, v2.0.0 card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; **v3** (mixed batch sizes per flavor + master shopping list) is specified in `v3_HANDOFF.md`. The companion manual update (matching v2.9.0 recipe values + Trace Dusting vocab) is queued for a dedicated next session.
 
 ## License
 
