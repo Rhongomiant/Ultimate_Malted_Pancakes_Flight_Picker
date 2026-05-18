@@ -586,6 +586,29 @@
     .out-header { position: static; border: 0; box-shadow: none; padding: 0; margin: 0 0 8px; }
   }
 
+  /* === v2.6.0: out-header structure (.out-header-text + .out-header-psb) ===
+     The embedded psb is hidden by default and revealed only in SIDE-BY-SIDE compact
+     mode, where it visually replaces the standalone .pancake-size-bar (which is hidden).
+     In stacked compact, the standalone psb is tucked under Batch in .picker-region (see
+     above), so the embedded copy stays hidden. */
+  .out-header .out-header-text { flex: 1; min-width: 0; }
+  .out-header .out-header-text h3 { margin: 0; font-size: 1.05rem; }
+  .out-header .out-header-text .yield { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
+  .out-header .out-header-psb { display: none; gap: 4px; flex-wrap: wrap; align-items: center;
+    margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--line); }
+  .out-header .out-header-psb .out-psb-label { font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--muted); margin-right: 4px; }
+  .out-header .out-header-psb .opt { padding: 4px 8px; font-size: 0.75rem;
+    border: 1.5px solid var(--line); background: var(--input-bg);
+    border-radius: 8px; cursor: pointer; color: var(--ink); transition: background .15s; }
+  .out-header .out-header-psb .opt.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .out-header .out-header-psb .opt:hover:not(.active) { background: var(--card); }
+  /* In SIDE-BY-SIDE compact mode, swap visibility — standalone psb hidden, embedded shown */
+  body[data-layout="side"][data-picker-compact="1"] .pancake-size-bar { display: none; }
+  body[data-layout="side"][data-picker-compact="1"] .out-header { display: flex; align-items: center; gap: 0; }
+  body[data-layout="side"][data-picker-compact="1"] .out-header .out-header-psb { display: flex; }
+  @media print { .out-header .out-header-psb { display: none !important; } }
+
   /* === v2.1.1: sub-card grid (Wet/Spices/Toppings — switchable layout) === */
   .subcards-grid { display: grid; gap: 12px; margin-top: 6px; }
   .subcards-grid[data-subcard-layout="grid"] {
@@ -664,38 +687,56 @@
   body:not([data-layout="side"]) .picker-pane > .card {
     width: 100%; margin-bottom: 0;
     transition: width 0.3s ease, max-width 0.3s ease; }
-  /* v2.4.0: When sentinel above .picker-pane scrolls offscreen, compact mode kicks in.
-     Cards become side-by-side AND visually shrunk (tighter padding, smaller text)
-     so the sticky band takes much less vertical space. */
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane > .card {
-    width: calc(50% - 7px); padding: 8px 12px 8px; }
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card h2 {
-    font-size: 0.7rem; margin: 0 0 6px; }
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card .opts { gap: 4px; }
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card .opt {
-    padding: 5px 10px; font-size: 0.78rem; }
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card[data-collapsed="1"] {
-    padding: 6px 12px; }
-  /* In compact mode, the picker-pane itself is the sticky band */
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane {
+  /* === v2.6.0: compact mode reorganization ===
+     STACKED compact (sentinel above picker scrolled off): .picker-region becomes a 2-col
+     grid where Batch sits in col 1 row 1, Flavors spans col 2 rows 1-2, and the
+     pancake-size-bar tucks under Batch in col 1 row 2. The picker-pane itself uses
+     display:contents so its children (Batch, Flavors) participate in the grid.
+     This fills the empty space under the shorter Batch card with the (smaller) psb. */
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
     position: sticky; top: var(--controls-h, 60px); z-index: 50;
-    background: var(--bg); padding: 8px 0; margin-left: auto; margin-right: auto;
+    background: var(--bg); padding: 8px 0;
     border-bottom: 1px solid var(--line); }
-  body:not([data-layout="side"])[data-controls-collapsed="1"][data-picker-compact="1"] .picker-pane {
+  body:not([data-layout="side"])[data-controls-collapsed="1"][data-picker-compact="1"] .picker-region {
     top: var(--controls-collapsed-h, 38px); }
-  /* Override the v2.2.0 sticky batch rule when in compact mode — compact pair takes over */
-  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card[data-card="batch"] {
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region > .picker-pane {
+    display: contents; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .picker-sentinel {
+    display: none; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card[data-card="batch"] {
+    grid-column: 1; grid-row: 1; width: auto;
+    padding: 8px 12px; margin: 0; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card[data-card="flavor"] {
+    grid-column: 2; grid-row: 1 / span 2; width: auto;
+    padding: 8px 12px; margin: 0; align-self: stretch; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card h2 {
+    font-size: 0.7rem; margin: 0 0 6px; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card .opts { gap: 4px; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card .opt {
+    padding: 5px 10px; font-size: 0.78rem; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card[data-collapsed="1"] {
+    padding: 6px 12px; }
+  /* Override the v2.2.0 sticky batch rule when in compact mode — grid placement takes over */
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .card[data-card="batch"] {
     position: static; top: auto; }
-  /* v2.4.0: pancake-size-bar sticks BELOW the compact picker band */
-  body:not([data-layout="side"])[data-picker-compact="1"] .pancake-size-bar {
-    top: calc(var(--controls-h, 60px) + var(--picker-compact-h, 100px)); z-index: 48; }
-  body:not([data-layout="side"])[data-controls-collapsed="1"][data-picker-compact="1"] .pancake-size-bar {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--picker-compact-h, 100px)); }
-  /* Picker-sentinel — invisible 1px div that the observer watches.
-     `display: contents` removes it from the grid/flex flow entirely but still allows IntersectionObserver. */
+  /* pancake-size-bar tucked under Batch, smaller */
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .pancake-size-bar {
+    grid-column: 1; grid-row: 2; position: static; top: auto; z-index: auto;
+    margin: 0; padding: 6px 12px; align-self: start; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .pancake-size-bar .psb-head {
+    padding: 0 0 4px; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .pancake-size-bar .psb-title {
+    font-size: 0.78rem; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .pancake-size-bar .opt {
+    padding: 4px 8px; font-size: 0.75rem; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-region .pancake-size-bar .opts {
+    gap: 4px; }
+  /* v2.6.0: picker-sentinel is now active in BOTH layouts so the observer fires in
+     side-by-side too. In side-by-side it spans the full grid width as a 1px line. */
   .picker-sentinel { display: block; width: 100%; height: 1px;
     margin: 0; padding: 0; pointer-events: none; }
-  body[data-layout="side"] .picker-sentinel { display: none; }
+  body[data-layout="side"] .picker-sentinel { grid-column: 1 / -1; }
 
   /* === v2.3.0: stacked-mode pancake-size-bar lives BELOW picker-pane (#11) === */
   /* In side-by-side, the grid placement (col 2 row 2) wins over DOM order, so no override needed there.
@@ -903,6 +944,7 @@
     </div>
   </div><!-- /controls-row -->
 
+  <div class="picker-region" id="picker-region">
   <div class="picker-sentinel" id="picker-sentinel"></div>
 
   <div class="picker-pane">
@@ -954,6 +996,7 @@
   </div><!-- /picker-pane -->
 
   <div class="pancake-size-bar" id="pancake-size-bar" data-collapsed="0">
+  <!-- the .pancake-size-bar is the last child of .picker-region -->
     <div class="psb-head">
       <h3 class="psb-title">
         <span class="psb-title-expanded">Pancake Size (Ladle Size)</span>
@@ -969,6 +1012,7 @@
       <div class="opts" id="size-opts"></div>
     </div>
   </div>
+  </div><!-- /picker-region -->
 
   <div class="print-alert" id="print-alert" role="alert" aria-live="polite">
     <button type="button" class="pa-close" id="pa-close" aria-label="Close alert">&times;</button>
@@ -1266,7 +1310,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.5.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.6.0</div>
 </div>
 
 <script>
@@ -2423,6 +2467,15 @@ function render() {
   updateControlsHeight();
 }
 
+// v2.6.0: shared helper to build the embedded pancake-size pills shown inside
+// #out-header. Visible only in side-by-side compact mode (CSS-controlled).
+function buildEmbeddedPsbHtml() {
+  return `<div class="out-header-psb" aria-label="Pancake size (compact)">
+    <span class="out-psb-label">Size</span>
+    ${SIZES.map((s, i) => `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`).join('')}
+  </div>`;
+}
+
 // =========================================================================
 // renderSingleOutput
 // =========================================================================
@@ -2489,10 +2542,14 @@ function renderSingleOutput() {
   cookingSteps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
   cookingSteps.push(`<li>Between every pancake: scrape → use the ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>`);
 
-  // v2.3.0: header lives OUTSIDE .out-card (which has `zoom`) so sticky works reliably
+  // v2.6.0: header has two sections — .out-header-text (always shown) and the
+  // embedded .out-header-psb (CSS-shown only in side-by-side compact mode).
   document.getElementById('out-header').innerHTML = `
-    <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
-    <p class="yield">${yieldText}</p>
+    <div class="out-header-text">
+      <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
+      <p class="yield">${yieldText}</p>
+    </div>
+    ${buildEmbeddedPsbHtml()}
   `;
   const out = document.getElementById('output');
   out.innerHTML = `
@@ -2551,7 +2608,7 @@ function renderFlightOutput() {
   const n = ids.length;
 
   if (n === 0) {
-    header.innerHTML = `<h3>Flight mode</h3>`;
+    header.innerHTML = `<div class="out-header-text"><h3>Flight mode</h3></div>${buildEmbeddedPsbHtml()}`;
     out.innerHTML = `
       <div class="empty-state">
         <p style="margin:0 0 6px;font-size:1.05rem;color:var(--ink)">No flavors selected yet.</p>
@@ -2803,8 +2860,14 @@ function renderFlightOutput() {
   const orderToggleSetupHtml = buildOrderToggle('setup');
   const orderToggleCookHtml  = buildOrderToggle('cook');
 
-  // --- Header (written to OUTSIDE-the-card element — #1 fix) ---
-  header.innerHTML = `<h3>${titleText}</h3><p class="yield">${yieldText}</p>`;
+  // --- Header (written to OUTSIDE-the-card element — #1 fix; v2.6.0 includes embedded psb) ---
+  header.innerHTML = `
+    <div class="out-header-text">
+      <h3>${titleText}</h3>
+      <p class="yield">${yieldText}</p>
+    </div>
+    ${buildEmbeddedPsbHtml()}
+  `;
 
   // --- Final body assembly (NOTE: order changed in v2.3.0 — Quality Tier now at the END) ---
   out.innerHTML = `
@@ -3017,6 +3080,19 @@ function attachToggleHandlers() {
       if (v === 'side' || v === 'stack' || v === 'grid') {
         state.cookLayout = v;
         try { localStorage.setItem('pancakeFlightCookLayout', v); } catch (_) {}
+        render();
+      }
+    };
+  });
+  // v2.6.0: embedded pancake-size pills inside #out-header (side-by-side compact mode).
+  // Same data-size pattern as the standalone #size-opts.
+  document.querySelectorAll('#out-header .out-header-psb [data-size]').forEach(pill => {
+    pill.onclick = (e) => {
+      e.stopPropagation();
+      const i = parseInt(pill.dataset.size, 10);
+      if (!isNaN(i) && i >= 0 && i < SIZES.length) {
+        state.size = i;
+        try { localStorage.setItem('pancakeFlightSize', String(i)); } catch (_) {}
         render();
       }
     };
