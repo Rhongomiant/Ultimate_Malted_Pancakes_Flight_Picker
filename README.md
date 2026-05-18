@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v3.0.0-rc.6.html` — the picker app (current)
+- `Ultimate_Malted_Pancakes_Flight_Picker_v3.0.0-rc.7.html` — the picker app (current)
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -458,38 +458,19 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 `X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins.
 
-**Current: v3.0.0-rc.6** — order toggle restructure + Mode A/B sizing fixes.
+**Current: v3.0.0-rc.7** — shared cooking inside each category section + hybrid batch column sizing.
 
-After a clarifying discussion of what the two output modes actually mean, the picker UX restructures around the realization that the Mode A/B distinction is fundamentally about cooking workflow:
+(1) **Shared Cooking Instructions placement, correct this time.** rc.6 placed the shared cooking card above the `.groups-row` (which made it appear at the top of the Setup phase section — wrong). It now lives INSIDE each `.category-section`, between the `.cs-setup` (prep batches ending in grease lines) and `.cs-cook` (per-flavor cook delta cards). The instructions are intentionally repeated per category since each `.category-section` is a self-contained workflow unit — the user works one category at a time, and within a category the flow is: prep batches → wipe and grease the cooking surface for THIS category → consult the shared cooking instructions → cook this category's flavors → check this category's quality tiers. The shared card gets a compact styling inside category sections (dashed border, muted heading) so it reads as a workflow waypoint rather than a heavy heading.
 
-* **By Recipe** (rc.6 name, was "By Batch" / "Mode A"): the user treats the flight as one cook session — set up everything, cook everything as one operation. Shared cooking instructions, one universal Cook phase block, one Quality Tier section. Useful when the user knows how to cook and just needs a one-page reference.
+The "applies to all categories below" scope annotation from rc.6 is removed (no longer accurate — each occurrence applies to its enclosing category). The Mode A placement (inside Cook phase, after the Cook phase header) is unchanged from rc.6.
 
-* **By Category** (rc.6 name, was "Mode B"): the user works one category at a time — prep, cook, check quality for Clean; wipe surface; prep, cook, check quality for Savory; wipe surface; etc. Each category section is a self-contained workflow unit with its own filtered prep batches, cook flavor cards, and quality tier cards.
+(2) **Hybrid batch column sizing**. rc.6's `.batch-column { flex: 0 0 auto; min-width: 320px }` made columns take their natural width with no growth, leaving large empty space when 2-3 batches occupied a wide viewport. Per locked design choice: hybrid sizing. Changed to `flex: 1 1 320px; min-width: 320px; max-width: 560px`. When columns fit comfortably they share leftover space (grow), when they exceed the row's width the row overflows and scrolls horizontally (unchanged scroll-hint logic still applies). The 560px max-width keeps a single column on a wide viewport from becoming absurdly wide (which would also push the inner sub-cards apart unhelpfully).
 
-The structural insight: By Category only makes sense when the user has already opted into category-aware ordering, which is exactly what recommended order does. So the output-mode toggle now lives inside the Order toggle group as a third sub-control alongside "within groups", and only appears when orderMode='recommended'. When the user picks Menu or Selection order, By Recipe is automatically used (categories aren't a meaningful grouping in those modes). When v3.1 adds user-defined groupings, the same pattern applies — the output toggle activates under recommended-style grouping modes.
+(3) **v3.1 user-defined groupings clarification** (documentation only, no code change). The earlier README characterized v3.1 custom groupings as "another `orderMode` value." That mischaracterized the design — they're actually a definition of WHAT the groups are inside any recommended-style ordering. Recommended (the built-in cook-group definition: Clean / Savory / Candy) and a future user-defined grouping (e.g. "Sweet / Savory" or "Caramel-day / Other") both feed into the same `By Recipe / By Category` toggle. So the v3.1 pattern is: a second sub-control under "within groups" lets the user pick which grouping definition to use, and the existing output toggle then applies on top of it. The output toggle stays meaningful in any grouping mode.
 
-Other UX changes:
+**Test totals: 236/236 across 9 suites** — alpha.2 10/10 · beta 39/39 · rc 50/50 · rc.2 40/40 · rc.3 34/34 · rc.4 17/17 · rc.5 10/10 · rc.6 21/21 · rc.7 14/14. The rc.5 and rc.6 suites had assertions updated to reflect rc.7's new per-category placement (rc.5: "appears exactly once in Mode B" → "appears once per category"; rc.6: dropped the "applies to all categories below" annotation check and the "above .groups-row" placement check, replaced with the new inside-section ordering check). New rc.7 suite covers: 3 category sections each containing 1 cs-setup + 1 cook-shared + 1 cs-cook + 1 cs-tier block; ordering inside each section is setup → cook-shared → cs-cook → cs-tier; single-category still Mode A with unchanged Cook-phase placement; By Recipe (Mode A) unchanged.
 
-* The three orderMode buttons drop their "Order" suffix (redundant with the group label "Order"): "Recommended Order" → "Recommended", "Menu Order" → "Menu", "Selection Order" → "Selection".
-
-* The placeholder `Group output by` bcr-group is removed from the Flavor card (rc.5 had moved it there, but the toggle now lives in the order toggle group).
-
-* `useCategorySections` now consults `state.outputGrouping` directly under recommended order (no more auto-derive shadowing the toggle). Single-category still falls back to By Recipe since the wrapping is structurally identical.
-
-Shared cooking instructions placement fixed:
-* **In By Recipe**: inside the Cook phase section (above per-flavor delta cards), which is where they belong structurally — rc.5 had hoisted them above the Setup phase header, which felt wrong.
-* **In By Category**: once above the `.groups-row`, with a header annotation "(applies to all categories below)" so users understand the scope. Since By Category suppresses the standalone Cook phase header, this is the natural home.
-
-Three CSS sizing bugs from rc.5 fixed:
-* **2a (huge gaps in groups-row)**: `.category-section` had `min-width: 360px` in side-mode, leaving huge gaps when a category had a single narrow batch. Dropped — categories now size to their inner content.
-* **2b (sub-cards overlapping)**: rc.5's `minmax(0, 1fr)` on the side-by-side sub-cards grid wasn't enough — the `.subcard` itself needed `overflow: hidden` and explicit word-wrap so content can shrink below its intrinsic width.
-* **2c (batch column max-width hard cap)**: the 480px cap from rc.5 was a sledgehammer for the ballooning that was actually caused by bug 2b. With 2b fixed properly, the cap is unnecessary — dropped so columns can use available space.
-
-**Test totals: 222/222 across 8 suites** — alpha.2 10/10 · beta 39/39 · rc 50/50 · rc.2 40/40 · rc.3 34/34 · rc.4 17/17 · rc.5 10/10 · rc.6 22/22. The rc.4 and rc.5 suites both needed assertion updates: rc.4 had stale references to `elementsByid['output-grouping-group']` from when the toggle lived in a static HTML element (removed in rc.6 since the toggle is now rendered inside `#output` as part of the order toggle); rc.5 had similar checks. Both suites now verify the toggle's presence/absence inside `#output` based on `orderMode`.
-
-**Mid-session bug found and fixed**: my first rc.6 edit broke because `sharedCookCardHtml` was constructed (line 3975) AFTER Mode B's setupBodyHtml referenced it (line 3931) — a temporal dead zone error from `let`. Hoisted the construction above the `setupBodyHtml` composition so both modes can use it. Caught by the test suite syntax check, which is exactly what those guardrails are for.
-
-**Prior releases**: rc.5 (sharedCookCard hoist + Flavor-card toggle placement — both reverted in rc.6 after the modes-discussion clarified intent), rc.4 (explicit outputGrouping toggle with placeholder pills), rc.3 (group/batch layout switchers + per-category Cook+Tier in Mode B), rc.2 (picker consolidation: combined Batch card row, reset button, horizontal scroll, F&S/Toppings layout switchers), rc (output rendering reorg), beta (picker UI for batches model), alpha.2 (data-model plumbing). v3.0.0-final still pending: master shopping list math.
+**Prior releases**: rc.6 (order toggle restructure with By Recipe / By Category sub-control, dropped "Order" suffix from pill labels, Mode A/B explicit), rc.5 (sharedCookCard hoist + Flavor-card toggle placement — both reverted in rc.6), rc.4 (explicit outputGrouping toggle with placeholder pills), rc.3 (group/batch layout switchers + per-category Cook+Tier in Mode B), rc.2 (picker consolidation: combined Batch card row, reset button, horizontal scroll, F&S/Toppings layout switchers), rc (output rendering reorg), beta (picker UI for batches model), alpha.2 (data-model plumbing). v3.0.0-final still pending: master shopping list math.
 
 **v2 line**: v2.10.1 (controls-row alignment fix). v2.10.0 (single-row controls). v2.9.0 (candy-combo recipe data + Trace Dusting vocab). v2.8.0 → v2.0.0 covered direct-bind layout switchers, picker-region wrapper, stacked width parity, layout-overhaul polish through 8/10/12-item refinements, URL state + sticky chrome, Flight mode, card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; v3 is specified in `v3_HANDOFF.md` but the design evolved past the handoff's per-flavor-override mental model. The companion manual update remains queued for a dedicated next session.
 
