@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -74,6 +74,32 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v2.9.0 — Candy-combo recipe data corrections + Trace Dusting vocabulary
+
+Recipe-data corrections for the four candy-combo flavors (Caramel + Toffee, Toffee + Chocolate, Caramel + Chocolate, Triple-Threat). User-provided authoritative chart values were math-verified before shipping: every per-batch quantity is a clean integer multiple (1× / 2× / 3× / 4×) of the Quarter Batch amount, and every per-size topping quantity follows a clean doubling pattern (Hint → Drop → Smidgen → Pinch → Dash for the toffee scale across all candy combos at each pancake size).
+
+**TOPPINGS data (per-pancake add-in amounts) tightened for all 4 candy combos:**
+
+The previous values had toffee scaling up to 2 tsp on a 4 oz pancake — far too much. Corrected values use Hint → Drop → Smidgen → Pinch → Dash across the 5 pancake sizes for toffee specifically. Caramel and chocolate quantities also tightened so the per-pancake candy amount stays consistent across combos (a 1.0 oz Caramel + Chocolate pancake now uses the same 2 chips it would use solo, instead of 8). 0.5 oz and 1.0 oz sizes use precise descriptors ("1 micro-chopped speck (¼ of a standard bit)", "2 mini chips (or 1 standard chip)", "1 tiny pinpoint dip", "1 level micro-spoon") so users have a physical reference for these tiny amounts.
+
+**Spice quantities (Section 1 Spice & Fat Chart equivalents) corrected for the same 4 combos:**
+
+| Flavor | Spice | Quarter | Half | Three-Quarter | Full |
+|---|---|---|---|---|---|
+| Caramel + Chocolate | Cinnamon | Hint (1/128 tsp) | Drop (1/64 tsp) | Smidgen (1/32 tsp) | Pinch (1/16 tsp) |
+| Caramel + Toffee | Nutmeg | Trace Dusting (1/256 tsp) | Hint (1/128 tsp) | Drop (1/64 tsp) | Smidgen (1/32 tsp) |
+| Toffee + Chocolate | Vanilla Bean Paste | Dash (⅛ tsp) | ¼ tsp | ⅜ tsp | ½ tsp |
+| Triple-Threat | Espresso Powder | Smidgen (1/32 tsp) | Pinch (1/16 tsp) | 3 Smidgens (3/32 tsp) | Dash (⅛ tsp) |
+| Triple-Threat | Sea Salt Flakes | Drop (1/64 tsp) | Smidgen (1/32 tsp) | 3 Drops (3/64 tsp) | Pinch (1/16 tsp) |
+
+The previous values shared `SPICE.nutmeg` (caramel_choc, toffee_caramel), `SPICE.vanillaPaste` (toffee_choc), and `SPICE.espresso` (triple) — generic arrays that didn't follow clean batch-multiplication patterns for these specific accent uses. v2.9.0 replaces those with inline arrays per flavor that follow exact doubling/multiplying from Quarter Batch.
+
+**New vocabulary: Trace Dusting (1/256 tsp).** Half a Hint — "a few microscopic specks tapped off a fingertip." Project-internal vocabulary (not a standard culinary term per a web search); it extends the project's Hint/Drop/Smidgen/Pinch/Dash/Tad doubling system one step further down to fit the Quarter Batch nutmeg amount for Caramel + Toffee, which needed to be below a Hint to scale cleanly through Half/Three-Quarter/Full as 1× / 2× / 4× × 8× of Trace Dusting (= Hint / Drop / Smidgen / Pinch).
+
+**Triple-Threat heat rule** still applies (300°F if either candy is deep-frozen, 325°F if both flash-frozen — unchanged from v2.x).
+
+**Companion manual:** This release updates picker data only. The companion `Ultimate_Malted_Pancakes_Manual.html` is being updated in a separate dedicated session with the same values (Section 2 Add-ins Sizing & Maximum Limit Chart additions for the 4 candy combos, Section 1 Spice & Fat Chart updates, and a Trace Dusting entry in the measurement vocabulary section).
 
 ### v2.8.0 — Direct-bind layouts, centered controls, relocated phase options
 
@@ -227,12 +253,12 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html   # Windows
 ```
 
-That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3220 lines as of v2.8.0) with inline CSS and vanilla JS.
+That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3245 lines as of v2.9.0) with inline CSS and vanilla JS.
 
 The companion `.html` manual opens the same way in a browser. To import into Word: File → Open → select the manual HTML; Word preserves the tables, headers, and bullet hierarchy.
 
@@ -240,7 +266,7 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.9.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
@@ -399,7 +425,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a single release bundles both, the higher bump wins. Current: **v2.8.0** (direct-bind onclick for tier/wet/spices/toppings layout switchers so they work alongside cook-layout's existing direct binding; main controls-row switchers centered via margin-left:auto on .mode-switcher; cook-phase order + cook-layout options moved out of phase-header into a `.phase-options` band between sharedCookCard and cookGroupsHtml; setup-phase order toggle similarly relocated between dryWetPair and spicesBlock). **v2.7.1** fixed a specificity bug where v2.2.0's sticky-batch CSS rule was overriding v2.7.0's intended static-Batch placement. **v2.7.0** introduced unconditional layouts and removed the compact-mode mechanism. **v2.6.0** had introduced compact-mode pancake-size relocation but broke side-by-side. **v2.5.0** bumped stacked .wrap to 1600px and centered h1/.sub. **v2.4.0** was the eight-item polish pass. **v2.3.0** was the 12-item refinement. **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.9.0**.
+`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins. Current: **v2.9.0** (recipe-data corrections for the 4 candy-combo flavors — tightened TOPPINGS quantities across all 5 pancake sizes, replaced generic SPICE references with inline arrays following clean Quarter-Batch × 2/3/4 multiplication, and a new "Trace Dusting" measurement vocabulary entry = 1/256 tsp = half a Hint). **v2.8.0** introduced direct-bind for all layout switchers, centered controls-row, and relocated phase options into dedicated `.phase-options` bands. **v2.7.1** fixed the v2.2.0 specificity-bug sticky Batch. **v2.7.0** introduced unconditional layouts (compact-mode removed). Earlier releases: v2.6.0 picker-region wrapper, v2.5.0 stacked width parity, v2.4.0 eight-item polish pass, v2.3.0 12-item refinement, v2.2.0 10-item layout overhaul, v2.1.1 URL state + sticky chrome, v2.1.0 Flight mode, v2.0.0 card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; **v3** (mixed batch sizes per flavor + master shopping list) is specified in `v3_HANDOFF.md`. The companion manual update (matching v2.9.0 recipe values + Trace Dusting vocab) is queued for a dedicated next session.
 
 ## License
 
