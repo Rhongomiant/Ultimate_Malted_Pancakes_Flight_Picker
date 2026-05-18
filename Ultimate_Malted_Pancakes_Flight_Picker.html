@@ -263,7 +263,9 @@
       column-gap: 28px; align-items: start; }
     body[data-layout="side"] h1,
     body[data-layout="side"] .sub,
-    body[data-layout="side"] .layout-switcher { grid-column: 1 / -1; }
+    body[data-layout="side"] .controls-row { grid-column: 1 / -1; }
+    body[data-layout="side"] .picker-pane { grid-column: 1; }
+    body[data-layout="side"] .output-pane { grid-column: 2; }
     body[data-layout="side"] .picker-pane { position: sticky; top: 14px;
       max-height: calc(100vh - 28px); overflow-y: auto;
       padding: 2px 8px 50vh 2px; /* big bottom pad lets card 3 scroll up toward center */ }
@@ -665,7 +667,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.15.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.15.1</div>
 </div>
 
 <script>
