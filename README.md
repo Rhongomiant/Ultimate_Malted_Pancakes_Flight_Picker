@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.7.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -74,6 +74,21 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v2.7.1 — Stacked Batch must not be sticky (specificity bug fix)
+
+Reported on v2.7.0: in stacked mode, scrolling made the pancake-size pills appear to slide under (= behind) the Batch card.
+
+**Root cause**: the v2.2.0 stacked-mode sticky-batch CSS rule was left in the file when v2.7.0 introduced the picker-region grid. v2.7.0 added an override that set `.card[data-card="batch"] { position: static }` inside `.picker-region`, but both selectors had the same specificity `(0,4,1)`:
+
+- `body:not([data-layout="side"]) .picker-region .card[data-card="batch"]` (v2.7.0 override)
+- `body:not([data-layout="side"]) .picker-pane .card[data-card="batch"]` (v2.2.0 sticky-batch)
+
+With equal specificity, source order decides — and the v2.2.0 rule came **later** in the file (line 817 vs line 694), so it won. The Batch card kept its `position: sticky; top: calc(controls-h + psb-h + 8px); z-index: 50` regardless of v2.7.0's override. On scroll the Batch card lifted up and stuck to the top, while the picker-region (also sticky) and the PSB at col 1 row 2 stayed put — the Batch card visually slid over the PSB, hiding it.
+
+**Fix**: removed the four v2.2.0 sticky-batch CSS rule variants entirely (controls-collapsed × pancake-collapsed cross-product). In v2.7.0's design the entire `.picker-region` is sticky as a unit, so per-card sticky on Batch is both redundant and actively harmful. One sibling rule from the same v2.2.0 block — `body[data-options-collapsed="1"]:not([data-layout="side"]) .picker-pane { display: none }` — was unrelated to sticky behavior and kept on purpose. Added five regression tests guarding against the rule's return.
+
+**Z bump per project versioning rule**: fixes a bug shipped in v2.7.0 (intended layout was static-Batch but actual was sticky-Batch), not a feature or UX change.
 
 ### v2.7.0 — Unconditional layouts (compact-mode removed)
 
@@ -196,9 +211,9 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.7.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.7.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.7.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html   # Windows
 ```
 
 That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3200 lines as of v2.7.0) with inline CSS and vanilla JS.
@@ -209,7 +224,7 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.7.0.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
@@ -368,7 +383,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.7.0** (unconditional layouts: side-by-side `.picker-region { display: contents }` restores v2.5.0 grid behavior so the pancake-size picker is visible again; stacked is always a 2-col sticky grid with Batch | Flavors | PSB matching the image-2 look user asked for; compact-mode mechanism with IntersectionObserver/sentinel/embedded-psb removed entirely). **v2.6.0** had introduced compact-mode pancake-size relocation but broke side-by-side. **v2.5.0** bumped stacked .wrap to 1600px and centered h1/.sub. **v2.4.0** was the eight-item polish pass. **v2.3.0** was the 12-item refinement. **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.8.0**.
+`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.7.1** (CSS specificity bug fix: the v2.2.0 stacked-mode sticky-batch rule was overriding v2.7.0's intended static-Batch placement because both had specificity (0,4,1) and v2.2.0 came later in source order — removed the four v2.2.0 sticky-batch rules entirely since v2.7.0's whole-picker-region sticky achieves the same UX goal). **v2.7.0** introduced unconditional layouts and removed the compact-mode mechanism. **v2.6.0** had introduced compact-mode pancake-size relocation but broke side-by-side. **v2.5.0** bumped stacked .wrap to 1600px and centered h1/.sub. **v2.4.0** was the eight-item polish pass. **v2.3.0** was the 12-item refinement. **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.8.0**.
 
 ## License
 
