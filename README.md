@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.1.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -44,7 +44,14 @@ When both candies are present, the lower temperature wins: if *either* candy is 
 
 **Card-size switcher** *(v2.0.0)*: a compact control next to Layout and Theme that resizes the recipe card from 80% to 140% without changing the recipe itself. Three controls in one pill — quick-jump preset pills (80% / 100% / 120% / 140%), a continuous slider, and a step selector (1% / 5% / 10%) that tunes the slider's increment. Implemented via CSS `zoom` on `.out-card`. Persists in `localStorage` (`pancakeFlightCardScale`, `pancakeFlightCardScaleStep`). Hidden on viewports under 600 px (browser zoom does the job there). Print always forces 100% regardless of slider position.
 
-All three switchers persist in `localStorage`.
+**Mode switcher: Single / Flight** *(v2.1.0)*: the first pill in the controls row toggles between **Single** mode (one flavor, the v1.x experience) and **Flight** mode (pick any subset of the 12 flavors and run them as a coordinated multi-flavor cook). In Flight mode, Card 2's flavor pills become multi-select (tap to include/exclude — same visual language as Single mode, an active pill is included), and the output reorganizes into two phases:
+
+- **Setup phase** — Deduped prep callouts (toast pine nuts, slice bananas, freeze candy) appear once across the whole flight. One Dry Bowl block labeled `× N` with a "measure N× and split, or make N separate bowls" note. One Wet Bowl per flavor (each with its own milk/egg/fat and spices, including the Banana-Nut pick-one). Cooking-surface grease lines deduplicated by group (Clean / Savory / Candy) so you only re-grease when the grease type actually changes. Toppings per pancake rendered as a grid of per-flavor cards.
+- **Cook phase** — Flavors are grouped by their **cooking order** (Clean → Savory → Candy) so you don't constantly swap greases or temperatures. Inline `[Cooking order ✓] [Selection order]` toggle lets you switch to selection-order rendering for the cook phase only. Each group shows its effective heat (Clean/Savory always 375°F; Candy uses colder-candy-wins across the *selected* candy flavors only — Triple + any-deep → 300°F, Triple all-flash → 325°F, non-Triple + any-deep → 325°F, otherwise 375°F). When a group has more than one flavor, a "stagger the rests" note explains how to mix flavor 2's bowls while flavor 1 is in its 10-min rest. Between groups: a "wipe surface and re-grease for the *next* group" transition.
+
+**Quality Tier in Flight mode** *(v2.1.0)*: across multiple flavors, the four tiers each have a syrup slot and an ingredient slot, so 4 selected flavors would otherwise produce 32 tier cells. The picker compares the eight slot values (best/good/ok/avoid × syrup/ingredient) across all selected flavors, lists strict matches once in a **Shared across all N flavors** block at the top, and renders only the differing slots in per-flavor cards below. An inline layout switcher offers `Side-by-side` / `Stacked` / `Grid`. Degenerate case: with exactly one flavor selected, the classic 4-card Single-mode tier grid is rendered instead.
+
+All five switchers (Mode, Layout, Theme, Card-size, plus the Flight-only Cook-grouping and Tier-layout toggles) persist in `localStorage`.
 
 **Reference docs** (collapsible at bottom): Bulk Pantry Mix recipe + jar storage, vocabulary cheat sheet (Hint / Drop / Smidgen / Pinch / Dash / Tad + Scant / Fat modifiers + Shield Rule), mixing & resting rules, Shield Rule with precise volumes per pancake size, ladle prep (45–60 sec ice-bath rule), advanced tips (warm-water fat bath, Microplane nutmeg, pine-nut toasting, Candy Crushing Protocol, Shield Application Mechanism), cooking order + between-batch cleanup, liquid troubleshooting, flipping technique, syrup grade reference, component sourcing guide.
 
@@ -52,12 +59,12 @@ All three switchers persist in `localStorage`.
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.1.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.1.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.1.0.html   # Windows
 ```
 
-That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~1400 lines) with inline CSS and vanilla JS.
+That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~2280 lines as of v2.1.0) with inline CSS and vanilla JS.
 
 The companion `.html` manual opens the same way in a browser. To import into Word: File → Open → select the manual HTML; Word preserves the tables, headers, and bullet hierarchy.
 
@@ -65,29 +72,36 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.1.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
 
 ## How the code is organized
 
-All in the picker HTML file. Approximate landmarks (line numbers from v2.0.0):
+All in the picker HTML file. Approximate landmarks (line numbers from v2.1.0):
 
 | Lines       | What lives there |
 |-------------|------------------|
-| 1–290       | `<style>` block — design tokens (CSS custom properties + dark theme overrides), pickers, output cards, tier badges, reference accordion, layout/theme switchers, print rules |
-| 290–340     | Card-scale switcher CSS (preset pills + slider + step selector) + `--card-scale` / `zoom` rules on `.out-card` *(new in v2.0.0)* |
-| 340–530     | HTML structure — controls row (layout + theme + card-size switchers), three picker cards, output card, all `<details>` reference sections, component-sourcing table |
-| 530–725     | Reference content (vocabulary cheat sheet, Shield Rule + Precise Shield Volumes, ladle prep, advanced tips, etc.) — all inside `<details>` accordions |
-| 725–790     | `<script>` opens · Theme switcher IIFE · Layout switcher IIFE (both persist to `localStorage`) |
-| 790–840     | Card-scale switcher IIFE *(new in v2.0.0)* — persists `pancakeFlightCardScale` (decimal) and `pancakeFlightCardScaleStep` (integer %) to `localStorage` |
-| 840–910     | Lookup tables: `BATCHES`, `BULK_OPTS`, `SIZES`, `SHIELD_VOLUMES`, `DRY`, `WET`, `BULK_SCOOP`, `FAT`, `SPICE` |
-| 910–1080    | `FLAVORS` array — 12 flavor objects with spices/fat/syrup/tiers/flags |
-| 1080–1160   | `TOPPINGS` per-flavor-per-size matrix |
-| 1160–1230   | `state`, `render()`, picker UI building |
-| 1230–1510   | `getEffectivePrep()`, `renderOutput()` — the big function that assembles the recipe HTML from state |
-| 1510–end    | Event listeners on the picker buttons |
+| 1–245       | `<style>` block — design tokens (CSS custom properties + dark-theme overrides), pickers, output cards, tier badges, reference accordion, print rules |
+| 246–294     | Layout switcher CSS · Theme switcher CSS (share visual language) |
+| 295–325     | Card-scale switcher CSS (preset pills + slider + step selector) + `--card-scale` / `zoom` rules on `.out-card` *(v2.0.0)* |
+| 326–490     | Flight-mode CSS — mode switcher, flavor-status row, empty state, phase headers, wet-flavor cards, toppings-by-flavor grid, grease lines, cook-group blocks, inline pill toggles, shared/per-flavor tier blocks with `data-tier-layout` attribute *(v2.1.0)* |
+| 491–538     | Remaining base CSS · print rules |
+| 545–620     | HTML — controls row (mode + layout + theme + card-size switchers), three picker cards (with flavor-status row in Card 2 for Flight mode), output card |
+| 621–905     | Reference content (`<details>` accordions) — vocabulary, Shield Rule + Precise Shield Volumes, ladle prep, advanced tips, component sourcing |
+| 907–963     | Theme switcher IIFE · Layout switcher IIFE (both persist to `localStorage`) |
+| 964–1033    | Card-scale switcher IIFE — persists `pancakeFlightCardScale` + `pancakeFlightCardScaleStep` |
+| 1034–1095   | Lookup tables: `BATCHES`, `BULK_OPTS`, `SIZES`, `SHIELD_VOLUMES`, `DRY`, `WET`, `BULK_SCOOP`, `FAT`, `SPICE` |
+| 1096–1265   | `FLAVORS` array — 12 flavor objects each with `cookGroup` (`clean`/`savory`/`candy`) + spices/fat/syrup/tiers/flags |
+| 1266–1346   | `TOPPINGS` per-flavor-per-size matrix |
+| 1347       | `CANDY_PREPS` |
+| 1352–1375   | `state` object (now with `mode`, `selectedFlavors`, `groupByCookOrder`, `tierLayout`) + persistence restore from `localStorage` |
+| 1377–1722   | Shared helpers used by both renderers — `flavorById`, `cookGroupOf`, `groupSelectedByCooking`, `getEffectivePrep`, `heatInfoForFlavor`, `effectiveHeatForGroup`, `distinctGreasesByGroup`, `totalYield`, `prepCalloutsFor`, `singlePrepNotes`, `dryBowlHtml`, `wetBowlHtml`, `spicesHtml`, `toppingsInnerHtml`, `flavorCallouts`, `tierGridHtml`, `compareTiers`, `flightCookStepsForFlavor` |
+| 1724–1820   | `render()` — dispatcher: builds pickers, applies mode-aware Card 2 behavior, calls `renderSingleOutput` or `renderFlightOutput` |
+| 1821–1939   | `renderSingleOutput()` — Single-mode recipe (byte-identical HTML output to v2.0.0 across all 12 flavors × batch × size × candy-prep combinations) |
+| 1940–2185   | `renderFlightOutput()` — Setup phase + Cook phase (cooking-order grouping with stagger notes and inter-group wipe transitions, or selection-order rendering; shared+per-flavor tier comparison with side/stack/grid layout) |
+| 2186–end    | Event listeners (mode switcher, mode-aware flavor pills, candy/size/batch/bulk; delegated cook-grouping + tier-layout toggles on `#output`) |
 
 ### Data model
 
@@ -96,6 +110,7 @@ Each entry in `FLAVORS[]` looks like this:
 ```js
 {
   id: 'caramel',
+  cookGroup: 'candy',      // 'clean' | 'savory' | 'candy' — used by Flight mode to group cooking steps
   label: 'Caramel',
   strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
   spices: [
@@ -158,9 +173,10 @@ Key tokens: `--bg`, `--card`, `--line`, `--ink`, `--muted`, `--accent`, `--accen
 ### Add a new flavor
 
 1. Add a new object to `FLAVORS[]` with the structure shown above.
-2. Add an entry to `TOPPINGS[<flavor-id>]` — an array of 5 entries (one per pancake size), each an array of topping lines.
-3. If it uses caramel, set `hasCaramel: true`. If it uses toffee, set `hasToffee: true`. Either flag enables the corresponding prep picker + heat logic.
-4. Done — it shows up in the flavor picker automatically.
+2. Set `cookGroup` to one of `clean` / `savory` / `candy` — Flight mode uses this to group the flavor's cooking steps. *Clean*: no bacon grease, no sticky candy. *Savory*: cooked in bacon grease. *Candy*: sticky sugar residue, cook last.
+3. Add an entry to `TOPPINGS[<flavor-id>]` — an array of 5 entries (one per pancake size), each an array of topping lines.
+4. If it uses caramel, set `hasCaramel: true`. If it uses toffee, set `hasToffee: true`. Either flag enables the corresponding prep picker + heat logic.
+5. Done — it shows up in both the Single-mode flavor picker and the Flight-mode multi-select pills automatically.
 
 ### Add a new batch size
 
@@ -210,7 +226,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` = bug fix, `Y` = feature change, `X` = major. Current: **v2.0.0** (recipe card-size switcher: preset pills + slider + step selector, the first v2 phase). The v2 roadmap is in `v2_HANDOFF.md`; subsequent phases will bump Y (flight mode → v2.1.0, mixed batch sizes → v2.2.0, polish → v2.3.0).
+`X.Y.Z` — `Z` = bug fix, `Y` = feature change, `X` = major. Current: **v2.1.0** (multi-flavor Flight mode: Single/Flight switcher, multi-select flavor pills, Setup + Cook phases with cooking-order grouping, shared/per-flavor Quality Tier with layout switcher). v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; subsequent phases will bump Y (mixed batch sizes per flavor + master shopping list → v2.2.0, polish → v2.3.0).
 
 ## License
 
