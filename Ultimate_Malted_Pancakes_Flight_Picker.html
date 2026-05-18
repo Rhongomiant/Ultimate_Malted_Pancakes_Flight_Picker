@@ -128,7 +128,7 @@
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased; line-height: 1.45; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 24px 18px 96px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 18px 96px; }
   h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
   h1 .em { color: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; }
@@ -558,10 +558,13 @@
     .controls-row, .controls-toggle { display: none !important; }
   }
 
-  /* === v2.3.0: sticky output header — lives OUTSIDE .out-card (which has `zoom` that breaks sticky descendants).
-     Single block contains both title and yield. */
+  /* === v2.4.0: sticky output header — lives OUTSIDE .out-card (which has `zoom`
+     that breaks sticky descendants). Single block contains both title and yield.
+     Gap bumped from 4px to 12px so the header doesn't visually crowd against the
+     pancake-size-bar; --picker-compact-h adds room for the compact pair band
+     in stacked mode when active. */
   .out-header { position: sticky;
-    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 4px);
+    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 12px);
     z-index: 30; background: var(--card);
     border: 1px solid var(--line); border-radius: 14px;
     margin: 0 0 14px; padding: 12px 18px 10px;
@@ -569,11 +572,16 @@
   .out-header h3 { margin: 0; font-size: 1.05rem; }
   .out-header .yield { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
   body[data-controls-collapsed="1"] .out-header {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 4px); }
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 12px); }
   body[data-pancake-collapsed="1"] .out-header {
-    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 4px); }
+    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 12px); }
   body[data-controls-collapsed="1"][data-pancake-collapsed="1"] .out-header {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 4px); }
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 12px); }
+  /* In stacked-mode compact pair, account for the compact picker band height too. */
+  body:not([data-layout="side"])[data-picker-compact="1"] .out-header {
+    top: calc(var(--controls-h, 60px) + var(--picker-compact-h, 100px) + var(--psb-h, 60px) + 12px); }
+  body:not([data-layout="side"])[data-picker-compact="1"][data-pancake-collapsed="1"] .out-header {
+    top: calc(var(--controls-h, 60px) + var(--picker-compact-h, 100px) + var(--psb-collapsed-h, 38px) + 12px); }
   @media print {
     .out-header { position: static; border: 0; box-shadow: none; padding: 0; margin: 0 0 8px; }
   }
@@ -656,19 +664,33 @@
   body:not([data-layout="side"]) .picker-pane > .card {
     width: 100%; margin-bottom: 0;
     transition: width 0.3s ease, max-width 0.3s ease; }
-  /* When the sentinel above .picker-pane scrolls offscreen, compact mode kicks in */
+  /* v2.4.0: When sentinel above .picker-pane scrolls offscreen, compact mode kicks in.
+     Cards become side-by-side AND visually shrunk (tighter padding, smaller text)
+     so the sticky band takes much less vertical space. */
   body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane > .card {
-    width: calc(50% - 7px); }
-  /* In compact mode, the picker-pane itself is centered as a sticky band */
+    width: calc(50% - 7px); padding: 8px 12px 8px; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card h2 {
+    font-size: 0.7rem; margin: 0 0 6px; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card .opts { gap: 4px; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card .opt {
+    padding: 5px 10px; font-size: 0.78rem; }
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card[data-collapsed="1"] {
+    padding: 6px 12px; }
+  /* In compact mode, the picker-pane itself is the sticky band */
   body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane {
     position: sticky; top: var(--controls-h, 60px); z-index: 50;
     background: var(--bg); padding: 8px 0; margin-left: auto; margin-right: auto;
     border-bottom: 1px solid var(--line); }
   body:not([data-layout="side"])[data-controls-collapsed="1"][data-picker-compact="1"] .picker-pane {
     top: var(--controls-collapsed-h, 38px); }
-  /* Override the prior v2.2.0 sticky batch rule when in compact mode — compact pair takes over */
+  /* Override the v2.2.0 sticky batch rule when in compact mode — compact pair takes over */
   body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card[data-card="batch"] {
     position: static; top: auto; }
+  /* v2.4.0: pancake-size-bar sticks BELOW the compact picker band */
+  body:not([data-layout="side"])[data-picker-compact="1"] .pancake-size-bar {
+    top: calc(var(--controls-h, 60px) + var(--picker-compact-h, 100px)); z-index: 48; }
+  body:not([data-layout="side"])[data-controls-collapsed="1"][data-picker-compact="1"] .pancake-size-bar {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--picker-compact-h, 100px)); }
   /* Picker-sentinel — invisible 1px div that the observer watches.
      `display: contents` removes it from the grid/flex flow entirely but still allows IntersectionObserver. */
   .picker-sentinel { display: block; width: 100%; height: 1px;
@@ -1244,7 +1266,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.3.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.4.0</div>
 </div>
 
 <script>
@@ -2204,9 +2226,11 @@ function layoutSwitcherHtml(name, current) {
   </div>`;
 }
 
+// v2.4.0: side-layout grid uses minmax(220px, 1fr) for sub-cards so columns
+// don't shrink below the .subcard min-width, which previously caused cards to overlap.
 function sideGridStyle(layout, n) {
   return (layout === 'side' && n > 1)
-    ? ` style="grid-template-columns: repeat(${n}, minmax(0, 1fr))"` : '';
+    ? ` style="grid-template-columns: repeat(${n}, minmax(220px, 1fr))"` : '';
 }
 
 // Compact per-flavor delta card used in the deduped cook phase
@@ -2390,6 +2414,10 @@ function render() {
   else                          renderFlightOutput();
   // v2.3.0: keep body[data-order-mode] in sync for sub-toggle visibility CSS
   applyCollapseStates();
+  // v2.4.0: direct-bind toggle handlers (defensive against delegation quirks)
+  attachToggleHandlers();
+  // v2.4.0: refresh sticky heights since content changed
+  updateStickyHeights();
 
   updateUrlState();
   updateControlsHeight();
@@ -2672,43 +2700,42 @@ function renderFlightOutput() {
   }
 
   // --- Cook phase ---
-  // v2.3.0 #9: syrup integration — Recommended (or any grouped mode) shows shared syrup list in the
-  // shared cook card; Menu/Selection (flat) show syrup per-flavor in each delta card.
-  const isRecommended = state.orderMode === 'recommended';
+  // v2.4.0 #9: syrups now appear in BOTH places, regardless of mode:
+  //   - deduped list in the shared cook card (always)
+  //   - per-flavor row in each delta card (always)
   const syrupGroupings = getSyrupGroupings(flavors);
 
-  // Shared cook card: now includes deduped syrups when in Recommended Order (#9).
-  const sharedSyrupHtml = isRecommended
-    ? `<div class="cook-shared-syrups">
-        <h5>Recommended syrups (one line per distinct syrup)</h5>
-        <ul>
-          ${syrupGroupings.map(sg =>
-            `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
-          ).join('')}
-        </ul>
-      </div>`
-    : '';
+  const sharedSyrupHtml = `<div class="cook-shared-syrups">
+    <h5>Recommended syrups (one line per distinct syrup)</h5>
+    <ul>
+      ${syrupGroupings.map(sg =>
+        `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
+      ).join('')}
+    </ul>
+  </div>`;
+
   const sharedCookCard = `<div class="cook-shared">
     <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
     <ol class="steps">${sharedCookingFlowHtml(flavors, sizeIdx)}</ol>
     ${sharedSyrupHtml}
   </div>`;
 
-  // v2.3.0 #8: Cook layout switcher applied to every flavor-deltas-grid in cook phase
+  // v2.4.0 #8: cook-layout attribute uses data-cook-layout-grid on the grid container
+  // (different from button's data-cook-layout) so closest() can't confuse them.
   const cookGridAttr = `data-cook-layout="${state.cookLayout}"`;
   const cookSideStyleN = m => state.cookLayout === 'side'
     ? ` style="grid-template-columns: repeat(${m}, minmax(240px, 1fr))"` : '';
 
-  // Per-flavor delta-card HTML — optionally appends a syrup row (Menu/Selection modes; #9).
+  // Per-flavor delta-card HTML — ALWAYS appends a syrup row (item 9).
   const deltaCardHtmlFor = (f, showHeat) => {
     const inner = flavorDeltaCardHtml(f, sizeIdx, { showHeat });
-    const syrupRow = !isRecommended
-      ? `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
-          <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
-        </ul>`
-      : '';
+    const syrupRow = `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
+        <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
+      </ul>`;
     return `<div class="flavor-delta-card"><h6>${f.label}</h6>${inner}${syrupRow}</div>`;
   };
+
+  const isRecommended = state.orderMode === 'recommended';
 
   let cookGroupsHtml;
   if (isRecommended) {
@@ -2760,8 +2787,9 @@ function renderFlightOutput() {
       </div>`
     : '';
 
-  // 3-way order toggle + conditional sub-order (#4)
-  const orderToggleHtml = `<div class="inline-toggle order-toggle" data-toggle-group="order-mode">
+  // v2.4.0 #4: 3-way order toggle + conditional sub-order, shown in BOTH Setup and Cook phase headers.
+  // The button-id suffix (`-setup` / `-cook`) keeps DOM ids unique even though the active state mirrors.
+  const buildOrderToggle = (suffix) => `<div class="inline-toggle order-toggle" data-toggle-group="order-mode-${suffix}">
     <span class="label">Order</span>
     <button type="button" data-order-mode="recommended" class="${state.orderMode === 'recommended' ? 'active' : ''}">Recommended Order</button>
     <button type="button" data-order-mode="menu"        class="${state.orderMode === 'menu'        ? 'active' : ''}">Menu Order</button>
@@ -2772,6 +2800,8 @@ function renderFlightOutput() {
       <button type="button" data-rec-sub-order="selection" class="${state.recommendedSubOrder === 'selection' ? 'active' : ''}">Selection</button>
     </span>
   </div>`;
+  const orderToggleSetupHtml = buildOrderToggle('setup');
+  const orderToggleCookHtml  = buildOrderToggle('cook');
 
   // --- Header (written to OUTSIDE-the-card element — #1 fix) ---
   header.innerHTML = `<h3>${titleText}</h3><p class="yield">${yieldText}</p>`;
@@ -2783,6 +2813,7 @@ function renderFlightOutput() {
     <div class="phase-header">
       <h3>Setup phase</h3>
       <span class="phase-sub">Measure everything. No cooking yet.</span>
+      ${orderToggleSetupHtml}
     </div>
     <div class="phase-section">
       ${dryWetPair}
@@ -2795,7 +2826,7 @@ function renderFlightOutput() {
 
     <div class="phase-header">
       <h3>Cook phase</h3>
-      ${orderToggleHtml}
+      ${orderToggleCookHtml}
       ${cookLayoutSwitcher}
     </div>
     <div class="phase-section">
@@ -2948,6 +2979,74 @@ document.getElementById('output').addEventListener('click', e => {
   }
 });
 
+// v2.4.0: attachToggleHandlers — direct per-button onclick binding for the
+// toggles users reported as unresponsive (cook layout, sub-order). Called after
+// every render. Direct binding bypasses any delegation/closest() quirks and
+// always wins over delegated listeners.
+function attachToggleHandlers() {
+  // Order mode (in both Setup and Cook phase headers)
+  document.querySelectorAll('#output button[data-order-mode]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const v = btn.dataset.orderMode;
+      if (v === 'recommended' || v === 'menu' || v === 'selection') {
+        state.orderMode = v;
+        try { localStorage.setItem('pancakeFlightOrderMode', v); } catch (_) {}
+        render();
+      }
+    };
+  });
+  // Recommended sub-order
+  document.querySelectorAll('#output button[data-rec-sub-order]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const v = btn.dataset.recSubOrder;
+      if (v === 'menu' || v === 'selection') {
+        state.recommendedSubOrder = v;
+        try { localStorage.setItem('pancakeFlightRecSubOrder', v); } catch (_) {}
+        render();
+      }
+    };
+  });
+  // Cook layout — note `button[...]` so the .flavor-deltas-grid (which also has
+  // data-cook-layout on it for CSS) is excluded; only buttons get the handler.
+  document.querySelectorAll('#output button[data-cook-layout]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const v = btn.dataset.cookLayout;
+      if (v === 'side' || v === 'stack' || v === 'grid') {
+        state.cookLayout = v;
+        try { localStorage.setItem('pancakeFlightCookLayout', v); } catch (_) {}
+        render();
+      }
+    };
+  });
+}
+
+// v2.4.0: ResizeObserver keeps --picker-compact-h, --psb-h, --controls-h fresh
+// so sticky offsets are always correct. Without this, when pancake-size-bar
+// reflows (e.g., wrap on narrow viewport), the sticky title can fall behind it.
+function setupSizeObservers() {
+  if (typeof ResizeObserver === 'undefined') return;
+  const ro = new ResizeObserver(() => updateStickyHeights());
+  ['controls-row', 'pancake-size-bar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) ro.observe(el);
+  });
+  // Picker pane — its height affects --picker-compact-h
+  const picker = document.querySelector('.picker-pane');
+  if (picker) {
+    const pickerRo = new ResizeObserver(() => {
+      // Only meaningful in compact mode, but harmless otherwise
+      const h = picker.offsetHeight;
+      if (h > 0) {
+        document.documentElement.style.setProperty('--picker-compact-h', h + 'px');
+      }
+    });
+    pickerRo.observe(picker);
+  }
+}
+
 // v2.2.0: a single updateStickyHeights tracks all sticky bar heights
 function updateStickyHeights() {
   const row = document.getElementById('controls-row');
@@ -2967,6 +3066,12 @@ function updateStickyHeights() {
     } else {
       document.documentElement.style.setProperty('--psb-h', h + 'px');
     }
+  }
+  // v2.4.0: track picker-pane height for compact-mode offsets
+  const picker = document.querySelector('.picker-pane');
+  if (picker) {
+    const h = picker.offsetHeight;
+    if (h > 0) document.documentElement.style.setProperty('--picker-compact-h', h + 'px');
   }
 }
 
@@ -3100,6 +3205,9 @@ applyCollapseStates();
 parseUrlState();
 
 render();
+
+// v2.4.0: keep sticky offsets fresh whenever bars resize
+setupSizeObservers();
 </script>
 </body>
 </html>
