@@ -647,11 +647,32 @@
     text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--muted); font-weight: 600;
   }
-  .category-section .cs-cook .flavor-deltas-grid,
-  .category-section .cs-tier .tiers-per-flavor,
-  .category-section .cs-tier .compact-tiers {
-    /* Use ambient cookLayout/tierLayout — controlled per their existing switchers. */
+  /* rc.4: compact cook + tier cards so they fit a category-section column. */
+  .category-section .cs-cook .flavor-deltas-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
   }
+  .category-section .cs-cook .flavor-delta-card {
+    padding: 8px 10px;
+  }
+  .category-section .cs-cook .flavor-delta-card h6 {
+    font-size: 0.76rem; margin-bottom: 6px;
+  }
+  .category-section .cs-cook ul.flavor-deltas li {
+    padding: 3px 0; font-size: 0.78rem; line-height: 1.35;
+  }
+  .category-section .cs-tier .flavor-tiers-card {
+    padding: 8px 10px;
+  }
+  .category-section .cs-tier .flavor-tiers-card h5 {
+    font-size: 0.78rem; margin: 0 0 6px;
+  }
+  .category-section .cs-tier .compact-tier-row {
+    font-size: 0.76rem; padding: 3px 0;
+  }
+  .category-section .cs-tier .tiers-shared { padding: 6px 8px; }
+  .category-section .cs-tier .tiers-shared h5 { font-size: 0.78rem; }
+  .category-section .cs-tier .tiers-shared li { font-size: 0.76rem; }
 
   /* Layout switcher band at top of output gets a max width so it doesn't
      overflow horizontally on narrow viewports — flex-wrap handles overflow. */
@@ -686,6 +707,25 @@
   .bcr-group .multi-batch-toggle-pill {
     /* Slightly larger when standalone (no surrounding label text). */
     padding: 4px 12px;
+  }
+  /* rc.4: output-grouping toggle (By Batch / By Category). */
+  .output-grouping-row {
+    display: inline-flex; gap: 4px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 2px;
+  }
+  .output-grouping-row button {
+    border: 0; background: transparent;
+    padding: 4px 12px; border-radius: 12px;
+    cursor: pointer; font-size: 11px; font-weight: 500;
+    color: var(--ink); font-family: inherit;
+    transition: background .15s;
+  }
+  .output-grouping-row button:hover:not(.active) {
+    background: var(--accent-soft);
+  }
+  .output-grouping-row button.active {
+    background: var(--accent); color: var(--on-accent);
   }
 
   /* Reset button in controls row. */
@@ -780,26 +820,9 @@
     .category-section { page-break-inside: avoid; }
   }
 
-  /* === v3.0.0-rc: per-batch column grid + active-category filter === */
-  .batches-row {
-    display: grid; gap: 14px; margin-bottom: 14px;
-    align-items: start;
-  }
-  .batches-row[data-batch-count="1"] { grid-template-columns: 1fr; }
-  .batches-row[data-batch-count="2"] { grid-template-columns: 1fr 1fr; }
-  .batches-row[data-batch-count="3"] { grid-template-columns: 1fr 1fr 1fr; }
-  .batches-row[data-batch-count="4"] { grid-template-columns: repeat(4, 1fr); }
-  .batches-row[data-batch-count="5"] { grid-template-columns: repeat(5, 1fr); }
-  .batches-row[data-batch-count="6"] { grid-template-columns: repeat(6, 1fr); }
-  @media (max-width: 1100px) {
-    .batches-row[data-batch-count="3"],
-    .batches-row[data-batch-count="4"],
-    .batches-row[data-batch-count="5"],
-    .batches-row[data-batch-count="6"] { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 700px) {
-    .batches-row { grid-template-columns: 1fr !important; }
-  }
+  /* === v3.0.0-rc: per-batch column styling (the .batches-row grid CSS that
+     used to live here was stripped in rc.4 because it shadowed the new
+     flex/grid/stack layout-switcher variants from rc.2 and rc.3.) === */
   .batch-column {
     background: var(--card); border: 1px solid var(--line);
     border-radius: 10px; padding: 12px;
@@ -1103,7 +1126,8 @@
 
   /* === v2.1.1: per-flavor delta cards (Cook phase) === */
   .flavor-deltas-grid { display: grid; gap: 10px; margin-top: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); min-width: 0; }
+    grid-template-columns: repeat(auto-fit, minmax(280px, 360px)); min-width: 0;
+    justify-content: start; }
   .flavor-delta-card { background: var(--card); border: 1px solid var(--line);
     border-radius: 10px; padding: 12px 14px; min-width: 0; }
   .flavor-delta-card h6 { margin: 0 0 8px; font-size: 0.82rem;
@@ -1124,7 +1148,7 @@
 
   /* === v2.3.0: Cook phase layout switcher (#8) === */
   .flavor-deltas-grid[data-cook-layout="grid"] {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    grid-template-columns: repeat(auto-fit, minmax(240px, 360px)); }
   .flavor-deltas-grid[data-cook-layout="stack"] {
     grid-template-columns: 1fr; }
   .flavor-deltas-grid[data-cook-layout="side"] {
@@ -1435,6 +1459,10 @@
         <div class="bcr-group" id="multi-batch-group" hidden>
           <span class="bcr-label">Allow same flavor in multiple batches</span>
           <div class="multi-batch-toggle-row" id="multi-batch-toggle-row"></div>
+        </div>
+        <div class="bcr-group" id="output-grouping-group" hidden>
+          <span class="bcr-label" title="Switch between batch-first (single horizontal row of full batch columns with separate Cook + Quality Tier sections below) and category-first (per-category sections, each containing filtered prep batches, cook flavor cards, and quality tier cards).">Group output by</span>
+          <div class="output-grouping-row" id="output-grouping-row"></div>
         </div>
       </div>
     </div>
@@ -1787,7 +1815,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.3</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.4</div>
 </div>
 
 <script>
@@ -2267,6 +2295,11 @@ const state = {
   // Both default to side-by-side per the reviewer item #1.
   groupLayout: 'side',             // 'side' | 'grid' | 'stack'
   batchLayout: 'side',             // 'side' | 'grid' | 'stack'
+  // v3.0.0-rc.4: explicit output organization. 'batch' = single-row of full
+  // batch columns + standalone Cook + Tier sections (the previous Mode A).
+  // 'category' = per-category .category-section sections each containing
+  // filtered prep batches + cook flavor cards + tier flavor cards (Mode B).
+  outputGrouping: 'category',      // 'batch' | 'category'
   controlsCollapsed: false,
   pancakeSizeCollapsed: false,
   batchCardCollapsed: false,
@@ -2323,6 +2356,10 @@ try {
   try { bl = localStorage.getItem('pancakeFlightBatchLayout'); } catch (_) {}
   if (gl === 'side' || gl === 'stack' || gl === 'grid') state.groupLayout = gl;
   if (bl === 'side' || bl === 'stack' || bl === 'grid') state.batchLayout = bl;
+  // rc.4: outputGrouping
+  let og;
+  try { og = localStorage.getItem('pancakeFlightOutputGrouping'); } catch (_) {}
+  if (og === 'batch' || og === 'category') state.outputGrouping = og;
   const cc = localStorage.getItem('pancakeFlightControlsCollapsed');
   if (cc === '1') state.controlsCollapsed = true;
   if (localStorage.getItem('pancakeFlightPancakeSizeCollapsed') === '1') state.pancakeSizeCollapsed = true;
@@ -2469,6 +2506,8 @@ function parseUrlState() {
     const urlBl = params.get('batchlayout');
     if (urlGl === 'side' || urlGl === 'stack' || urlGl === 'grid') state.groupLayout = urlGl;
     if (urlBl === 'side' || urlBl === 'stack' || urlBl === 'grid') state.batchLayout = urlBl;
+    const urlOg = params.get('grouping');
+    if (urlOg === 'batch' || urlOg === 'category') state.outputGrouping = urlOg;
   } catch (_) {}
 }
 
@@ -2528,6 +2567,7 @@ function updateUrlState() {
     // v3.0.0-rc.3: groupLayout + batchLayout (only emit if non-default).
     if (state.groupLayout !== 'side') params.set('grouplayout', state.groupLayout);
     if (state.batchLayout !== 'side') params.set('batchlayout', state.batchLayout);
+    if (state.outputGrouping !== 'category') params.set('grouping', state.outputGrouping);
 
     const qs = params.toString();
     const url = qs ? `?${qs}` : window.location.pathname;
@@ -2570,6 +2610,8 @@ function persistBatchesState() {
     // v3.0.0-rc.3
     localStorage.setItem('pancakeFlightGroupLayout', state.groupLayout);
     localStorage.setItem('pancakeFlightBatchLayout', state.batchLayout);
+    // rc.4
+    localStorage.setItem('pancakeFlightOutputGrouping', state.outputGrouping);
   } catch (_) {}
 }
 
@@ -3209,6 +3251,8 @@ function render() {
   // on the multi-batch affordance). Label is rendered outside in .bcr-label.
   const batchQuantityGroup = document.getElementById('batch-quantity-group');
   const multiBatchGroup = document.getElementById('multi-batch-group');
+  const outputGroupingGroup = document.getElementById('output-grouping-group');
+  const outputGroupingRow = document.getElementById('output-grouping-row');
   if (state.mode === 'flight') {
     const ab = getActiveBatch();
     const cnt = ab ? (ab.count || 1) : 1;
@@ -3222,11 +3266,18 @@ function render() {
     batchCountRow.hidden = false;
     batchQuantityGroup.hidden = false;
     multiBatchGroup.hidden = false;
+    // rc.4: output-grouping toggle
+    outputGroupingRow.innerHTML =
+      `<button type="button" data-output-grouping="batch" class="${state.outputGrouping === 'batch' ? 'active' : ''}">By Batch</button>` +
+      `<button type="button" data-output-grouping="category" class="${state.outputGrouping === 'category' ? 'active' : ''}">By Category</button>`;
+    outputGroupingGroup.hidden = false;
   } else {
     batchCountRow.hidden = true;
     batchCountRow.innerHTML = '';
     batchQuantityGroup.hidden = true;
     multiBatchGroup.hidden = true;
+    outputGroupingGroup.hidden = true;
+    outputGroupingRow.innerHTML = '';
   }
 
   document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
@@ -3686,8 +3737,10 @@ function renderFlightOutput() {
     const toppingsSideStyle = (state.toppingsLayout === 'side' && orderedFlavors.length > 1)
       ? ` style="grid-template-columns: repeat(${orderedFlavors.length}, minmax(180px, 1fr))"` : '';
 
+    // rc.4: restore v2.10.1 "(into wet bowl[s])" wording — clarifies that
+    // these go into the wet bowl(s) before adding to dry.
     const spicesBlock = `<div class="block">
-      <h4>FAT &amp; Spices${flavorIds.length > 1 ? ' (per flavor)' : ''}</h4>
+      <h4>FAT &amp; Spices (into wet bowl${flavorIds.length > 1 ? 's' : ''})${flavorIds.length > 1 ? ', per flavor' : ''}</h4>
       <div class="subcards-grid" ${spicesLayoutAttr}${spicesSideStyle}>
         ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${fatAndSpicesHtml(f, b.batch)}</div>`).join('')}
       </div>
@@ -3724,7 +3777,10 @@ function renderFlightOutput() {
   const visibleCategoriesSet = new Set();
   visibleTuples.forEach(t => visibleCategoriesSet.add(t.flavor.cookGroup));
   const visibleCategoriesOrdered = COOK_GROUP_ORDER.filter(g => visibleCategoriesSet.has(g));
-  const useCategorySections = isRecommended && visibleCategoriesOrdered.length > 1;
+  // rc.4: user-controlled. Mode B (category sections) runs when outputGrouping
+  // is 'category' and there's at least one visible category with flavors.
+  // Mode A (single batch row + standalone Cook/Tier sections) runs otherwise.
+  const useCategorySections = state.outputGrouping === 'category' && visibleCategoriesOrdered.length > 0;
 
   // Build the Setup phase body.
   let setupBodyHtml;
@@ -4255,6 +4311,7 @@ function resetToDefaults() {
     'pancakeFlightActiveCategories', 'pancakeFlightAllowMultiBatchFlavor',
     'pancakeFlightShoppingListExpanded',
     'pancakeFlightGroupLayout', 'pancakeFlightBatchLayout',
+    'pancakeFlightOutputGrouping',
   ];
   contentKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
 
@@ -4284,6 +4341,7 @@ function resetToDefaults() {
   state.shoppingListExpanded = false;
   state.groupLayout = 'side';
   state.batchLayout = 'side';
+  state.outputGrouping = 'category';
 
   // Reflect Single mode in the switcher UI.
   const ms = document.getElementById('mode-switcher');
@@ -4293,6 +4351,17 @@ function resetToDefaults() {
   render();
 }
 document.getElementById('reset-btn').addEventListener('click', resetToDefaults);
+
+// v3.0.0-rc.4: output-grouping toggle handler.
+document.getElementById('output-grouping-row').addEventListener('click', e => {
+  const btn = e.target.closest('[data-output-grouping]');
+  if (!btn) return;
+  const v = btn.dataset.outputGrouping;
+  if (v !== 'batch' && v !== 'category') return;
+  state.outputGrouping = v;
+  try { localStorage.setItem('pancakeFlightOutputGrouping', v); } catch (_) {}
+  render();
+});
 
 // v3.0.0-rc: active-category pill handlers (delegated on #output).
 document.getElementById('output').addEventListener('click', e => {
