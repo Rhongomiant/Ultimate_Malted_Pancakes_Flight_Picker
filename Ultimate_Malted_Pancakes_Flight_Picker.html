@@ -29,6 +29,8 @@
     padding: 18px 18px 14px; margin-bottom: 18px; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
   .card h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
     color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  .card h3.sub-h { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 16px 0 8px; font-weight: 600; }
   .opts { display: flex; flex-wrap: wrap; gap: 8px; }
   .opt { border: 1.5px solid var(--line); background: #fff; padding: 10px 14px;
     border-radius: 999px; cursor: pointer; font-size: 0.92rem; color: var(--ink);
@@ -42,6 +44,7 @@
   .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
   .out .desc { color: var(--muted); margin: 0 0 16px; font-size: 0.93rem; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .col { display: flex; flex-direction: column; gap: 14px; }
   @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
   .block { background: #fbf6ec; border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
   .block h4 { margin: 0 0 8px; font-size: 0.7rem; text-transform: uppercase;
@@ -59,6 +62,10 @@
   .callout.warn { background: #fef2f2; border: 1px solid #fecaca; color: var(--warn); }
   .callout.info { background: var(--accent-soft); border: 1px solid #f5d9a8; color: #7c3a00; }
   .callout.good { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--good); }
+  .topping-note { border-radius: 8px; padding: 8px 10px; font-size: 0.85rem;
+    margin-top: 8px; line-height: 1.45; }
+  .topping-note.warn { background: #fef2f2; border: 1px solid #fecaca; color: var(--warn); }
+  .topping-note.info { background: #fff; border: 1px solid #f5d9a8; color: #7c3a00; }
   .steps { margin: 14px 0 0; padding: 0 0 0 22px; font-size: 0.94rem; line-height: 1.55; }
   .steps li { padding: 3px 0; }
   .syrup { display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
@@ -128,32 +135,28 @@
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
 
   <div class="card">
-    <h2>1. Batch size</h2>
+    <h2>1. Batch size &amp; starting from</h2>
     <div class="opts" id="batch-opts"></div>
+    <h3 class="sub-h">Starting from</h3>
+    <label class="toggle">
+      <input type="checkbox" id="bulk-toggle">
+      <span>I'm using the bulk dry pantry mix from the jar (instead of measuring each dry ingredient)</span>
+    </label>
   </div>
 
   <div class="card">
     <h2>2. Flavor combination</h2>
     <div class="opts" id="flavor-opts"></div>
+    <div id="caramel-inline" style="display:none;">
+      <h3 class="sub-h">Caramel preparation</h3>
+      <div class="opts" id="caramel-opts"></div>
+      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the griddle temperature. Hard-frozen caramel takes longer to melt and survives lower heat better; flash-frozen behaves more like room-temp candy.</p>
+    </div>
   </div>
 
   <div class="card">
     <h2>3. Pancake size (ladle)</h2>
     <div class="opts" id="size-opts"></div>
-  </div>
-
-  <div class="card" id="caramel-card" style="display:none">
-    <h2>4. Caramel preparation</h2>
-    <div class="opts" id="caramel-opts"></div>
-    <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the griddle temperature. Hard-frozen caramel takes longer to melt and survives lower heat better; flash-frozen behaves more like room-temp candy and cooks at the normal 375°F.</p>
-  </div>
-
-  <div class="card">
-    <h2 id="bulk-step-num">5. Starting from</h2>
-    <label class="toggle">
-      <input type="checkbox" id="bulk-toggle">
-      <span>I'm using the bulk dry pantry mix from the jar (instead of measuring each dry ingredient)</span>
-    </label>
   </div>
 
   <div class="card out-card">
@@ -202,12 +205,17 @@
   <details>
     <summary>🔤 Vocabulary cheat sheet</summary>
     <div class="body">
+      <h5>Small spice measurements (with finger methods)</h5>
       <ul>
-        <li><b>Trace Dusting:</b> fraction of a drop — touch dry fingertip to spice, tap into bowl.</li>
-        <li><b>Drop:</b> 1/64 tsp (very tiny dusting / dip fingertip).</li>
-        <li><b>Smidgen:</b> 1/32 tsp.</li>
-        <li><b>Pinch:</b> 1/16 tsp.</li>
-        <li><b>Dash:</b> ⅛ tsp (≈ two normal finger pinches).</li>
+        <li><b>Hint (1/128 tsp):</b> exactly <b>half</b> of a Drop spoon — fill your smallest micro-spoon halfway. <b>Finger method:</b> "Pin-Point Dip" — use only the absolute tip or corner of your finger to gather a sparse speckling.</li>
+        <li><b>Drop (1/64 tsp):</b> one full level scoop of the smallest micro-spoon (= exactly half of a Smidgen). <b>Finger method:</b> "Finger-Tip Press" — press your finger flat against the spice pile to fully coat your fingerprint pad.</li>
+        <li><b>Smidgen (1/32 tsp):</b> one full level scoop of a Smidgen spoon (= exactly half of a Pinch). <b>Finger method:</b> two-finger pinch between thumb and index finger, then <i>roll</i> your fingers to release only half of the gathered spice.</li>
+        <li><b>Pinch (1/16 tsp):</b> one full level scoop of a standard pinch spoon. <b>Finger method:</b> grip spice deeply between the pads of thumb and index finger to form a full, solid cluster.</li>
+        <li><b>Dash (⅛ tsp):</b> one full level scoop of a standard dash spoon (= exactly two level Pinches). <b>Finger method:</b> a massive three-finger pinch using the pads of thumb, index, and middle fingers together.</li>
+        <li><b>Tad (¼ tsp):</b> one full level scoop of a standard quarter-teaspoon spoon (= exactly two level Dashes). <b>Finger method:</b> a massive four-finger pinch using the pads of thumb, index, middle, and ring fingers pressed tightly together.</li>
+      </ul>
+      <h5>Other terms</h5>
+      <ul>
         <li><b>Scant:</b> fill the measure just below the upper brim.</li>
         <li><b>Batter Shield / Seal Method:</b> spoon a tiny drizzle of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the pan.</li>
         <li><b>Ghee:</b> clarified butter (milk solids strained out). Deep, toasted, brown-butter note — pairs with malt powder.</li>
@@ -240,6 +248,58 @@
 
       <h5>Cooking window</h5>
       <p>Cook the full batch within <b>20–40 minutes</b> of the rest finishing. After 40 min the chemical leavening exhausts itself and pancakes go flat.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🧈 Advanced cooking tips</summary>
+    <div class="body">
+      <h5>Salted vs. unsalted butter</h5>
+      <p>Always use <b>unsalted butter</b> in the wet mix. The dry recipe already has a precise salt amount tuned to malt + Lactaid. Salted butter brands vary wildly and can push sweet pancakes into salty territory.</p>
+
+      <h5>Managing melted fats across multiple flights</h5>
+      <p>Melted butter/ghee solidifies on contact with cold Lactaid, disrupting even fat distribution. Two methods:</p>
+      <ul>
+        <li><b>Warm-water bath (best):</b> melt butter + ghee into small glass jars. Set jars in a skillet/bowl filled with hot tap water (water up to halfway). Residual heat keeps fats liquid for over an hour — refresh hot water between flights.</li>
+        <li><b>Microwave nuke-as-you-go:</b> right before each batch, cut cold fat into a small cup, microwave 10–15 sec until melted, sit 1 minute so it isn't boiling.</li>
+      </ul>
+
+      <h5>Vanilla bean paste vs. extract</h5>
+      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot pan. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Chocolate (anchors cocoa).</p>
+
+      <h5>Freshly grated vs. pre-ground nutmeg</h5>
+      <p>Freshly grated = bright, sweet, intensely warm oils. Pre-ground = dusty/woody/medicinal. Fresh is mandatory to cut through heavy sugars cleanly.</p>
+
+      <h5>Best nutmeg tool</h5>
+      <p>Manual <b>Microplane Premium Classic Zester</b>. Hold at 45° over the wet bowl. Slide whole seed across teeth. Stop when seed shrinks to marble/pea size (finger safety). Avoid stick blenders (nutmeg shatters them) and electric grinders (can't grind tiny amounts).</p>
+
+      <h5>Toasting pine nuts</h5>
+      <p>Raw pine nuts taste chalky. Dry skillet, medium-low, <b>no oil</b>, shake constantly. The exact second they turn light golden and smell intensely fragrant (~2–3 min) → pour into a cool bowl to stop the cook.</p>
+
+      <h5>Banana thickness</h5>
+      <p>Slice ⅛"–¼" thick (ideally 3/16" — two stacked coins), sharp paring knife, right before cooking. Too thick = tears pancake on flip. Too thin = dissolves into mush, sticks to pan.</p>
+
+      <h5>Caramel prep</h5>
+      <p>Buy baking caramel bits, chop micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the griddle.</p>
+
+      <h5>Banana Nut experimentation</h5>
+      <ul>
+        <li><b>Traditional Bakery Profile:</b> Melted Ghee + Cinnamon + Fresh Nutmeg.</li>
+        <li><b>Exotic Modern Cafe Profile:</b> Melted Butter + Cinnamon + Ground Cardamom.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🥄 Ladle / pancake size reference</summary>
+    <div class="body">
+      <ul>
+        <li><b>0.5 oz (1 Tbsp scoop):</b> 1.5–2" sample bite. Drop toppings the second you pour — they cook fast. 8 of these = one normal stack.</li>
+        <li><b>1.0 oz (2 Tbsp scoop):</b> 2.5–3" silver dollar — the tasting-flight size. Single-serving batch yields 4 of these.</li>
+        <li><b>2.0 oz (¼ cup):</b> 4" standard diner pancake. Easiest size for practicing flips.</li>
+        <li><b>3.0 oz (⅜ cup):</b> 5" thick-stack. Leave on griddle slightly longer so the center cooks through.</li>
+        <li><b>4.0 oz (½ cup):</b> 6–7" plate-sized flapjack. Hardest to flip; best for laying down whole bacon strips.</li>
+      </ul>
     </div>
   </details>
 
@@ -294,58 +354,6 @@
   </details>
 
   <details>
-    <summary>🧊 Storage &amp; leftovers</summary>
-    <div class="body">
-      <ul>
-        <li><b>Whole nutmeg seeds:</b> 4–5+ years in a sealed glass jar, cool/dark/dry pantry. Never above the stove (heat + steam ruin oils). Don't freeze — condensation rots them.</li>
-        <li><b>Leftover whisked egg (from half-batches):</b> keep covered in fridge up to <b>2 days</b>. Use in scrambled eggs, egg wash, or another half-batch tomorrow.</li>
-        <li><b>Leftover mixed wet batter:</b> ❌ Discard. The cold kills leavening — overnight batter = flat, gummy paste. If you can't finish a full batch, mix a half-batch instead.</li>
-        <li><b>Leftover dry mix:</b> 6–9 months sealed; 1–2 years dry-vacuum-sealed.</li>
-        <li><b>Leftover cooked pancakes:</b> freeze beautifully. Cool fully → stack with parchment between → heavy-duty freezer bag. Reheat from frozen in toaster.</li>
-      </ul>
-    </div>
-  </details>
-
-  <details>
-    <summary>🧈 Advanced cooking tips</summary>
-    <div class="body">
-      <h5>Salted vs. unsalted butter</h5>
-      <p>Always use <b>unsalted butter</b> in the wet mix. The dry recipe already has a precise salt amount tuned to malt + Lactaid. Salted butter brands vary wildly and can push sweet pancakes into salty territory.</p>
-
-      <h5>Managing melted fats across multiple flights</h5>
-      <p>Melted butter/ghee solidifies on contact with cold Lactaid, disrupting even fat distribution. Two methods:</p>
-      <ul>
-        <li><b>Warm-water bath (best):</b> melt butter + ghee into small glass jars. Set jars in a skillet/bowl filled with hot tap water (water up to halfway). Residual heat keeps fats liquid for over an hour — refresh hot water between flights.</li>
-        <li><b>Microwave nuke-as-you-go:</b> right before each batch, cut cold fat into a small cup, microwave 10–15 sec until melted, sit 1 minute so it isn't boiling.</li>
-      </ul>
-
-      <h5>Vanilla bean paste vs. extract</h5>
-      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot pan. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Chocolate (anchors cocoa).</p>
-
-      <h5>Freshly grated vs. pre-ground nutmeg</h5>
-      <p>Freshly grated = bright, sweet, intensely warm oils. Pre-ground = dusty/woody/medicinal. Fresh is mandatory to cut through heavy sugars cleanly.</p>
-
-      <h5>Best nutmeg tool</h5>
-      <p>Manual <b>Microplane Premium Classic Zester</b>. Hold at 45° over the wet bowl. Slide whole seed across teeth. Stop when seed shrinks to marble/pea size (finger safety). Avoid stick blenders (nutmeg shatters them) and electric grinders (can't grind tiny amounts).</p>
-
-      <h5>Toasting pine nuts</h5>
-      <p>Raw pine nuts taste chalky. Dry skillet, medium-low, <b>no oil</b>, shake constantly. The exact second they turn light golden and smell intensely fragrant (~2–3 min) → pour into a cool bowl to stop the cook.</p>
-
-      <h5>Banana thickness</h5>
-      <p>Slice ⅛"–¼" thick (ideally 3/16" — two stacked coins), sharp paring knife, right before cooking. Too thick = tears pancake on flip. Too thin = dissolves into mush, sticks to pan.</p>
-
-      <h5>Caramel prep</h5>
-      <p>Buy baking caramel bits, chop micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the griddle.</p>
-
-      <h5>Banana Nut experimentation</h5>
-      <ul>
-        <li><b>Traditional Bakery Profile:</b> Melted Ghee + Cinnamon + Fresh Nutmeg.</li>
-        <li><b>Exotic Modern Cafe Profile:</b> Melted Butter + Cinnamon + Ground Cardamom.</li>
-      </ul>
-    </div>
-  </details>
-
-  <details>
     <summary>🍁 Syrup grade reference</summary>
     <div class="body">
       <p>Use <b>100% Pure Grade A Maple Syrup</b>. Never commercial table syrups (Aunt Jemima, Log Cabin = HFCS + artificial flavor).</p>
@@ -360,6 +368,19 @@
 
       <h5>The Structural Conflict Rule</h5>
       <p>Ripe banana discs release water-sugar compounds when seared. Combining bananas with pure melting candies (toffee/caramel) is locked in the "Bad" tier — it liquefies the pancake interior, causing tear-on-flip and burning.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🧊 Storage &amp; leftovers</summary>
+    <div class="body">
+      <ul>
+        <li><b>Whole nutmeg seeds:</b> 4–5+ years in a sealed glass jar, cool/dark/dry pantry. Never above the stove (heat + steam ruin oils). Don't freeze — condensation rots them.</li>
+        <li><b>Leftover whisked egg (from half-batches):</b> keep covered in fridge up to <b>2 days</b>. Use in scrambled eggs, egg wash, or another half-batch tomorrow.</li>
+        <li><b>Leftover mixed wet batter:</b> ❌ Discard. The cold kills leavening — overnight batter = flat, gummy paste. If you can't finish a full batch, mix a half-batch instead.</li>
+        <li><b>Leftover dry mix:</b> 6–9 months sealed; 1–2 years dry-vacuum-sealed.</li>
+        <li><b>Leftover cooked pancakes:</b> freeze beautifully. Cool fully → stack with parchment between → heavy-duty freezer bag. Reheat from frozen in toaster.</li>
+      </ul>
     </div>
   </details>
 
@@ -381,20 +402,7 @@
     </div>
   </details>
 
-  <details>
-    <summary>🥄 Ladle / pancake size reference</summary>
-    <div class="body">
-      <ul>
-        <li><b>0.5 oz (1 Tbsp scoop):</b> 1.5–2" sample bite. Drop toppings the second you pour — they cook fast. 8 of these = one normal stack.</li>
-        <li><b>1.0 oz (2 Tbsp scoop):</b> 2.5–3" silver dollar — the tasting-flight size. Single-serving batch yields 4 of these.</li>
-        <li><b>2.0 oz (¼ cup):</b> 4" standard diner pancake. Easiest size for practicing flips.</li>
-        <li><b>3.0 oz (⅜ cup):</b> 5" thick-stack. Leave on griddle slightly longer so the center cooks through.</li>
-        <li><b>4.0 oz (½ cup):</b> 6–7" plate-sized flapjack. Hardest to flip; best for laying down whole bacon strips.</li>
-      </ul>
-    </div>
-  </details>
-
-  <div class="footer">Based on The Master Pancake Flight Manual · v2</div>
+  <div class="footer">Based on The Master Pancake Flight Manual · v3</div>
 </div>
 
 <script>
@@ -434,16 +442,16 @@ const BULK_SCOOP = ['½ cup', '1 cup', '1½ cups', '2 cups'];
 const FAT = ['1½ tsp', '1 Tbsp', '1½ Tbsp', '2 Tbsp'];
 
 const SPICE = {
-  cinnamon: ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)',     'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
-  nutmeg:   ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
-  cardamom: ['Trace Dusting',    'Drop (1/64 tsp)',  'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
-  vanilla:  ['¼ tsp',            '½ tsp',            '¾ tsp',                  '1 tsp'],
-  vanillaPaste: ['¼ tsp',        '½ tsp',            '¾ tsp',                  '1 tsp'],
-  salt:     ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)',     'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
-  blackPepper: ['Drop (1/64 tsp)','Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)','Pinch (1/16 tsp)'],
-  cayenne:  ['Trace Dusting',    'Drop (1/64 tsp)',  'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
-  espresso: ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
-  seaSalt:  ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+  cinnamon:    ['Pinch (1/16 tsp)',  'Dash (⅛ tsp)',       'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
+  nutmeg:      ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+  cardamom:    ['Hint (1/128 tsp)',  'Drop (1/64 tsp)',    'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
+  vanilla:     ['¼ tsp',             '½ tsp',              '¾ tsp',                  '1 tsp'],
+  vanillaPaste:['¼ tsp',             '½ tsp',              '¾ tsp',                  '1 tsp'],
+  salt:        ['Pinch (1/16 tsp)',  'Dash (⅛ tsp)',       'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
+  blackPepper: ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+  cayenne:     ['Hint (1/128 tsp)',  'Drop (1/64 tsp)',    'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
+  espresso:    ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+  seaSalt:     ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
 };
 
 const FLAVORS = [
@@ -729,9 +737,6 @@ const TOPPINGS = {
     ['12–14 chopped caramel bits'],
     ['16–18 chopped caramel bits'],
   ],
-  // Combo candy flavors: only the individual ingredient limits are explicit in the PDF.
-  // The PDF only gives one explicit combo formula (Triple at 1.0 oz).
-  // For others, we show the per-ingredient max + the overall Max Combined Volume.
   toffee_caramel: [
     ['Stay under the Max Combined limit, split how you like:', '• up to ~Smidgen toffee + ~2 caramel bits'],
     ['• up to ~½ tsp toffee + up to ~5 caramel bits'],
@@ -763,8 +768,8 @@ const TOPPINGS = {
 };
 
 const CARAMEL_PREPS = [
-  { id: 'flash', label: 'Flash-frozen (10 min)', desc: 'Behaves like room-temp candy — normal heat 375°F' },
-  { id: 'deep',  label: 'Deep-frozen (long-term)', desc: 'Takes longer to melt — lower heat 325°F (300–325°F for Triple)' },
+  { id: 'flash', label: 'Flash-frozen (10 min)', desc: 'Behaves like room-temp candy — normal heat 375°F (or 325°F for Triple)' },
+  { id: 'deep',  label: 'Deep-frozen (long-term)', desc: 'Takes longer to melt — lower heat 325°F (or 300°F for Triple)' },
 ];
 
 const state = { batch: 1, flavor: 'plain', size: 1, bulk: false, caramelPrep: 'flash' };
@@ -782,18 +787,16 @@ function render() {
     `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
   ).join('');
 
-  // Caramel prep picker (only for flavors with caramel)
+  // Inline caramel prep picker — appears WITHIN the flavor card when flavor has caramel
   const flavor = FLAVORS.find(f => f.id === state.flavor);
-  const caramelCard = document.getElementById('caramel-card');
+  const caramelInline = document.getElementById('caramel-inline');
   if (flavor && flavor.hasCaramel) {
-    caramelCard.style.display = '';
+    caramelInline.style.display = '';
     document.getElementById('caramel-opts').innerHTML = CARAMEL_PREPS.map(p =>
       `<div class="opt ${state.caramelPrep === p.id ? 'active' : ''}" data-caramel="${p.id}" title="${p.desc}">${p.label}</div>`
     ).join('');
-    document.getElementById('bulk-step-num').textContent = '5. Starting from';
   } else {
-    caramelCard.style.display = 'none';
-    document.getElementById('bulk-step-num').textContent = '4. Starting from';
+    caramelInline.style.display = 'none';
   }
 
   document.getElementById('bulk-toggle').checked = state.bulk;
@@ -850,33 +853,65 @@ function renderOutput() {
     }
   }
 
-  // Toppings block
+  // Toppings block — now also hosts caramel prep + double shield notes when applicable (in that order)
   const toppingsList = TOPPINGS[flavor.id];
-  let toppingsHtml = '';
+  let toppingsInner = '';
   if (toppingsList) {
-    toppingsHtml = `<div class="block">
-      <h4>Toppings per pancake</h4>
-      <ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="v" style="text-align:left;font-weight:500">${t}</span></li>`).join('')}</ul>
+    toppingsInner = `<ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="v" style="text-align:left;font-weight:500">${t}</span></li>`).join('')}</ul>
       <div class="max-limit">Max Combined Volume Limit: ${sizeInfo.maxCombined}</div>
-      <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Keep toppings tight in the center — leave a clean batter perimeter (needed for the Batter Shield seal).</p>
-    </div>`;
+      <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Keep toppings tight in the center — leave a clean batter perimeter (needed for the Batter Shield seal).</p>`;
   } else if (flavor.id === 'plain') {
-    toppingsHtml = `<div class="block"><h4>Toppings per pancake</h4><p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p></div>`;
+    toppingsInner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
   }
 
-  // Compute effective low-heat from caramel preparation state
-  const useLowHeat = flavor.hasCaramel && state.caramelPrep === 'deep';
-  const lowHeatTempLabel = flavor.id === 'triple' ? '300–325°F' : '325°F';
+  // 1st: Caramel prep note (if applicable)
+  if (flavor.hasCaramel) {
+    const prepText = state.caramelPrep === 'flash'
+      ? `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+      : `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
+    toppingsInner += `<div class="topping-note info">${prepText}</div>`;
+  }
 
-  // Cooking callouts
-  const callouts = [];
+  // 2nd: Double Batter Shield required note (if applicable)
   if (flavor.doubleShield) {
-    callouts.push(`<div class="callout warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the pan otherwise.</div>`);
-  } else if (flavor.shield) {
+    toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the pan otherwise.</div>`;
+  }
+
+  const toppingsHtml = toppingsInner
+    ? `<div class="block"><h4>Toppings per pancake</h4>${toppingsInner}</div>`
+    : '';
+
+  // Heat line — CORRECTION: Triple uses low heat in BOTH prep states (300°F deep / 325°F flash);
+  // other caramel combos use 325°F deep / 375°F flash; everything else 375°F.
+  let heatLine;
+  let lowHeatCalloutLabel = null;
+  if (flavor.id === 'triple') {
+    if (state.caramelPrep === 'deep') {
+      heatLine = '300°F (low — deep-frozen Triple)';
+      lowHeatCalloutLabel = '300°F';
+    } else {
+      heatLine = '325°F (low — flash-frozen Triple)';
+      lowHeatCalloutLabel = '325°F';
+    }
+  } else if (flavor.hasCaramel && state.caramelPrep === 'deep') {
+    heatLine = '325°F (low — deep-frozen caramel)';
+    lowHeatCalloutLabel = '325°F';
+  } else {
+    heatLine = '375°F (Med-Low / Med on most stoves)';
+  }
+
+  // Cooking callouts (single shield, heat, butter, bacon-rest, banana/pine nuts)
+  // Double shield and caramel-prep notes are now inside the toppings block, not here.
+  const callouts = [];
+  if (flavor.shield && !flavor.doubleShield) {
     callouts.push(`<div class="callout warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the pan otherwise.</div>`);
   }
-  if (useLowHeat) {
-    callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle to ${lowHeatTempLabel}</b> — you picked deep-frozen caramel, which takes longer to melt and burns at the normal 375°F.</div>`);
+  if (lowHeatCalloutLabel) {
+    if (flavor.id === 'triple') {
+      callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle to ${lowHeatCalloutLabel}</b> — Triple-Threat requires low heat regardless of prep state (${state.caramelPrep === 'deep' ? '300°F for rock-hard, deep-frozen caramel' : '325°F for 10-minute flash-frozen caramel'}).</div>`);
+    } else {
+      callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle to ${lowHeatCalloutLabel}</b> — you picked deep-frozen caramel, which takes longer to melt and burns at the normal 375°F.</div>`);
+    }
   } else if (flavor.hasCaramel) {
     callouts.push(`<div class="callout info">🌡 Normal griddle temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
   }
@@ -890,13 +925,6 @@ function renderOutput() {
     callouts.push(`<div class="callout info">🍌 Slice bananas ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
     callouts.push(`<div class="callout info">🌰 Toast pine nuts in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
   }
-  if (flavor.hasCaramel) {
-    if (state.caramelPrep === 'flash') {
-      callouts.push(`<div class="callout info">🧊 Caramel prep: micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.</div>`);
-    } else {
-      callouts.push(`<div class="callout info">🧊 Caramel prep: micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.</div>`);
-    }
-  }
 
   // Quality Tier
   const t = flavor.tiers;
@@ -908,9 +936,6 @@ function renderOutput() {
   </div>`;
 
   // Steps
-  const heatLine = useLowHeat
-    ? (flavor.id === 'triple' ? '300–325°F (low — deep-frozen Triple)' : '325°F (low — deep-frozen caramel)')
-    : '375°F (Med-Low / Med on most stoves)';
   const bakeBaconStep = (flavor.id === 'bacon' || flavor.id === 'bnut_bacon')
     ? 'Cook bacon now (during the rest).'
     : 'At the 7-min mark, heat the pan and add the pan grease.';
@@ -923,24 +948,28 @@ function renderOutput() {
     <p class="desc">${flavor.strategy} · Griddle: <b>${heatLine}</b>.</p>
 
     <div class="grid">
-      <div class="block">
-        <h4>Dry Bowl</h4>
-        ${dryHtml}
+      <div class="col">
+        <div class="block">
+          <h4>Dry Bowl</h4>
+          ${dryHtml}
+        </div>
+        <div class="block">
+          <h4>Pan Grease</h4>
+          <ul class="list"><li><span class="k">Use</span><span class="v">${flavor.panGrease}</span></li></ul>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Apply 1 tsp, then wipe across with paper towel to a micro-thin shimmering film. No puddles.</p>
+        </div>
       </div>
-      <div class="block">
-        <h4>Wet Bowl</h4>
-        ${wetHtml}
+      <div class="col">
+        <div class="block">
+          <h4>Wet Bowl</h4>
+          ${wetHtml}
+        </div>
+        <div class="block">
+          <h4>Spices (into wet bowl)</h4>
+          ${spicesHtml}
+        </div>
+        ${toppingsHtml}
       </div>
-      <div class="block">
-        <h4>Spices (into wet bowl)</h4>
-        ${spicesHtml}
-      </div>
-      <div class="block">
-        <h4>Pan Grease</h4>
-        <ul class="list"><li><span class="k">Use</span><span class="v">${flavor.panGrease}</span></li></ul>
-        <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Apply 1 tsp, then wipe across with paper towel to a micro-thin shimmering film. No puddles.</p>
-      </div>
-      ${toppingsHtml}
     </div>
 
     ${callouts.join('')}
