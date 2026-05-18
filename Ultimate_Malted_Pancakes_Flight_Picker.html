@@ -813,17 +813,11 @@
     .pancake-size-bar[data-collapsed="1"] .psb-title-collapsed { display: none; }
   }
 
-  /* === v2.2.0: stacked-mode sticky Batch card (Pancake Size + Batch stay on screen) === */
-  body:not([data-layout="side"]) .picker-pane .card[data-card="batch"] {
-    position: sticky;
-    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 8px);
-    z-index: 50; background: var(--card); }
-  body:not([data-layout="side"])[data-controls-collapsed="1"] .picker-pane .card[data-card="batch"] {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 8px); }
-  body:not([data-layout="side"])[data-pancake-collapsed="1"] .picker-pane .card[data-card="batch"] {
-    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 8px); }
-  body:not([data-layout="side"])[data-controls-collapsed="1"][data-pancake-collapsed="1"] .picker-pane .card[data-card="batch"] {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 8px); }
+  /* v2.7.1: removed the v2.2.0 stacked-mode sticky-batch rules — they had the same
+     specificity (0,4,1) as v2.7.0's static-batch override but came later in source order,
+     so v2.2.0 won and the Batch card stuck on scroll, sliding over the PSB. In v2.7.0+ the
+     whole picker-region is sticky at top:controls-h, so per-card sticky on Batch is
+     unnecessary AND broke the grid layout. */
   body[data-options-collapsed="1"]:not([data-layout="side"]) .picker-pane { display: none; }
 
   /* === v2.2.0: per-card collapse (Batch + Flavors picker cards) === */
@@ -1287,7 +1281,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.7.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.7.1</div>
 </div>
 
 <script>
