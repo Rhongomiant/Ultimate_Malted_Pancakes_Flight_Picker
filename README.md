@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v3.0.0-rc.5.html` — the picker app (current)
+- `Ultimate_Malted_Pancakes_Flight_Picker_v3.0.0-rc.6.html` — the picker app (current)
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -458,23 +458,38 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 `X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins.
 
-**Current: v3.0.0-rc.5** — six bug fixes from rc.4 review.
+**Current: v3.0.0-rc.6** — order toggle restructure + Mode A/B sizing fixes.
 
-(1) **Shared Cooking Instructions restored in Mode B**. rc.3/rc.4 had the instructions gated on Mode A only via `if (visibleFlavorCount > 0 && !useCategorySections)` — Mode B (By Category) silently dropped them. They're universal context, so they now render once at the top of the output in both modes, between the prep callouts and the Setup phase header.
+After a clarifying discussion of what the two output modes actually mean, the picker UX restructures around the realization that the Mode A/B distinction is fundamentally about cooking workflow:
 
-(2) **`Group output by` moved from Batch card to Flavor card**. The Flavor card is the de facto Flight configuration area (the picker only has a Single/Flight mode-switcher at the very top, no separate "Flight card"). The bcr-group now sits between the flavor-block-msg and the candy-row.
+* **By Recipe** (rc.6 name, was "By Batch" / "Mode A"): the user treats the flight as one cook session — set up everything, cook everything as one operation. Shared cooking instructions, one universal Cook phase block, one Quality Tier section. Useful when the user knows how to cook and just needs a one-page reference.
 
-(3) **Recommended Order's category-grouping function restored**. rc.4 decoupled outputGrouping from orderMode, which made recommended order feel redundant because By Category was driving the visible grouping regardless. Restored rc.3's auto-derivation: Mode B fires when `isRecommended && multi-cat`. The `Group output by` toggle is kept as a UI placeholder — pills are visually muted (`.placeholder` class), the disabled attribute is set, and the active pill tracks the auto-derived state so users can see the current grouping. The label's tooltip explains: "Coming soon. For now, this auto-tracks Recommended Order: multi-category recommended order → By Category; menu/selection order → By Batch."
+* **By Category** (rc.6 name, was "Mode B"): the user works one category at a time — prep, cook, check quality for Clean; wipe surface; prep, cook, check quality for Savory; wipe surface; etc. Each category section is a self-contained workflow unit with its own filtered prep batches, cook flavor cards, and quality tier cards.
 
-(4) **Setup-phase batch columns no longer balloon in side-by-side**. `.batches-row > .batch-column` had `flex: 0 0 auto; min-width: 320px` with no max — so columns grew to fit their natural content width (F&S sub-cards stretching to 1fr inside them). Capped with `max-width: 480px` and `overflow: hidden` to clip residual overflow.
+The structural insight: By Category only makes sense when the user has already opted into category-aware ordering, which is exactly what recommended order does. So the output-mode toggle now lives inside the Order toggle group as a third sub-control alongside "within groups", and only appears when orderMode='recommended'. When the user picks Menu or Selection order, By Recipe is automatically used (categories aren't a meaningful grouping in those modes). When v3.1 adds user-defined groupings, the same pattern applies — the output toggle activates under recommended-style grouping modes.
 
-(5/6) **Setup-phase Grid mode fixes**: (a) was `repeat(auto-fit, minmax(280px, 1fr))` producing 3+ columns on wide screens — switched to explicit `repeat(2, minmax(0, 1fr))` for 2-per-row (drops to 1 only below 700px viewport). (b) Sub-cards (F&S and Toppings) overflowing horizontally when side-by-side inside narrow batch columns — the inline `repeat(N, minmax(180px, 1fr))` ignored parent width. Changed the JS to emit `repeat(N, minmax(0, 1fr))` so sub-cards shrink to fit instead of overflowing.
+Other UX changes:
 
-**Test totals: 203/203 across 7 suites** — alpha.2 plumbing 10/10 · beta picker UI 39/39 · rc rendering 50/50 · rc.2 picker consolidation 40/40 · rc.3 group/batch layouts 34/34 · rc.4 18/18 · rc.5 12/12. Four rc.4 assertions updated to reflect rc.5's placeholder behavior (pills are disabled, active tracks auto-derive, outputGrouping state field no longer drives layout). One F&S wording test rewritten to use `['plain', 'choc']` (single-category multi-flavor) instead of `['plain', 'bacon']` (multi-category) so the scenario stays in Mode A where the "(into wet bowls), per flavor" heading is emitted.
+* The three orderMode buttons drop their "Order" suffix (redundant with the group label "Order"): "Recommended Order" → "Recommended", "Menu Order" → "Menu", "Selection Order" → "Selection".
 
-**Note on the engineering quality of this release**: the previous releases shipped several bugs (rc.3 layout switchers that did nothing because of a CSS specificity issue; rc.4 sharedCookCard gated on Mode A only; rc.4 outputGrouping breaking auto-derivation). The unit-test harness is HTML-presence-focused and doesn't catch CSS specificity issues, sizing problems, or visual regressions. Future revisions should pair each shipped feature with a manual visual spot-check before claiming it works.
+* The placeholder `Group output by` bcr-group is removed from the Flavor card (rc.5 had moved it there, but the toggle now lives in the order toggle group).
 
-**Prior releases**: rc.4 (auto-derive replaced with explicit outputGrouping toggle — reverted in rc.5), rc.3 (group/batch layout switchers + per-category Cook+Tier in Mode B), rc.2 (picker consolidation: combined Batch card row, reset button, horizontal scroll, F&S/Toppings layout switchers), rc (output rendering reorg), beta (picker UI for batches model), alpha.2 (data-model plumbing). v3.0.0-final still pending: master shopping list math.
+* `useCategorySections` now consults `state.outputGrouping` directly under recommended order (no more auto-derive shadowing the toggle). Single-category still falls back to By Recipe since the wrapping is structurally identical.
+
+Shared cooking instructions placement fixed:
+* **In By Recipe**: inside the Cook phase section (above per-flavor delta cards), which is where they belong structurally — rc.5 had hoisted them above the Setup phase header, which felt wrong.
+* **In By Category**: once above the `.groups-row`, with a header annotation "(applies to all categories below)" so users understand the scope. Since By Category suppresses the standalone Cook phase header, this is the natural home.
+
+Three CSS sizing bugs from rc.5 fixed:
+* **2a (huge gaps in groups-row)**: `.category-section` had `min-width: 360px` in side-mode, leaving huge gaps when a category had a single narrow batch. Dropped — categories now size to their inner content.
+* **2b (sub-cards overlapping)**: rc.5's `minmax(0, 1fr)` on the side-by-side sub-cards grid wasn't enough — the `.subcard` itself needed `overflow: hidden` and explicit word-wrap so content can shrink below its intrinsic width.
+* **2c (batch column max-width hard cap)**: the 480px cap from rc.5 was a sledgehammer for the ballooning that was actually caused by bug 2b. With 2b fixed properly, the cap is unnecessary — dropped so columns can use available space.
+
+**Test totals: 222/222 across 8 suites** — alpha.2 10/10 · beta 39/39 · rc 50/50 · rc.2 40/40 · rc.3 34/34 · rc.4 17/17 · rc.5 10/10 · rc.6 22/22. The rc.4 and rc.5 suites both needed assertion updates: rc.4 had stale references to `elementsByid['output-grouping-group']` from when the toggle lived in a static HTML element (removed in rc.6 since the toggle is now rendered inside `#output` as part of the order toggle); rc.5 had similar checks. Both suites now verify the toggle's presence/absence inside `#output` based on `orderMode`.
+
+**Mid-session bug found and fixed**: my first rc.6 edit broke because `sharedCookCardHtml` was constructed (line 3975) AFTER Mode B's setupBodyHtml referenced it (line 3931) — a temporal dead zone error from `let`. Hoisted the construction above the `setupBodyHtml` composition so both modes can use it. Caught by the test suite syntax check, which is exactly what those guardrails are for.
+
+**Prior releases**: rc.5 (sharedCookCard hoist + Flavor-card toggle placement — both reverted in rc.6 after the modes-discussion clarified intent), rc.4 (explicit outputGrouping toggle with placeholder pills), rc.3 (group/batch layout switchers + per-category Cook+Tier in Mode B), rc.2 (picker consolidation: combined Batch card row, reset button, horizontal scroll, F&S/Toppings layout switchers), rc (output rendering reorg), beta (picker UI for batches model), alpha.2 (data-model plumbing). v3.0.0-final still pending: master shopping list math.
 
 **v2 line**: v2.10.1 (controls-row alignment fix). v2.10.0 (single-row controls). v2.9.0 (candy-combo recipe data + Trace Dusting vocab). v2.8.0 → v2.0.0 covered direct-bind layout switchers, picker-region wrapper, stacked width parity, layout-overhaul polish through 8/10/12-item refinements, URL state + sticky chrome, Flight mode, card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; v3 is specified in `v3_HANDOFF.md` but the design evolved past the handoff's per-flavor-override mental model. The companion manual update remains queued for a dedicated next session.
 
