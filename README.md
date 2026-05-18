@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v1.15.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -42,7 +42,9 @@ When both candies are present, the lower temperature wins: if *either* candy is 
 
 **Theme switcher:** Auto (follows OS) / Light / Dark. Auto reacts to OS theme changes live. Print always uses the light palette.
 
-Both switchers persist in `localStorage`.
+**Card-size switcher** *(v2.0.0)*: a compact control next to Layout and Theme that resizes the recipe card from 80% to 140% without changing the recipe itself. Three controls in one pill — quick-jump preset pills (80% / 100% / 120% / 140%), a continuous slider, and a step selector (1% / 5% / 10%) that tunes the slider's increment. Implemented via CSS `zoom` on `.out-card`. Persists in `localStorage` (`pancakeFlightCardScale`, `pancakeFlightCardScaleStep`). Hidden on viewports under 600 px (browser zoom does the job there). Print always forces 100% regardless of slider position.
+
+All three switchers persist in `localStorage`.
 
 **Reference docs** (collapsible at bottom): Bulk Pantry Mix recipe + jar storage, vocabulary cheat sheet (Hint / Drop / Smidgen / Pinch / Dash / Tad + Scant / Fat modifiers + Shield Rule), mixing & resting rules, Shield Rule with precise volumes per pancake size, ladle prep (45–60 sec ice-bath rule), advanced tips (warm-water fat bath, Microplane nutmeg, pine-nut toasting, Candy Crushing Protocol, Shield Application Mechanism), cooking order + between-batch cleanup, liquid troubleshooting, flipping technique, syrup grade reference, component sourcing guide.
 
@@ -50,9 +52,9 @@ Both switchers persist in `localStorage`.
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v1.15.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v1.15.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v1.15.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html   # Windows
 ```
 
 That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~1400 lines) with inline CSS and vanilla JS.
@@ -63,27 +65,29 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v1.15.0.html  # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.0.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
 
 ## How the code is organized
 
-All in the picker HTML file. Approximate landmarks (line numbers from v1.15.0):
+All in the picker HTML file. Approximate landmarks (line numbers from v2.0.0):
 
 | Lines       | What lives there |
 |-------------|------------------|
-| 1–230       | `<style>` block — design tokens (CSS custom properties + dark theme overrides), pickers, output cards, tier badges, reference accordion, layout/theme switchers, print rules |
-| 230–530     | HTML structure — controls row (layout + theme switchers), three picker cards, output card, all `<details>` reference sections, component-sourcing table |
-| 530–670     | Reference content (vocabulary cheat sheet, Shield Rule + Precise Shield Volumes, ladle prep, advanced tips, etc.) — all inside `<details>` accordions |
-| 670–725     | `<script>` opens · Theme switcher IIFE · Layout switcher IIFE (both persist to `localStorage`) |
-| 725–790     | Lookup tables: `BATCHES`, `BULK_OPTS`, `SIZES`, `SHIELD_VOLUMES`, `DRY`, `WET`, `BULK_SCOOP`, `FAT`, `SPICE` |
-| 790–960     | `FLAVORS` array — 12 flavor objects with spices/fat/syrup/tiers/flags |
-| 960–1040    | `TOPPINGS` per-flavor-per-size matrix |
-| 1040–1110   | `state`, `render()`, picker UI building |
-| 1110–1380   | `getEffectivePrep()`, `renderOutput()` — the big function that assembles the recipe HTML from state |
-| 1380–end    | Event listeners on the picker buttons |
+| 1–290       | `<style>` block — design tokens (CSS custom properties + dark theme overrides), pickers, output cards, tier badges, reference accordion, layout/theme switchers, print rules |
+| 290–340     | Card-scale switcher CSS (preset pills + slider + step selector) + `--card-scale` / `zoom` rules on `.out-card` *(new in v2.0.0)* |
+| 340–530     | HTML structure — controls row (layout + theme + card-size switchers), three picker cards, output card, all `<details>` reference sections, component-sourcing table |
+| 530–725     | Reference content (vocabulary cheat sheet, Shield Rule + Precise Shield Volumes, ladle prep, advanced tips, etc.) — all inside `<details>` accordions |
+| 725–790     | `<script>` opens · Theme switcher IIFE · Layout switcher IIFE (both persist to `localStorage`) |
+| 790–840     | Card-scale switcher IIFE *(new in v2.0.0)* — persists `pancakeFlightCardScale` (decimal) and `pancakeFlightCardScaleStep` (integer %) to `localStorage` |
+| 840–910     | Lookup tables: `BATCHES`, `BULK_OPTS`, `SIZES`, `SHIELD_VOLUMES`, `DRY`, `WET`, `BULK_SCOOP`, `FAT`, `SPICE` |
+| 910–1080    | `FLAVORS` array — 12 flavor objects with spices/fat/syrup/tiers/flags |
+| 1080–1160   | `TOPPINGS` per-flavor-per-size matrix |
+| 1160–1230   | `state`, `render()`, picker UI building |
+| 1230–1510   | `getEffectivePrep()`, `renderOutput()` — the big function that assembles the recipe HTML from state |
+| 1510–end    | Event listeners on the picker buttons |
 
 ### Data model
 
@@ -206,7 +210,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` = bug fix, `Y` = change, `X` = major. Current: **v1.15.0** (dark mode + theme switcher).
+`X.Y.Z` — `Z` = bug fix, `Y` = feature change, `X` = major. Current: **v2.0.0** (recipe card-size switcher: preset pills + slider + step selector, the first v2 phase). The v2 roadmap is in `v2_HANDOFF.md`; subsequent phases will bump Y (flight mode → v2.1.0, mixed batch sizes → v2.2.0, polish → v2.3.0).
 
 ## License
 
