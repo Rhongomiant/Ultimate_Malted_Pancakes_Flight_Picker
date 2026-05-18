@@ -550,9 +550,7 @@
     font-size: 0.78rem; cursor: pointer; color: var(--muted);
     font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
   .controls-toggle:hover { color: var(--ink); }
-  body[data-controls-collapsed="1"] .controls-row > :not(.controls-toggle) {
-    display: none; }
-  body[data-controls-collapsed="1"] .controls-toggle { margin-left: 0; }
+  /* Controls-toggle label swap (still needed even though the toggle lives in .controls-actions now) */
   body:not([data-controls-collapsed="1"]) .controls-toggle .expand-label { display: none; }
   body[data-controls-collapsed="1"] .controls-toggle .collapse-label { display: none; }
   body[data-layout="side"] .controls-row { margin-bottom: 8px; }
@@ -560,15 +558,24 @@
     .controls-row, .controls-toggle { display: none !important; }
   }
 
-  /* === v2.1.1: sticky output header (recipe title row) === */
-  .out-header { position: sticky; top: var(--controls-h, 60px); z-index: 30;
-    background: var(--card); margin: -8px -16px 14px;
-    padding: 10px 16px 8px; border-bottom: 1px solid var(--line); }
-  .out-header h3 { margin: 0; }
-  .out-header .yield { margin: 4px 0 0; }
-  body[data-controls-collapsed="1"] .out-header { top: var(--controls-collapsed-h, 38px); }
+  /* === v2.3.0: sticky output header — lives OUTSIDE .out-card (which has `zoom` that breaks sticky descendants).
+     Single block contains both title and yield. */
+  .out-header { position: sticky;
+    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 4px);
+    z-index: 30; background: var(--card);
+    border: 1px solid var(--line); border-radius: 14px;
+    margin: 0 0 14px; padding: 12px 18px 10px;
+    box-shadow: var(--card-shadow); }
+  .out-header h3 { margin: 0; font-size: 1.05rem; }
+  .out-header .yield { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
+  body[data-controls-collapsed="1"] .out-header {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 4px); }
+  body[data-pancake-collapsed="1"] .out-header {
+    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 4px); }
+  body[data-controls-collapsed="1"][data-pancake-collapsed="1"] .out-header {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 4px); }
   @media print {
-    .out-header { position: static; border-bottom: 0; padding: 0; margin: 0 0 8px; }
+    .out-header { position: static; border: 0; box-shadow: none; padding: 0; margin: 0 0 8px; }
   }
 
   /* === v2.1.1: sub-card grid (Wet/Spices/Toppings — switchable layout) === */
@@ -620,6 +627,107 @@
     font-size: 0.86rem; color: var(--ink); line-height: 1.45;
     word-wrap: break-word; overflow-wrap: anywhere; }
   ul.flavor-deltas li:last-child { border-bottom: 0; }
+
+  /* === v2.3.0: Dry + Wet side-by-side pair (#3) === */
+  .setup-row-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 0; }
+  .setup-row-pair > .block { margin-bottom: 0; }
+  @media (max-width: 700px) {
+    .setup-row-pair { grid-template-columns: 1fr; }
+  }
+
+  /* === v2.3.0: Cook phase layout switcher (#8) === */
+  .flavor-deltas-grid[data-cook-layout="grid"] {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .flavor-deltas-grid[data-cook-layout="stack"] {
+    grid-template-columns: 1fr; }
+  .flavor-deltas-grid[data-cook-layout="side"] {
+    overflow-x: auto; padding-bottom: 6px; }
+  .flavor-deltas-grid[data-cook-layout="side"]::-webkit-scrollbar { height: 6px; }
+  .flavor-deltas-grid[data-cook-layout="side"]::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb); border-radius: 3px; }
+  .flavor-deltas-grid[data-cook-layout="side"] > * { min-width: 240px; }
+
+  /* === v2.3.0: stacked-mode compact pair animation (#10) ===
+     - .picker-pane uses flex with wrap so Batch + Flavors can transition between stacked and side-by-side
+     - widths transition smoothly when body[data-picker-compact="1"] flips */
+  body:not([data-layout="side"]) .picker-pane {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+  body:not([data-layout="side"]) .picker-pane > .card {
+    width: 100%; margin-bottom: 0;
+    transition: width 0.3s ease, max-width 0.3s ease; }
+  /* When the sentinel above .picker-pane scrolls offscreen, compact mode kicks in */
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane > .card {
+    width: calc(50% - 7px); }
+  /* In compact mode, the picker-pane itself is centered as a sticky band */
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane {
+    position: sticky; top: var(--controls-h, 60px); z-index: 50;
+    background: var(--bg); padding: 8px 0; margin-left: auto; margin-right: auto;
+    border-bottom: 1px solid var(--line); }
+  body:not([data-layout="side"])[data-controls-collapsed="1"][data-picker-compact="1"] .picker-pane {
+    top: var(--controls-collapsed-h, 38px); }
+  /* Override the prior v2.2.0 sticky batch rule when in compact mode — compact pair takes over */
+  body:not([data-layout="side"])[data-picker-compact="1"] .picker-pane .card[data-card="batch"] {
+    position: static; top: auto; }
+  /* Picker-sentinel — invisible 1px div that the observer watches.
+     `display: contents` removes it from the grid/flex flow entirely but still allows IntersectionObserver. */
+  .picker-sentinel { display: block; width: 100%; height: 1px;
+    margin: 0; padding: 0; pointer-events: none; }
+  body[data-layout="side"] .picker-sentinel { display: none; }
+
+  /* === v2.3.0: stacked-mode pancake-size-bar lives BELOW picker-pane (#11) === */
+  /* In side-by-side, the grid placement (col 2 row 2) wins over DOM order, so no override needed there.
+     In stacked, the DOM order is now picker-pane → pancake-size-bar, which is what we want. */
+  /* Update sticky top for the pancake-size-bar in stacked mode: now sits BELOW the picker-pane
+     instead of above. We re-anchor it to the top of the viewport just under the controls. */
+  body:not([data-layout="side"]) .pancake-size-bar {
+    /* Pancake size in stacked mode only sticks when there's room (after picker-pane); CSS sticky
+       handles this naturally — it sticks at top: var(--controls-h) but only while in its parent's box. */
+    top: var(--controls-h, 60px); }
+
+  /* === v2.3.0: print fallback — side-by-side → grid for printing if too many flavors (#12) === */
+  @media print {
+    body[data-print-fallback="1"] .subcards-grid[data-subcard-layout="side"],
+    body[data-print-fallback="1"] .tier-side-grid,
+    body[data-print-fallback="1"] .flavor-deltas-grid[data-cook-layout="side"] {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+      overflow: visible !important;
+    }
+    body[data-print-fallback="1"] .subcards-grid[data-subcard-layout="side"] > *,
+    body[data-print-fallback="1"] .tier-side-grid > *,
+    body[data-print-fallback="1"] .flavor-deltas-grid[data-cook-layout="side"] > * {
+      min-width: 0 !important;
+    }
+  }
+
+  /* === v2.3.0: Print side alert (#12) — fixed to LEFT edge so print dialog doesn't cover it === */
+  .print-alert { display: none;
+    position: fixed; left: 16px; top: 80px; z-index: 9999;
+    max-width: 280px; padding: 14px 16px;
+    background: var(--card); color: var(--ink);
+    border: 1px solid var(--accent); border-left: 4px solid var(--accent);
+    border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.18);
+    font-size: 0.88rem; line-height: 1.4; }
+  .print-alert h4 { margin: 0 0 6px; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
+  .print-alert p { margin: 0; }
+  .print-alert .pa-close { position: absolute; top: 6px; right: 8px;
+    background: none; border: 0; cursor: pointer; color: var(--muted);
+    font-size: 1.1rem; line-height: 1; padding: 4px 6px; }
+  .print-alert .pa-close:hover { color: var(--ink); }
+  body[data-print-alert="1"] .print-alert { display: block; }
+  @media print {
+    .print-alert { display: none !important; }
+  }
+
+  /* === v2.3.0: Order toggle group + sub-order (#4) === */
+  .order-toggle { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .order-toggle .order-sub { display: inline-flex; align-items: center; gap: 6px;
+    margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--line); }
+  .order-toggle .order-sub .label { font-size: 0.72rem; color: var(--muted); }
+  /* Hide sub-order when not in Recommended mode */
+  body:not([data-order-mode="recommended"]) .order-toggle .order-sub { display: none; }
+
 
   /* === v2.2.0: controls-row actions container (Hide Options + Hide Controls grouped right) === */
   .controls-actions { margin-left: auto; display: inline-flex; gap: 8px; align-items: center; }
@@ -692,26 +800,6 @@
     .card[data-collapsed="1"] .card-body { display: block; }
   }
 
-  /* === v2.2.0: split sticky header — title scrolls away, yield stays === */
-  .out-title { margin: -8px -16px 0; padding: 10px 16px 4px;
-    background: var(--card); border-bottom: 1px dashed var(--line); }
-  .out-title h3 { margin: 0; }
-  .out-yield { position: sticky;
-    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 4px);
-    z-index: 25; background: var(--card);
-    margin: 0 -16px 14px; padding: 8px 16px;
-    border-bottom: 1px solid var(--line); }
-  body[data-controls-collapsed="1"] .out-yield {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 4px); }
-  body[data-pancake-collapsed="1"] .out-yield {
-    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 4px); }
-  body[data-controls-collapsed="1"][data-pancake-collapsed="1"] .out-yield {
-    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 4px); }
-  .out-yield .yield { margin: 0; }
-  @media print {
-    .out-title, .out-yield { position: static; padding: 0; margin: 0 0 8px;
-      border-bottom: 0; background: transparent; }
-  }
 
   /* === v2.2.0: sub-card list k/v stacking (item 6a — kills horizontal squish) === */
   .subcards-grid .subcard ul.list li {
@@ -725,13 +813,20 @@
   .subcards-grid .subcard ul.list li .v::before {
     content: "•"; position: absolute; left: 2px; color: var(--accent); }
 
-  /* === v2.2.0: sub-card grid horizontal scroll fallback (item 6b) === */
+  /* === v2.3.0: sub-card grid horizontal scroll w/ wider min-width to prevent overlap (#7) === */
   .subcards-grid[data-subcard-layout="side"] {
     overflow-x: auto; padding-bottom: 6px; }
   .subcards-grid[data-subcard-layout="side"]::-webkit-scrollbar { height: 6px; }
   .subcards-grid[data-subcard-layout="side"]::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb); border-radius: 3px; }
-  .subcards-grid[data-subcard-layout="side"] .subcard { min-width: 200px; }
+  .subcards-grid[data-subcard-layout="side"] .subcard { min-width: 220px; }
+  /* Tier-side gets a wider floor since tier cards have more text */
+  .tier-side-grid {
+    overflow-x: auto; padding-bottom: 6px; }
+  .tier-side-grid::-webkit-scrollbar { height: 6px; }
+  .tier-side-grid::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb); border-radius: 3px; }
+  .tier-side-grid > * { min-width: 260px; }
 
 </style>
 </head>
@@ -775,38 +870,23 @@
     <div class="controls-actions" id="controls-actions">
       <button type="button" class="options-toggle" id="options-toggle"
               aria-label="Toggle picker options visibility">
-        <span class="collapse-label">◀ Hide options</span>
-        <span class="expand-label">▶ Show options</span>
+        <span class="collapse-label">◀ Hide Options</span>
+        <span class="expand-label">▶ Show Options</span>
       </button>
       <button type="button" class="controls-toggle" id="controls-toggle"
               aria-label="Toggle controls visibility">
-        <span class="collapse-label">▲ Hide controls</span>
-        <span class="expand-label">▼ Show controls</span>
+        <span class="collapse-label">▲ Hide Controls</span>
+        <span class="expand-label">▼ Show Controls</span>
       </button>
     </div>
   </div><!-- /controls-row -->
 
-  <div class="pancake-size-bar" id="pancake-size-bar" data-collapsed="0">
-    <div class="psb-head">
-      <h3 class="psb-title">
-        <span class="psb-title-expanded">Pancake Size (Ladle Size)</span>
-        <span class="psb-title-collapsed">Reveal Pancake Size (Ladle Size)</span>
-      </h3>
-      <button type="button" class="psb-toggle" id="psb-toggle"
-              aria-label="Toggle pancake size visibility">
-        <span class="collapse-label">▲ Hide</span>
-        <span class="expand-label">▼ Show</span>
-      </button>
-    </div>
-    <div class="psb-body">
-      <div class="opts" id="size-opts"></div>
-    </div>
-  </div>
+  <div class="picker-sentinel" id="picker-sentinel"></div>
 
   <div class="picker-pane">
   <div class="card" data-card="batch" data-collapsed="0">
     <div class="card-head">
-      <h2>2. Batch size &amp; dry mix source</h2>
+      <h2>Batch size &amp; dry mix source</h2>
       <button type="button" class="card-collapse" data-card-toggle="batch"
               aria-label="Toggle Batch card">
         <span class="collapse-label">▲ Hide</span>
@@ -822,7 +902,7 @@
 
   <div class="card" data-card="flavor" data-collapsed="0">
     <div class="card-head">
-      <h2>3. Flavors &amp; Combinations</h2>
+      <h2>Flavors &amp; Combinations</h2>
       <button type="button" class="card-collapse" data-card-toggle="flavor"
               aria-label="Toggle Flavors card">
         <span class="collapse-label">▲ Hide</span>
@@ -851,10 +931,34 @@
   </div>
   </div><!-- /picker-pane -->
 
+  <div class="pancake-size-bar" id="pancake-size-bar" data-collapsed="0">
+    <div class="psb-head">
+      <h3 class="psb-title">
+        <span class="psb-title-expanded">Pancake Size (Ladle Size)</span>
+        <span class="psb-title-collapsed">Reveal Pancake Size (Ladle Size)</span>
+      </h3>
+      <button type="button" class="psb-toggle" id="psb-toggle"
+              aria-label="Toggle pancake size visibility">
+        <span class="collapse-label">▲ Hide</span>
+        <span class="expand-label">▼ Show</span>
+      </button>
+    </div>
+    <div class="psb-body">
+      <div class="opts" id="size-opts"></div>
+    </div>
+  </div>
+
+  <div class="print-alert" id="print-alert" role="alert" aria-live="polite">
+    <button type="button" class="pa-close" id="pa-close" aria-label="Close alert">&times;</button>
+    <h4>Print layout adjusted</h4>
+    <p id="print-alert-msg">Side-by-side was switched to Grid for printing so all flavor cards fit on the page.</p>
+  </div>
+
   <div class="output-pane">
+  <div class="out-header" id="out-header"></div>
   <div class="card out-card">
     <div class="out" id="output"></div>
-    <button class="print-btn" onclick="window.print()">🖨 Print this recipe</button>
+    <button class="print-btn" id="print-btn">🖨 Print this recipe</button>
   </div>
 
   <div class="section-title">Reference (tap to expand)</div>
@@ -1140,7 +1244,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.2.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.3.0</div>
 </div>
 
 <script>
@@ -1597,25 +1701,40 @@ const state = {
   bulk: false,
   caramelPrep: 'flash',
   toffeePrep: 'flash',
-  groupByCookOrder: true,          // Recommended Order (true) vs Selection Order (false) — affects Setup + Cook
+  // v2.3.0: replaces groupByCookOrder (boolean). Three modes for both Setup and Cook phases.
+  //   'recommended' — group by cooking order (Clean → Savory → Candy); within each group use recommendedSubOrder
+  //   'menu'        — flat by FLAVORS array order (no grouping)
+  //   'selection'   — flat by user's pick order (no grouping)
+  orderMode: 'recommended',
+  recommendedSubOrder: 'menu',     // 'menu' | 'selection' — within-group order when orderMode === 'recommended'
   tierLayout: 'side',
   wetLayout: 'grid',
   spicesLayout: 'grid',
   toppingsLayout: 'grid',
+  cookLayout: 'grid',              // v2.3.0: 'side' | 'stack' | 'grid' for Cook-phase delta cards
   controlsCollapsed: false,
-  pancakeSizeCollapsed: false,     // v2.2.0
-  batchCardCollapsed: false,       // v2.2.0
-  flavorCardCollapsed: false,      // v2.2.0
-  optionsCollapsed: false,         // v2.2.0
+  pancakeSizeCollapsed: false,
+  batchCardCollapsed: false,
+  flavorCardCollapsed: false,
+  optionsCollapsed: false,
+  pickerCompact: false,            // v2.3.0: stacked-mode compact pair (Batch | Flavors side-by-side) — observer-driven, not persisted
 };
 
 // Restore persisted UI prefs (mode/grouping/layouts/collapse) from localStorage
 try {
   const m = localStorage.getItem('pancakeFlightMode');
   if (m === 'flight' || m === 'single') state.mode = m;
-  const g = localStorage.getItem('pancakeFlightGroupByCook');
-  if (g === '0') state.groupByCookOrder = false;
-  if (g === '1') state.groupByCookOrder = true;
+  // v2.3.0: new orderMode key + backward compat for old groupByCook boolean
+  const om = localStorage.getItem('pancakeFlightOrderMode');
+  if (om === 'recommended' || om === 'menu' || om === 'selection') state.orderMode = om;
+  else {
+    // Backward compat: old boolean
+    const g = localStorage.getItem('pancakeFlightGroupByCook');
+    if (g === '0') state.orderMode = 'selection';
+    if (g === '1') state.orderMode = 'recommended';
+  }
+  const rs = localStorage.getItem('pancakeFlightRecSubOrder');
+  if (rs === 'menu' || rs === 'selection') state.recommendedSubOrder = rs;
   const tl = localStorage.getItem('pancakeFlightTierLayout');
   if (tl === 'side' || tl === 'stack' || tl === 'grid') state.tierLayout = tl;
   const wl = localStorage.getItem('pancakeFlightWetLayout');
@@ -1624,6 +1743,8 @@ try {
   if (sl === 'side' || sl === 'stack' || sl === 'grid') state.spicesLayout = sl;
   const tpl = localStorage.getItem('pancakeFlightToppingsLayout');
   if (tpl === 'side' || tpl === 'stack' || tpl === 'grid') state.toppingsLayout = tpl;
+  const ckl = localStorage.getItem('pancakeFlightCookLayout');
+  if (ckl === 'side' || ckl === 'stack' || ckl === 'grid') state.cookLayout = ckl;
   const cc = localStorage.getItem('pancakeFlightControlsCollapsed');
   if (cc === '1') state.controlsCollapsed = true;
   if (localStorage.getItem('pancakeFlightPancakeSizeCollapsed') === '1') state.pancakeSizeCollapsed = true;
@@ -1659,11 +1780,24 @@ function parseUrlState() {
     if (cp === 'flash' || cp === 'deep') state.caramelPrep = cp;
     const tp = params.get('tprep');
     if (tp === 'flash' || tp === 'deep') state.toffeePrep = tp;
-    const grp = params.get('group');
-    if (grp === '0') state.groupByCookOrder = false;
-    if (grp === '1') state.groupByCookOrder = true;
+    // v2.3.0: order param replaces group; backward compat for both
+    const order = params.get('order');
+    if (order === 'recommended' || order === 'rec') state.orderMode = 'recommended';
+    else if (order === 'menu') state.orderMode = 'menu';
+    else if (order === 'selection' || order === 'sel') state.orderMode = 'selection';
+    else {
+      const grp = params.get('group');
+      if (grp === '0') state.orderMode = 'selection';
+      if (grp === '1') state.orderMode = 'recommended';
+    }
+    const recsub = params.get('recsub');
+    if (recsub === 'menu' || recsub === 'sel' || recsub === 'selection') {
+      state.recommendedSubOrder = recsub === 'sel' ? 'selection' : recsub;
+    }
     const tl = params.get('tlayout');
     if (tl === 'side' || tl === 'stack' || tl === 'grid') state.tierLayout = tl;
+    const ckl = params.get('cklayout');
+    if (ckl === 'side' || ckl === 'stack' || ckl === 'grid') state.cookLayout = ckl;
   } catch (_) {}
 }
 
@@ -1678,8 +1812,15 @@ function updateUrlState() {
       if (state.flavor !== 'plain') params.set('flavor', state.flavor);
     } else {
       params.set('flavors', state.selectedFlavors.join(','));
-      if (!state.groupByCookOrder) params.set('group', '0');
+      // v2.3.0: write order as 'rec' (default elided) / 'menu' / 'sel'
+      if (state.orderMode === 'menu') params.set('order', 'menu');
+      else if (state.orderMode === 'selection') params.set('order', 'sel');
+      // recsub only meaningful in recommended mode; only write if non-default
+      if (state.orderMode === 'recommended' && state.recommendedSubOrder !== 'menu') {
+        params.set('recsub', 'sel');
+      }
       if (state.tierLayout !== 'side') params.set('tlayout', state.tierLayout);
+      if (state.cookLayout !== 'grid') params.set('cklayout', state.cookLayout);
     }
     if (state.caramelPrep !== 'flash') params.set('cprep', state.caramelPrep);
     if (state.toffeePrep !== 'flash') params.set('tprep', state.toffeePrep);
@@ -1716,23 +1857,45 @@ function getSortedSelectedFlavors() {
   return state.selectedFlavors.slice().sort((a, b) => FLAVOR_INDEX[a] - FLAVOR_INDEX[b]);
 }
 
-// v2.2.0: return ids in the order the user wants displayed — menu order when
-// Recommended Order is active, raw pick order when Selection Order is active.
+// v2.3.0: 3-way order resolution.
+// Used by SETUP-phase sub-cards (Wet/FAT&Spices/Toppings) and by flat cook-phase delta lists.
+//   'recommended' — group by cookGroup (Clean → Savory → Candy), within each group sub-order applies
+//   'menu'        — flat by menu order
+//   'selection'   — flat by pick order
 function getRenderOrderedFlavors() {
-  return state.groupByCookOrder
-    ? getSortedSelectedFlavors()
-    : state.selectedFlavors.slice();
+  if (state.orderMode === 'selection') return state.selectedFlavors.slice();
+  if (state.orderMode === 'menu') return getSortedSelectedFlavors();
+  // Recommended: interleave by cook group, then sub-order within each group
+  const grouped = groupSelectedByCooking(state.selectedFlavors, state.recommendedSubOrder);
+  const result = [];
+  for (const g of COOK_GROUP_ORDER) result.push(...grouped[g]);
+  return result;
 }
 
 // Group selected ids by cook-group; within each group, sorted by menu order
-function groupSelectedByCooking(ids) {
-  const sorted = ids.slice().sort((a, b) => FLAVOR_INDEX[a] - FLAVOR_INDEX[b]);
+// v2.3.0: subOrder ('menu' or 'selection') controls within-group ordering.
+// 'menu' (default) sorts by FLAVOR_INDEX; 'selection' preserves the input order (assumed to be pick order).
+function groupSelectedByCooking(ids, subOrder = 'menu') {
   const out = { clean: [], savory: [], candy: [] };
-  sorted.forEach(id => {
+  const ordered = subOrder === 'selection'
+    ? ids.slice()
+    : ids.slice().sort((a, b) => FLAVOR_INDEX[a] - FLAVOR_INDEX[b]);
+  ordered.forEach(id => {
     const f = flavorById(id);
     if (f) out[f.cookGroup].push(id);
   });
   return out;
+}
+
+// v2.3.0: Group flavors by their recommended syrup for cook-phase dedup display.
+// Returns [{ syrup, flavors: [labels] }] in syrup-encounter order.
+function getSyrupGroupings(flavors) {
+  const map = new Map();
+  for (const f of flavors) {
+    if (!map.has(f.syrup)) map.set(f.syrup, []);
+    map.get(f.syrup).push(f.label);
+  }
+  return Array.from(map, ([syrup, labels]) => ({ syrup, flavors: labels }));
 }
 
 // Effective candy prep: with both candies, deep wins
@@ -2225,6 +2388,8 @@ function render() {
   // --- Output ---
   if (state.mode === 'single') renderSingleOutput();
   else                          renderFlightOutput();
+  // v2.3.0: keep body[data-order-mode] in sync for sub-toggle visibility CSS
+  applyCollapseStates();
 
   updateUrlState();
   updateControlsHeight();
@@ -2296,14 +2461,13 @@ function renderSingleOutput() {
   cookingSteps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
   cookingSteps.push(`<li>Between every pancake: scrape → use the ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>`);
 
+  // v2.3.0: header lives OUTSIDE .out-card (which has `zoom`) so sticky works reliably
+  document.getElementById('out-header').innerHTML = `
+    <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
+    <p class="yield">${yieldText}</p>
+  `;
   const out = document.getElementById('output');
   out.innerHTML = `
-    <div class="out-title">
-      <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
-    </div>
-    <div class="out-yield">
-      <p class="yield">${yieldText}</p>
-    </div>
     ${prepStackHtml}
     <p class="desc">${flavor.strategy} · Cooking surface: <b>${heatLine}</b>.</p>
 
@@ -2354,11 +2518,13 @@ function renderSingleOutput() {
 
 function renderFlightOutput() {
   const out = document.getElementById('output');
-  const ids = getRenderOrderedFlavors();   // menu order or selection order based on toggle
+  const header = document.getElementById('out-header');
+  const ids = getRenderOrderedFlavors();
   const n = ids.length;
 
   if (n === 0) {
-    out.innerHTML = `<div class="out-title"><h3>Flight mode</h3></div>
+    header.innerHTML = `<h3>Flight mode</h3>`;
+    out.innerHTML = `
       <div class="empty-state">
         <p style="margin:0 0 6px;font-size:1.05rem;color:var(--ink)">No flavors selected yet.</p>
         <p style="margin:0">Pick one or more flavors above to build a flight. Each flavor becomes its own batch at the chosen batch size.</p>
@@ -2403,6 +2569,9 @@ function renderFlightOutput() {
     <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">${wetNote}</p>
   </div>`;
 
+  // v2.3.0: Dry + Wet side-by-side (#3)
+  const dryWetPair = `<div class="setup-row-pair">${dryBlock}${wetBlock}</div>`;
+
   // --- FAT & Spices — per-flavor sub-cards w/layout switcher ---
   const spicesHeading = n === 1 ? 'FAT & Spices (into wet bowl)' : 'FAT & Spices (into wet bowls)';
   const spicesBlock = `<div class="block">
@@ -2427,7 +2596,8 @@ function renderFlightOutput() {
   </div>`;
 
   // --- Grease (one block) ---
-  const grouped = groupSelectedByCooking(ids);
+  // v2.3.0: use menu order for grease grouping regardless of orderMode (presentation-only).
+  const grouped = groupSelectedByCooking(ids, 'menu');
   const greases = distinctGreasesByGroup(grouped);
   const greaseBlock = `<div class="grease-lines">
     <h4>Cooking-Surface Grease (one line per distinct grease type)</h4>
@@ -2445,23 +2615,7 @@ function renderFlightOutput() {
   flavors.forEach(f => flavorCallouts(f).forEach(c => calloutSet.add(c)));
   const calloutsHtml = Array.from(calloutSet).join('');
 
-  // Recommended syrups (one line per distinct syrup)
-  const syrupMap = new Map();
-  flavors.forEach(f => {
-    if (!syrupMap.has(f.syrup)) syrupMap.set(f.syrup, []);
-    syrupMap.get(f.syrup).push(f.label);
-  });
-  const syrupsHtml = `<div class="syrup">
-    <span class="dot"></span>
-    <div>
-      <b>Recommended syrups:</b><br>
-      ${Array.from(syrupMap.entries()).map(([s, fl]) =>
-        `<span><b>${s}</b> <span style="color:var(--muted)">— for ${fl.join(', ')}</span></span>`
-      ).join('<br>')}
-    </div>
-  </div>`;
-
-  // --- Quality Tiers ---
+  // --- Quality Tiers (moved to AFTER Cook phase in v2.3.0; #5) ---
   let tiersBlockHtml;
   if (n === 1) {
     tiersBlockHtml = `<h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Quality Tier (Chef → Avoid) — ${flavors[0].label}</h4>
@@ -2481,10 +2635,11 @@ function renderFlightOutput() {
         </div>`
       : `<div class="tiers-shared"><h5>Shared across all ${n} flavors</h5><p class="tiers-shared-empty">Nothing in common across these flavors' quality tiers — see per-flavor blocks below.</p></div>`;
 
-    // FIX item 6: side-by-side uses inline cols so all N show (no auto-fit cap)
+    // v2.3.0 FIX #7: side-by-side uses inline minmax(260px, 1fr) so cards don't shrink past readability; horizontal scroll if overflow
     const tierSideStyle = state.tierLayout === 'side'
-      ? ` style="grid-template-columns: repeat(${n}, minmax(0, 1fr))"` : '';
-    const perFlavorHtml = `<div class="tiers-per-flavor" data-tier-layout="${state.tierLayout}"${tierSideStyle}>
+      ? ` style="grid-template-columns: repeat(${n}, minmax(260px, 1fr))"` : '';
+    const tierGridClass = state.tierLayout === 'side' ? 'tiers-per-flavor tier-side-grid' : 'tiers-per-flavor';
+    const perFlavorHtml = `<div class="${tierGridClass}" data-tier-layout="${state.tierLayout}"${tierSideStyle}>
       ${flavors.map(f => {
         const entries = cmp.perFlavor[f.id];
         if (!entries.length) {
@@ -2516,17 +2671,51 @@ function renderFlightOutput() {
     ${perFlavorHtml}`;
   }
 
-  // --- Cook phase (deduped) ---
+  // --- Cook phase ---
+  // v2.3.0 #9: syrup integration — Recommended (or any grouped mode) shows shared syrup list in the
+  // shared cook card; Menu/Selection (flat) show syrup per-flavor in each delta card.
+  const isRecommended = state.orderMode === 'recommended';
+  const syrupGroupings = getSyrupGroupings(flavors);
+
+  // Shared cook card: now includes deduped syrups when in Recommended Order (#9).
+  const sharedSyrupHtml = isRecommended
+    ? `<div class="cook-shared-syrups">
+        <h5>Recommended syrups (one line per distinct syrup)</h5>
+        <ul>
+          ${syrupGroupings.map(sg =>
+            `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
+          ).join('')}
+        </ul>
+      </div>`
+    : '';
   const sharedCookCard = `<div class="cook-shared">
     <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
     <ol class="steps">${sharedCookingFlowHtml(flavors, sizeIdx)}</ol>
+    ${sharedSyrupHtml}
   </div>`;
 
+  // v2.3.0 #8: Cook layout switcher applied to every flavor-deltas-grid in cook phase
+  const cookGridAttr = `data-cook-layout="${state.cookLayout}"`;
+  const cookSideStyleN = m => state.cookLayout === 'side'
+    ? ` style="grid-template-columns: repeat(${m}, minmax(240px, 1fr))"` : '';
+
+  // Per-flavor delta-card HTML — optionally appends a syrup row (Menu/Selection modes; #9).
+  const deltaCardHtmlFor = (f, showHeat) => {
+    const inner = flavorDeltaCardHtml(f, sizeIdx, { showHeat });
+    const syrupRow = !isRecommended
+      ? `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
+          <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
+        </ul>`
+      : '';
+    return `<div class="flavor-delta-card"><h6>${f.label}</h6>${inner}${syrupRow}</div>`;
+  };
+
   let cookGroupsHtml;
-  if (state.groupByCookOrder) {
-    const groupingOrder = COOK_GROUP_ORDER.filter(g => grouped[g].length);
+  if (isRecommended) {
+    const grpForCook = groupSelectedByCooking(ids, state.recommendedSubOrder);
+    const groupingOrder = COOK_GROUP_ORDER.filter(g => grpForCook[g].length);
     cookGroupsHtml = groupingOrder.map((g, idx) => {
-      const groupIds = grouped[g];
+      const groupIds = grpForCook[g];
       const groupFlavors = groupIds.map(flavorById);
       const heat = effectiveHeatForGroup(g, groupIds);
       const isLast = idx === groupingOrder.length - 1;
@@ -2535,11 +2724,8 @@ function renderFlightOutput() {
         ? `<div class="cg-stagger">Stagger the rests: mix flavor 1's bowls, start its 10-min rest, then mix flavor 2's while flavor 1 is resting (flavor 2's rest finishes ~7 min after flavor 1's). Cook flavor 1 the moment its rest is up, then flavor 2.</div>`
         : '';
 
-      const deltaCards = `<div class="flavor-deltas-grid">
-        ${groupFlavors.map(f => `<div class="flavor-delta-card">
-          <h6>${f.label}</h6>
-          ${flavorDeltaCardHtml(f, sizeIdx, { showHeat: false })}
-        </div>`).join('')}
+      const deltaCards = `<div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyleN(groupFlavors.length)}>
+        ${groupFlavors.map(f => deltaCardHtmlFor(f, false)).join('')}
       </div>`;
 
       const transition = isLast ? '' :
@@ -2557,24 +2743,41 @@ function renderFlightOutput() {
       </div>`;
     }).join('');
   } else {
-    // Selection-order rendering — flat per-flavor cards in user's pick order
-    const selFlavors = state.selectedFlavors.map(flavorById);
-    cookGroupsHtml = `<div class="flavor-deltas-grid">
-      ${selFlavors.map(f => `<div class="flavor-delta-card">
-        <h6>${f.label}</h6>
-        ${flavorDeltaCardHtml(f, sizeIdx, { showHeat: true })}
-      </div>`).join('')}
+    // Menu or Selection — flat per-flavor cards using getRenderOrderedFlavors order
+    const flatFlavors = ids.map(flavorById);
+    cookGroupsHtml = `<div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyleN(flatFlavors.length)}>
+      ${flatFlavors.map(f => deltaCardHtmlFor(f, true)).join('')}
     </div>`;
   }
 
-  // --- Final assembly ---
+  // Cook layout switcher (when n>1)
+  const cookLayoutSwitcher = n > 1
+    ? `<div class="inline-toggle" data-toggle-group="cook-layout" style="margin-left:8px">
+        <span class="label">Layout</span>
+        <button type="button" data-cook-layout="side"  class="${state.cookLayout === 'side'  ? 'active' : ''}">Side-by-side</button>
+        <button type="button" data-cook-layout="stack" class="${state.cookLayout === 'stack' ? 'active' : ''}">Stacked</button>
+        <button type="button" data-cook-layout="grid"  class="${state.cookLayout === 'grid'  ? 'active' : ''}">Grid</button>
+      </div>`
+    : '';
+
+  // 3-way order toggle + conditional sub-order (#4)
+  const orderToggleHtml = `<div class="inline-toggle order-toggle" data-toggle-group="order-mode">
+    <span class="label">Order</span>
+    <button type="button" data-order-mode="recommended" class="${state.orderMode === 'recommended' ? 'active' : ''}">Recommended Order</button>
+    <button type="button" data-order-mode="menu"        class="${state.orderMode === 'menu'        ? 'active' : ''}">Menu Order</button>
+    <button type="button" data-order-mode="selection"   class="${state.orderMode === 'selection'   ? 'active' : ''}">Selection Order</button>
+    <span class="order-sub">
+      <span class="label">within groups</span>
+      <button type="button" data-rec-sub-order="menu"      class="${state.recommendedSubOrder === 'menu'      ? 'active' : ''}">Menu</button>
+      <button type="button" data-rec-sub-order="selection" class="${state.recommendedSubOrder === 'selection' ? 'active' : ''}">Selection</button>
+    </span>
+  </div>`;
+
+  // --- Header (written to OUTSIDE-the-card element — #1 fix) ---
+  header.innerHTML = `<h3>${titleText}</h3><p class="yield">${yieldText}</p>`;
+
+  // --- Final body assembly (NOTE: order changed in v2.3.0 — Quality Tier now at the END) ---
   out.innerHTML = `
-    <div class="out-title">
-      <h3>${titleText}</h3>
-    </div>
-    <div class="out-yield">
-      <p class="yield">${yieldText}</p>
-    </div>
     ${prepHtml}
 
     <div class="phase-header">
@@ -2582,8 +2785,7 @@ function renderFlightOutput() {
       <span class="phase-sub">Measure everything. No cooking yet.</span>
     </div>
     <div class="phase-section">
-      ${dryBlock}
-      ${wetBlock}
+      ${dryWetPair}
       ${spicesBlock}
       ${toppingsBlock}
       ${greaseBlock}
@@ -2591,22 +2793,17 @@ function renderFlightOutput() {
 
     ${calloutsHtml}
 
-    ${syrupsHtml}
-
-    ${tiersBlockHtml}
-
     <div class="phase-header">
       <h3>Cook phase</h3>
-      <div class="inline-toggle" data-toggle-group="cook-group">
-        <span class="label">Order</span>
-        <button type="button" data-cook-grouping="1" class="${state.groupByCookOrder ? 'active' : ''}">Recommended Order</button>
-        <button type="button" data-cook-grouping="0" class="${state.groupByCookOrder ? '' : 'active'}">Selection Order</button>
-      </div>
+      ${orderToggleHtml}
+      ${cookLayoutSwitcher}
     </div>
     <div class="phase-section">
       ${sharedCookCard}
       ${cookGroupsHtml}
     </div>
+
+    ${tiersBlockHtml}
   `;
 }
 
@@ -2676,11 +2873,37 @@ document.getElementById('toffee-opts').addEventListener('click', e => {
 
 // Delegated listener on the output card for all inline toggles
 document.getElementById('output').addEventListener('click', e => {
-  const cookBtn = e.target.closest('[data-cook-grouping]');
-  if (cookBtn) {
-    state.groupByCookOrder = (cookBtn.dataset.cookGrouping === '1');
-    try { localStorage.setItem('pancakeFlightGroupByCook', state.groupByCookOrder ? '1' : '0'); } catch (_) {}
-    render();
+  // v2.3.0: 3-way order mode toggle (Recommended / Menu / Selection)
+  const orderBtn = e.target.closest('[data-order-mode]');
+  if (orderBtn) {
+    const v = orderBtn.dataset.orderMode;
+    if (v === 'recommended' || v === 'menu' || v === 'selection') {
+      state.orderMode = v;
+      try { localStorage.setItem('pancakeFlightOrderMode', v); } catch (_) {}
+      render();
+    }
+    return;
+  }
+  // v2.3.0: sub-order within Recommended (Menu / Selection)
+  const subBtn = e.target.closest('[data-rec-sub-order]');
+  if (subBtn) {
+    const v = subBtn.dataset.recSubOrder;
+    if (v === 'menu' || v === 'selection') {
+      state.recommendedSubOrder = v;
+      try { localStorage.setItem('pancakeFlightRecSubOrder', v); } catch (_) {}
+      render();
+    }
+    return;
+  }
+  // v2.3.0: cook-phase layout switcher
+  const cookLayoutBtn = e.target.closest('[data-cook-layout]');
+  if (cookLayoutBtn) {
+    const v = cookLayoutBtn.dataset.cookLayout;
+    if (v === 'side' || v === 'stack' || v === 'grid') {
+      state.cookLayout = v;
+      try { localStorage.setItem('pancakeFlightCookLayout', v); } catch (_) {}
+      render();
+    }
     return;
   }
   const tierBtn = e.target.closest('[data-tier-layout]');
@@ -2750,12 +2973,13 @@ function updateStickyHeights() {
 // Alias the old name so render() can still call it
 function updateControlsHeight() { updateStickyHeights(); }
 
-// v2.2.0: applyCollapseStates writes all body data-attrs from state
+// v2.3.0: applyCollapseStates writes all body data-attrs from state (incl. order-mode for sub-toggle CSS visibility)
 function applyCollapseStates() {
   const body = document.body;
   body.dataset.controlsCollapsed = state.controlsCollapsed ? '1' : '0';
   body.dataset.optionsCollapsed = state.optionsCollapsed ? '1' : '0';
   body.dataset.pancakeCollapsed = state.pancakeSizeCollapsed ? '1' : '0';
+  body.dataset.orderMode = state.orderMode;
 
   const psb = document.getElementById('pancake-size-bar');
   if (psb) psb.dataset.collapsed = state.pancakeSizeCollapsed ? '1' : '0';
@@ -2808,11 +3032,68 @@ document.querySelectorAll('[data-card-toggle]').forEach(btn => {
 
 window.addEventListener('resize', updateStickyHeights);
 
+// v2.3.0: IntersectionObserver detects when picker-pane crosses the sticky threshold
+// in stacked mode → toggles data-picker-compact for the side-by-side animation (#10).
+(function setupPickerCompactObserver() {
+  const sentinel = document.getElementById('picker-sentinel');
+  if (!sentinel || typeof IntersectionObserver === 'undefined') return;
+  // The sentinel sits 1px above the picker-pane. When it scrolls above the controls-h offset,
+  // compact mode kicks in.
+  const obs = new IntersectionObserver(
+    entries => {
+      for (const entry of entries) {
+        state.pickerCompact = !entry.isIntersecting;
+        document.body.dataset.pickerCompact = state.pickerCompact ? '1' : '0';
+      }
+    },
+    { rootMargin: '-80px 0px 0px 0px', threshold: 0 }
+  );
+  obs.observe(sentinel);
+})();
+
+// v2.3.0: Print override (#12) — if any side-by-side layout would overflow,
+// temporarily force grid for printing and show a left-side alert so the print
+// dialog doesn't cover it.
+(function setupPrintOverride() {
+  const btn = document.getElementById('print-btn');
+  const alertEl = document.getElementById('print-alert');
+  const closeBtn = document.getElementById('pa-close');
+  if (!btn || !alertEl) return;
+
+  function detectOverflow() {
+    // Heuristic: side-by-side layouts with more than 5 cards overflow on most prints.
+    const n = state.mode === 'flight' ? state.selectedFlavors.length : 1;
+    const tooManyForSide = n > 5;
+    const layouts = [state.spicesLayout, state.toppingsLayout, state.tierLayout, state.cookLayout];
+    return tooManyForSide && layouts.includes('side');
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', () => {
+    document.body.dataset.printAlert = '0';
+  });
+
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (detectOverflow()) {
+      document.body.dataset.printFallback = '1';
+      document.body.dataset.printAlert = '1';
+    }
+    window.print();
+  });
+
+  window.addEventListener('afterprint', () => {
+    document.body.dataset.printFallback = '0';
+    // Leave alert visible briefly after print so user sees what happened
+    setTimeout(() => { document.body.dataset.printAlert = '0'; }, 4000);
+  });
+})();
+
 // Initial mode-switcher active state (apply persisted)
 document.getElementById('mode-switcher').querySelectorAll('[data-mode-pick]').forEach(b =>
   b.classList.toggle('active', b.dataset.modePick === state.mode));
 
-// Apply all initial collapsed states
+// Apply all initial collapsed states (also writes body[data-order-mode])
 applyCollapseStates();
 
 // Parse URL state before initial render
