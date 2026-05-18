@@ -6,16 +6,123 @@
 <title>Ultimate Malted Pancakes Flight Picker</title>
 <style>
   :root {
+    color-scheme: light dark;
+
+    /* Surfaces */
     --bg: #fdf8ef;
     --card: #fff;
     --line: #e7d9bd;
+    --input-bg: #fff;
+    --block-bg: #fbf6ec;
+
+    /* Text */
     --ink: #2a221a;
     --muted: #6b5b46;
+    --ink-soft: #3a2f23;
+    --list-divider: #ecdfc6;
+
+    /* Brand + state */
     --accent: #b45309;
     --accent-soft: #fde9c8;
+    --accent-strong: #92400e;
+    --on-accent: #fff;
     --good: #166534;
     --warn: #b91c1c;
     --info: #1e40af;
+
+    /* Callouts */
+    --warn-bg: #fef2f2;
+    --warn-border: #fecaca;
+    --info-bg: var(--accent-soft);
+    --info-border: #f5d9a8;
+    --info-fg: #7c3a00;
+    --info-light-bg: #fff;
+    --good-bg: #f0fdf4;
+    --good-border: #bbf7d0;
+    --max-limit-bg: var(--accent-soft);
+    --max-limit-border: #f5d9a8;
+    --max-limit-fg: #7c3a00;
+
+    /* Syrup callout */
+    --syrup-bg: #fff8e6;
+    --syrup-border: #f3dca4;
+
+    /* Tiers */
+    --tier-best-bg: #fef9c3;
+    --tier-best-border: #fde68a;
+    --tier-best-fg: #92400e;
+    --tier-good-bg: #ecfccb;
+    --tier-good-border: #d9f99d;
+    --tier-good-fg: #3f6212;
+    --tier-ok-bg: #fed7aa;
+    --tier-ok-border: #fdba74;
+    --tier-ok-fg: #9a3412;
+    --tier-bad-bg: #fee2e2;
+    --tier-bad-border: #fecaca;
+    --tier-bad-fg: #991b1b;
+    --tier-ing-fg: #555;
+
+    /* Misc */
+    --details-th-bg: #fbf6ec;
+    --code-bg: #fbf6ec;
+    --scrollbar-thumb: #d8c8a8;
+    --card-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  }
+
+  /* === Dark theme === */
+  body[data-theme="dark"] {
+    --bg: #14110d;
+    --card: #1d1812;
+    --line: #3a3025;
+    --input-bg: #251f17;
+    --block-bg: #1a160f;
+
+    --ink: #f1e6d1;
+    --muted: #a59377;
+    --ink-soft: #d4c5a9;
+    --list-divider: #3a3025;
+
+    --accent: #f59e0b;
+    --accent-soft: #3a2a10;
+    --accent-strong: #d97706;
+    --on-accent: #14110d;
+    --good: #86efac;
+    --warn: #fca5a5;
+    --info: #93c5fd;
+
+    --warn-bg: #2a1414;
+    --warn-border: #5a2424;
+    --info-bg: #2a1f0f;
+    --info-border: #6e4d1a;
+    --info-fg: #fbbf24;
+    --info-light-bg: #1d1812;
+    --good-bg: #0f2818;
+    --good-border: #1f4d2e;
+    --max-limit-bg: #3a2a10;
+    --max-limit-border: #6e4d1a;
+    --max-limit-fg: #fbbf24;
+
+    --syrup-bg: #2a1f0f;
+    --syrup-border: #6e4d1a;
+
+    --tier-best-bg: #2e2410;
+    --tier-best-border: #5a481a;
+    --tier-best-fg: #fde68a;
+    --tier-good-bg: #1a2810;
+    --tier-good-border: #2f4d1a;
+    --tier-good-fg: #d9f99d;
+    --tier-ok-bg: #2e1c10;
+    --tier-ok-border: #5a3520;
+    --tier-ok-fg: #fdba74;
+    --tier-bad-bg: #2a1212;
+    --tier-bad-border: #5a2222;
+    --tier-bad-fg: #fecaca;
+    --tier-ing-fg: #a59377;
+
+    --details-th-bg: #1a160f;
+    --code-bg: #1a160f;
+    --scrollbar-thumb: #4a3e2c;
+    --card-shadow: 0 1px 0 rgba(0,0,0,0.3);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
@@ -26,20 +133,20 @@
   h1 .em { color: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 18px 18px 14px; margin-bottom: 18px; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
+    padding: 18px 18px 14px; margin-bottom: 18px; box-shadow: var(--card-shadow); }
   .card h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
     color: var(--muted); margin: 0 0 12px; font-weight: 600; }
   .card h3.sub-h { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
     color: var(--muted); margin: 16px 0 8px; font-weight: 600; }
   .opts { display: flex; flex-wrap: wrap; gap: 8px; }
-  .opt { border: 1.5px solid var(--line); background: #fff; padding: 10px 14px;
+  .opt { border: 1.5px solid var(--line); background: var(--input-bg); padding: 10px 14px;
     border-radius: 999px; cursor: pointer; font-size: 0.92rem; color: var(--ink);
     transition: all .12s; user-select: none; }
   .opt:hover { border-color: var(--accent); }
-  .opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .opt.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .candy-row { display: flex; flex-wrap: wrap; gap: 0 24px; align-items: flex-start; }
   .candy-cell { flex: 1 1 240px; min-width: 0; }
-  .out { background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  .out { background: var(--input-bg); border: 1px solid var(--line); border-radius: 14px;
     padding: 20px; margin-top: 8px; }
   .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
   .out .yield { margin: 0 0 8px; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
@@ -54,12 +161,12 @@
   .grid > .full-row.callout { margin-top: 0; }
   @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 
-  .block { background: #fbf6ec; border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .block { background: var(--block-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
   .block h4 { margin: 0 0 8px; font-size: 0.7rem; text-transform: uppercase;
     letter-spacing: 0.1em; color: var(--accent); font-weight: 700; }
 
   ul.list { margin: 0; padding: 0; list-style: none; }
-  ul.list li { padding: 4px 0; border-bottom: 1px dashed #ecdfc6; font-size: 0.94rem;
+  ul.list li { padding: 4px 0; border-bottom: 1px dashed var(--list-divider); font-size: 0.94rem;
     display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
   ul.list li:last-child { border-bottom: 0; }
   ul.list li .v { color: var(--ink); font-weight: 600; text-align: right;
@@ -67,25 +174,25 @@
   ul.list li .k { color: var(--muted); flex: 1 1 auto; min-width: 0;
     overflow-wrap: anywhere; }
 
-  .max-limit { background: var(--accent-soft); border: 1px solid #f5d9a8; color: #7c3a00;
+  .max-limit { background: var(--max-limit-bg); border: 1px solid var(--max-limit-border); color: var(--max-limit-fg);
     padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 8px;
     text-align: center; font-weight: 600; }
   .callout { border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin-top: 10px; }
-  .callout.warn { background: #fef2f2; border: 1px solid #fecaca; color: var(--warn); }
-  .callout.info { background: var(--accent-soft); border: 1px solid #f5d9a8; color: #7c3a00; }
-  .callout.good { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--good); }
+  .callout.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+  .callout.info { background: var(--info-bg); border: 1px solid var(--info-border); color: var(--info-fg); }
+  .callout.good { background: var(--good-bg); border: 1px solid var(--good-border); color: var(--good); }
   .topping-note { border-radius: 8px; padding: 8px 10px; font-size: 0.85rem;
     margin-top: 8px; line-height: 1.45; }
-  .topping-note.warn { background: #fef2f2; border: 1px solid #fecaca; color: var(--warn); }
-  .topping-note.info { background: #fff; border: 1px solid #f5d9a8; color: #7c3a00; }
+  .topping-note.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+  .topping-note.info { background: var(--info-light-bg); border: 1px solid var(--info-border); color: var(--info-fg); }
 
   .steps { margin: 14px 0 0; padding: 0 0 0 22px; font-size: 0.94rem; line-height: 1.55; }
   .steps > li { padding: 3px 0; }
   .steps .sub-steps { margin: 6px 0 4px; padding: 0 0 0 20px; list-style: disc; }
-  .steps .sub-steps li { padding: 2px 0; font-size: 0.92rem; color: #3a2f23; }
+  .steps .sub-steps li { padding: 2px 0; font-size: 0.92rem; color: var(--ink-soft); }
 
   .syrup { display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
-    background: #fff8e6; border: 1px solid #f3dca4; padding: 10px 12px; border-radius: 10px;
+    background: var(--syrup-bg); border: 1px solid var(--syrup-border); padding: 10px 12px; border-radius: 10px;
     margin-top: 14px; }
   .syrup .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
   .tiers { margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -93,23 +200,23 @@
   .tier { padding: 10px; border-radius: 8px; font-size: 0.85rem; }
   .tier .tier-h { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
     text-transform: uppercase; margin-bottom: 4px; }
-  .tier-best { background: #fef9c3; border: 1px solid #fde68a; }
-  .tier-best .tier-h { color: #92400e; }
-  .tier-good { background: #ecfccb; border: 1px solid #d9f99d; }
-  .tier-good .tier-h { color: #3f6212; }
-  .tier-ok   { background: #fed7aa; border: 1px solid #fdba74; }
-  .tier-ok .tier-h { color: #9a3412; }
-  .tier-bad  { background: #fee2e2; border: 1px solid #fecaca; }
-  .tier-bad .tier-h { color: #991b1b; }
+  .tier-best { background: var(--tier-best-bg); border: 1px solid var(--tier-best-border); }
+  .tier-best .tier-h { color: var(--tier-best-fg); }
+  .tier-good { background: var(--tier-good-bg); border: 1px solid var(--tier-good-border); }
+  .tier-good .tier-h { color: var(--tier-good-fg); }
+  .tier-ok   { background: var(--tier-ok-bg); border: 1px solid var(--tier-ok-border); }
+  .tier-ok .tier-h { color: var(--tier-ok-fg); }
+  .tier-bad  { background: var(--tier-bad-bg); border: 1px solid var(--tier-bad-border); }
+  .tier-bad .tier-h { color: var(--tier-bad-fg); }
   .tier .syr { font-weight: 600; display: block; }
-  .tier .ing { color: #555; }
+  .tier .ing { color: var(--tier-ing-fg); }
 
   .footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
-  .print-btn { background: var(--accent); color: #fff; border: 0; padding: 10px 16px;
+  .print-btn { background: var(--accent); color: var(--on-accent); border: 0; padding: 10px 16px;
     border-radius: 8px; cursor: pointer; font-size: 0.92rem; margin-top: 8px; }
-  .print-btn:hover { background: #92400e; }
+  .print-btn:hover { background: var(--accent-strong); }
 
-  details { background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
     margin-bottom: 10px; overflow: hidden; }
   details summary { padding: 14px 18px; cursor: pointer; font-weight: 600;
     font-size: 0.98rem; user-select: none; list-style: none; display: flex;
@@ -118,7 +225,7 @@
   details summary::after { content: "+"; font-size: 1.3rem; color: var(--accent); }
   details[open] summary::after { content: "−"; }
   details[open] summary { border-bottom: 1px solid var(--line); }
-  details .body { padding: 14px 18px 18px; font-size: 0.92rem; line-height: 1.6; color: #3a2f23; }
+  details .body { padding: 14px 18px 18px; font-size: 0.92rem; line-height: 1.6; color: var(--ink-soft); }
   details .body h5 { margin: 14px 0 6px; font-size: 0.85rem; color: var(--accent);
     text-transform: uppercase; letter-spacing: 0.05em; }
   details .body h5:first-child { margin-top: 0; }
@@ -129,8 +236,8 @@
     font-size: 0.88rem; }
   details .body th, details .body td { border: 1px solid var(--line); padding: 6px 8px;
     text-align: left; }
-  details .body th { background: #fbf6ec; }
-  details .body code { background: #fbf6ec; padding: 1px 6px; border-radius: 4px;
+  details .body th { background: var(--details-th-bg); }
+  details .body code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px;
     font-size: 0.9em; }
 
   .section-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
@@ -146,7 +253,7 @@
   .layout-switcher .ls-btn { border: 0; background: transparent; padding: 6px 12px;
     border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.82rem;
     font-family: inherit; }
-  .layout-switcher .ls-btn.active { background: var(--accent); color: #fff;
+  .layout-switcher .ls-btn.active { background: var(--accent); color: var(--on-accent);
     font-weight: 600; }
 
   /* === Side-by-side layout (>= 1000px viewport only) === */
@@ -166,9 +273,50 @@
     /* Slim scrollbar inside the sticky pane */
     body[data-layout="side"] .picker-pane::-webkit-scrollbar { width: 6px; }
     body[data-layout="side"] .picker-pane::-webkit-scrollbar-thumb {
-      background: #d8c8a8; border-radius: 3px; }
+      background: var(--scrollbar-thumb); border-radius: 3px; }
   }
 
+
+
+  /* === Theme switcher (re-uses layout-switcher styles) === */
+  .theme-switcher { display: inline-flex; gap: 6px; align-items: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px 6px 4px 12px; font-size: 0.78rem; color: var(--muted);
+    margin: 0 0 24px 8px; }
+  .theme-switcher .ts-label { letter-spacing: 0.04em; text-transform: uppercase;
+    font-weight: 600; font-size: 0.7rem; }
+  .theme-switcher .ts-btn { border: 0; background: transparent; padding: 6px 12px;
+    border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.82rem;
+    font-family: inherit; }
+  .theme-switcher .ts-btn.active { background: var(--accent); color: var(--on-accent);
+    font-weight: 600; }
+  .controls-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+  body[data-layout="side"] .controls-row { margin-bottom: 8px; }
+
+  /* In print, force the light palette regardless of theme */
+  @media print {
+    body[data-theme="dark"] {
+      --bg: #fff; --card: #fff; --ink: #000; --muted: #444;
+      --line: #ccc; --input-bg: #fff; --block-bg: #fff;
+      --ink-soft: #222; --list-divider: #ddd;
+      --accent: #b45309; --accent-soft: #fde9c8; --on-accent: #fff;
+      --good: #166534; --warn: #b91c1c; --info: #1e40af;
+      --warn-bg: #fff; --warn-border: #ddd;
+      --info-bg: #fff; --info-border: #ddd; --info-fg: #222;
+      --info-light-bg: #fff;
+      --good-bg: #fff; --good-border: #ddd;
+      --max-limit-bg: #fff; --max-limit-border: #ddd; --max-limit-fg: #222;
+      --syrup-bg: #fff; --syrup-border: #ddd;
+      --tier-best-bg: #fff; --tier-best-border: #ccc; --tier-best-fg: #444;
+      --tier-good-bg: #fff; --tier-good-border: #ccc; --tier-good-fg: #444;
+      --tier-ok-bg: #fff; --tier-ok-border: #ccc; --tier-ok-fg: #444;
+      --tier-bad-bg: #fff; --tier-bad-border: #ccc; --tier-bad-fg: #444;
+      --tier-ing-fg: #444;
+      --details-th-bg: #f5f5f5; --code-bg: #f5f5f5;
+      --card-shadow: none;
+    }
+    .theme-switcher { display: none; }
+  }
 
   @media print {
     body { background: #fff; }
@@ -184,10 +332,18 @@
 <div class="wrap">
   <h1>🥞 Ultimate Malted Pancakes <span class="em">Flight</span> Picker</h1>
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
-  <div class="layout-switcher" id="layout-switcher">
-    <span class="ls-label">Layout</span>
-    <button type="button" data-mode="side" class="ls-btn active">Side-by-side</button>
-    <button type="button" data-mode="stacked" class="ls-btn">Stacked</button>
+  <div class="controls-row">
+    <div class="layout-switcher" id="layout-switcher">
+      <span class="ls-label">Layout</span>
+      <button type="button" data-mode="side" class="ls-btn active">Side-by-side</button>
+      <button type="button" data-mode="stacked" class="ls-btn">Stacked</button>
+    </div>
+    <div class="theme-switcher" id="theme-switcher">
+      <span class="ts-label">Theme</span>
+      <button type="button" data-theme="auto"  class="ts-btn active">Auto</button>
+      <button type="button" data-theme="light" class="ts-btn">Light</button>
+      <button type="button" data-theme="dark"  class="ts-btn">Dark</button>
+    </div>
   </div>
 
   <div class="picker-pane">
@@ -509,10 +665,43 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.14.1</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.15.0</div>
 </div>
 
 <script>
+
+
+// === Theme switcher (Auto / Light / Dark, persisted) ===
+(function() {
+  const KEY = 'pancakeFlightTheme';      // 'auto' | 'light' | 'dark'
+  const sw = document.getElementById('theme-switcher');
+  const mql = window.matchMedia('(prefers-color-scheme: dark)');
+  let pref = 'auto';
+  try { pref = localStorage.getItem(KEY) || 'auto'; } catch (_) {}
+  apply(pref);
+  sw.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-theme]');
+    if (!btn) return;
+    apply(btn.dataset.theme);
+  });
+  // React to OS change if user hasn't overridden
+  if (mql.addEventListener) {
+    mql.addEventListener('change', function() {
+      let p = 'auto';
+      try { p = localStorage.getItem(KEY) || 'auto'; } catch (_) {}
+      if (p === 'auto') apply('auto');
+    });
+  }
+  function apply(p) {
+    if (p !== 'auto' && p !== 'light' && p !== 'dark') p = 'auto';
+    const resolved = (p === 'auto') ? (mql.matches ? 'dark' : 'light') : p;
+    document.body.dataset.theme = resolved;
+    sw.querySelectorAll('[data-theme]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.theme === p);
+    });
+    try { localStorage.setItem(KEY, p); } catch (_) {}
+  }
+})();
 
 // === Layout switcher (Stacked <-> Side-by-side, persisted) ===
 (function() {
