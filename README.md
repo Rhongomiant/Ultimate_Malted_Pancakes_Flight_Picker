@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.2.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.3.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -75,6 +75,35 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
 
+### v2.3.0 — Twelve refinements + a sub-order add
+
+Twelve user-driven refinements addressing v2.2.0 bugs and feature requests:
+
+1. **Sticky title + yield (both visible, fixed)**: v2.2.0's split sticky (title scrolls, yield stays) didn't actually stick — the `.out-yield` element lived inside `.out-card`, which has `zoom: var(--card-scale)`, and that zoom breaks `position: sticky` on descendants in every browser. Fix: moved the header into a new `<div class="out-header" id="out-header">` that lives **outside** `.out-card`, directly inside `.output-pane`. Both renderers now write to two elements (`#out-header` for the header, `#output` for the recipe body). Single sticky block contains both title and `Yields ~X pancakes` together; both stay visible while scrolling.
+2. **Show/Hide buttons visible when collapsed; capitalized labels**: deleted a leftover v2.1.1 CSS rule (`body[data-controls-collapsed="1"] .controls-row > :not(.controls-toggle) { display: none; }`) that was still hiding `.controls-actions` even though v2.2.0 moved the toggle inside that wrapper. Labels are now `Hide Controls` / `Show Controls` / `Hide Options` / `Show Options` (capitalized).
+3. **Dry + Wet side-by-side**: in Flight output, the Dry Bowl(s) and Wet Bowl(s) blocks are wrapped in a `.setup-row-pair` 2-column grid (`grid-template-columns: 1fr 1fr`). Falls back to a single column under 700px viewport.
+4. **Three-way order toggle + sub-order**: the Cook-phase grouping toggle was a boolean (`Recommended Order` / `Selection Order`). It's now a 3-way enum: **Recommended Order** (cook-group grouping, Clean → Savory → Candy), **Menu Order** (flat, by FLAVORS array position), **Selection Order** (flat, by user's pick order). Applies to both Setup and Cook phases. When Recommended is selected, a secondary sub-toggle appears (`within groups: Menu / Selection`) that controls within-group ordering. State: `orderMode` ('recommended'|'menu'|'selection') and `recommendedSubOrder` ('menu'|'selection') replace the old `groupByCookOrder` boolean. CSS hides the sub-toggle when not in Recommended mode via `body[data-order-mode="recommended"]`.
+5. **Quality Tier moved to the end** (after Cook phase): Quality Tier is reference content, not action content. Recipe flow now reads top-to-bottom in execution order — header → prep callouts → Setup phase → Cook phase → Quality Tier (reference).
+6. **Picker card prefixes stripped**: `2. Batch size & dry mix source` → `Batch size & dry mix source`. `3. Flavors & Combinations` → `Flavors & Combinations`. (Pancake Size already had no prefix.)
+7. **Side-by-side overlap fix**: tier and sub-card grids in Side-by-side mode no longer crush cards past readability. Sub-card grid min-width raised from 200px to 220px; tier-side cards have their own min-width of 260px (more text per card). Tier-side now also has horizontal scroll (`.tier-side-grid { overflow-x: auto }`) matching the sub-card behavior, with a slim themed scrollbar.
+8. **Cook-phase layout switcher**: Side-by-side / Stacked / Grid switcher, same pattern as Tier / Wet / Spices / Toppings. New state `cookLayout` (default `grid`), localStorage key `pancakeFlightCookLayout`, URL param `cklayout`. Applies to every `.flavor-deltas-grid` in the cook phase (one per group in Recommended mode, one flat grid in Menu/Selection mode). Hidden when n=1.
+9. **Syrups moved into Cook phase**: the standalone Recommended-Syrups block (previously between callouts and Quality Tier) is gone. In **Recommended Order** mode, syrups appear in the Shared Cooking Instructions card as a deduped list (`Recommended syrups: <syrup> — for <flavors>`). In **Menu** or **Selection** mode (flat per-flavor cards), each delta card gets its own Syrup row. New helper `getSyrupGroupings(flavors)` returns `[{syrup, flavors:[labels]}]` for the dedup.
+10. **Stacked mode compact pair animation**: in Stacked layout, Batch / Flavors / Pancake Size cards start vertically stacked (full-width). When the user scrolls past the picker-pane's natural position, Batch and Flavors animate into a side-by-side compact pair (each card width transitions from `100%` to `calc(50% - 7px)` over 0.3s ease). The pair becomes sticky as a band at the top of the viewport (under the controls row). Pancake Size stays as its own separate sticky bar below the pair. Implementation: hidden `.picker-sentinel` 1px element sits just above the picker-pane; an IntersectionObserver watches the sentinel and toggles `body[data-picker-compact]` when it leaves the viewport. The picker-pane uses `display: flex; flex-wrap: wrap; transition: width 0.3s ease` so card widths animate smoothly.
+11. **Pancake Size under Flavors in Stacked**: in v2.2.0 the DOM order was `pancake-size-bar` → `picker-pane`, which put the size bar above Batch in Stacked. v2.3.0 moves `pancake-size-bar` in DOM to **after** `picker-pane`. In Side-by-side, the grid placement is explicit (col 2) so DOM order doesn't matter — the bar still sits above the recipe in the right column.
+12. **Print fallback with side alert**: clicking 🖨 Print now goes through a JS override (the inline `onclick="window.print()"` is gone). If any layout currently set to Side-by-side has more than 5 flavors (heuristic — overflows most print pages), the script sets `body[data-print-fallback="1"]` (CSS auto-switches side-by-side grids to `repeat(auto-fit, minmax(240px, 1fr))` for print) and shows a fixed-position alert pinned to the **left** edge of the viewport (so the centered print dialog can't cover it) explaining what happened. On `afterprint`, the fallback flag clears immediately and the alert fades after 4 seconds. The alert also has a manual close button.
+
+**Bug fixes layered into the same release:**
+
+- The v2.1.1-era CSS rule `body[data-controls-collapsed="1"] .controls-row > :not(.controls-toggle) { display: none; }` was hiding `.controls-actions` whenever controls were collapsed (item 2 above). Deleted; the equivalent v2.2.0 rule using `:not(.controls-actions)` is what's actually correct.
+
+**State / localStorage / URL changes (with backward compatibility):**
+
+- State: `orderMode` ('recommended'|'menu'|'selection') and `recommendedSubOrder` ('menu'|'selection') replace `groupByCookOrder` (bool). Added `cookLayout` ('side'|'stack'|'grid'). Added transient `pickerCompact` (observer-driven, not persisted).
+- localStorage: new keys `pancakeFlightOrderMode`, `pancakeFlightRecSubOrder`, `pancakeFlightCookLayout`. **Backward compat**: if `pancakeFlightOrderMode` is absent, the old `pancakeFlightGroupByCook` is read — `'1'` → `recommended`, `'0'` → `selection`. New key wins when both are present.
+- URL: new params `order=recommended|menu|selection` (or short forms `rec`/`sel`), `recsub=menu|sel`, `cklayout=...`. Backward compat: old `group=0|1` still parses. `recsub` is only written when in Recommended mode and value is non-default; `cklayout` elides when grid (default).
+- Helpers: `groupSelectedByCooking(ids, subOrder)` accepts a sub-order parameter. New `getSyrupGroupings(flavors)`. `getRenderOrderedFlavors()` rewritten for 3-way + sub-order. `applyCollapseStates()` now also writes `body[data-order-mode]` so the sub-toggle CSS visibility stays in sync.
+- DOM: new elements `#out-header` (outside `.out-card`), `#picker-sentinel` (above `.picker-pane`), `#print-alert` (fixed-left alert), `#pa-close` (alert close), `#print-btn` (id added so JS can override). `pancake-size-bar` relocated in DOM after `picker-pane`.
+
 ### v2.2.0 — Layout overhaul
 
 Ten user-driven layout refinements:
@@ -105,12 +134,12 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.2.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.2.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.2.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.3.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.3.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.3.0.html   # Windows
 ```
 
-That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~2825 lines as of v2.2.0) with inline CSS and vanilla JS.
+That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3100 lines as of v2.3.0) with inline CSS and vanilla JS.
 
 The companion `.html` manual opens the same way in a browser. To import into Word: File → Open → select the manual HTML; Word preserves the tables, headers, and bullet hierarchy.
 
@@ -118,7 +147,7 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.2.0.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.3.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
@@ -277,7 +306,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.2.0** (10-item layout overhaul: card 3 rename, Wet/FAT-&-Spices restructure, sticky/scrolling header split, Selection Order extended to Setup phase, sub-card readability fixes, Pancake Size relocated to sticky bar, Hide Options button, Stacked-mode sticky pickers, per-card collapse, wider wrap). **v2.1.1** was URL state encoding + sticky chrome + picker card reorder + setup restructure + tier-side-by-side fix + topping wrapping fix + menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.3.0**.
+`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.3.0** (12-item layout refinement: sticky title+yield reliability fix, Show/Hide buttons visible when collapsed + capitalized labels, Dry+Wet side-by-side, 3-way Recommended/Menu/Selection order toggle + Recommended-only sub-order, Quality Tier moved to end, picker-card prefixes removed, side-by-side overlap fix with wider min-widths, Cook-phase layout switcher, syrups integrated into Cook phase, Stacked-mode compact pair animation, Pancake Size relocated under Flavors in Stacked, print-time side-by-side → grid fallback with left-side alert). **v2.2.0** was the 10-item layout overhaul (card 3 rename, Wet/FAT-&-Spices restructure, sticky/scrolling header split, Selection Order extended to Setup phase, sub-card readability, Pancake Size relocated, Hide Options button, Stacked-mode sticky pickers, per-card collapse, wider wrap). **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.4.0**.
 
 ## License
 
