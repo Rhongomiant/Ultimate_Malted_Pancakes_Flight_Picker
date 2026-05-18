@@ -571,6 +571,92 @@
     .controls-row, .controls-toggle { display: none !important; }
   }
 
+  /* === v3.0.0-rc.3: group/batch layout switchers + per-category Cook+Tier === */
+  .groups-row {
+    gap: 18px; padding-bottom: 8px; align-items: stretch;
+  }
+  .groups-row[data-group-layout="side"] {
+    display: flex; overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .groups-row[data-group-layout="side"]::-webkit-scrollbar { height: 8px; }
+  .groups-row[data-group-layout="side"]::-webkit-scrollbar-track { background: var(--bg); }
+  .groups-row[data-group-layout="side"]::-webkit-scrollbar-thumb {
+    background: var(--line); border-radius: 4px;
+  }
+  .groups-row[data-group-layout="side"]::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  .groups-row[data-group-layout="side"] > .category-section {
+    flex: 0 0 auto; min-width: 360px;
+  }
+  .groups-row[data-group-layout="grid"] {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  }
+  .groups-row[data-group-layout="stack"] {
+    display: flex; flex-direction: column;
+  }
+  /* The accent top-border on each .category-section makes sense in stack mode
+     but looks odd in side-by-side. Suppress it when not stacked. */
+  .groups-row[data-group-layout="side"] > .category-section,
+  .groups-row[data-group-layout="grid"] > .category-section {
+    border-top: 0; padding-top: 0;
+  }
+  .groups-row[data-group-layout="side"] > .category-section,
+  .groups-row[data-group-layout="grid"] > .category-section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px;
+  }
+  /* Make category-section a column even in side-by-side so its inner
+     cs-setup / cs-cook / cs-tier stack vertically inside the column. */
+  .category-section {
+    display: flex; flex-direction: column;
+  }
+
+  /* Batches-row layout variants — data-batch-layout overrides the default
+     flex+overflow behavior from rc.2. */
+  .batches-row[data-batch-layout="grid"] {
+    display: grid !important; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    overflow-x: visible;
+  }
+  .batches-row[data-batch-layout="stack"] {
+    display: flex; flex-direction: column; overflow-x: visible;
+  }
+  .batches-row[data-batch-layout="stack"] > .batch-column {
+    min-width: 0; width: 100%;
+  }
+  .batches-row[data-batch-layout="grid"] > .batch-column {
+    min-width: 0;
+  }
+
+  /* Inner sub-sections of a Mode B category section: setup batches, cook
+     flavor cards, tier flavor cards. */
+  .category-section .cs-setup,
+  .category-section .cs-cook,
+  .category-section .cs-tier {
+    margin-top: 12px;
+  }
+  .category-section .cs-setup:first-child { margin-top: 8px; }
+  .category-section .cs-cook,
+  .category-section .cs-tier {
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+  }
+  .category-section .cs-cook h4,
+  .category-section .cs-tier h4,
+  .category-section .cs-setup h4.section-title {
+    font-size: 11px; margin: 0 0 8px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); font-weight: 600;
+  }
+  .category-section .cs-cook .flavor-deltas-grid,
+  .category-section .cs-tier .tiers-per-flavor,
+  .category-section .cs-tier .compact-tiers {
+    /* Use ambient cookLayout/tierLayout — controlled per their existing switchers. */
+  }
+
+  /* Layout switcher band at top of output gets a max width so it doesn't
+     overflow horizontally on narrow viewports — flex-wrap handles overflow. */
+  .setup-layout-toggles { row-gap: 6px; }
+
   /* === v3.0.0-rc.2: picker UI consolidation, horizontal scroll, category sections === */
   /* Combined row in Batch card: dry-mix-source + Batch Quantity + multi-batch toggle. */
   .batch-combined-row {
@@ -1701,7 +1787,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.2</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.3</div>
 </div>
 
 <script>
@@ -2175,6 +2261,12 @@ const state = {
   spicesLayout: 'grid',
   toppingsLayout: 'grid',
   cookLayout: 'grid',              // v2.3.0: 'side' | 'stack' | 'grid' for Cook-phase delta cards
+  // v3.0.0-rc.3: layout switchers for category sections (Mode B) + per-row batch columns.
+  // groupLayout controls how .category-section wrappers are arranged in .groups-row.
+  // batchLayout controls how .batch-column children are arranged inside any .batches-row.
+  // Both default to side-by-side per the reviewer item #1.
+  groupLayout: 'side',             // 'side' | 'grid' | 'stack'
+  batchLayout: 'side',             // 'side' | 'grid' | 'stack'
   controlsCollapsed: false,
   pancakeSizeCollapsed: false,
   batchCardCollapsed: false,
@@ -2225,6 +2317,12 @@ try {
   if (tpl === 'side' || tpl === 'stack' || tpl === 'grid') state.toppingsLayout = tpl;
   const ckl = localStorage.getItem('pancakeFlightCookLayout');
   if (ckl === 'side' || ckl === 'stack' || ckl === 'grid') state.cookLayout = ckl;
+  // v3.0.0-rc.3: groupLayout + batchLayout
+  let gl, bl;
+  try { gl = localStorage.getItem('pancakeFlightGroupLayout'); } catch (_) {}
+  try { bl = localStorage.getItem('pancakeFlightBatchLayout'); } catch (_) {}
+  if (gl === 'side' || gl === 'stack' || gl === 'grid') state.groupLayout = gl;
+  if (bl === 'side' || bl === 'stack' || bl === 'grid') state.batchLayout = bl;
   const cc = localStorage.getItem('pancakeFlightControlsCollapsed');
   if (cc === '1') state.controlsCollapsed = true;
   if (localStorage.getItem('pancakeFlightPancakeSizeCollapsed') === '1') state.pancakeSizeCollapsed = true;
@@ -2366,6 +2464,11 @@ function parseUrlState() {
 
     if (params.get('multiflavor') === '1') state.allowMultiBatchFlavor = true;
     if (params.get('shopopen') === '1') state.shoppingListExpanded = true;
+    // v3.0.0-rc.3: groupLayout / batchLayout from URL.
+    const urlGl = params.get('grouplayout');
+    const urlBl = params.get('batchlayout');
+    if (urlGl === 'side' || urlGl === 'stack' || urlGl === 'grid') state.groupLayout = urlGl;
+    if (urlBl === 'side' || urlBl === 'stack' || urlBl === 'grid') state.batchLayout = urlBl;
   } catch (_) {}
 }
 
@@ -2422,6 +2525,9 @@ function updateUrlState() {
 
     if (state.allowMultiBatchFlavor) params.set('multiflavor', '1');
     if (state.shoppingListExpanded) params.set('shopopen', '1');
+    // v3.0.0-rc.3: groupLayout + batchLayout (only emit if non-default).
+    if (state.groupLayout !== 'side') params.set('grouplayout', state.groupLayout);
+    if (state.batchLayout !== 'side') params.set('batchlayout', state.batchLayout);
 
     const qs = params.toString();
     const url = qs ? `?${qs}` : window.location.pathname;
@@ -2461,6 +2567,9 @@ function persistBatchesState() {
     localStorage.setItem('pancakeFlightActiveBatchIdx', String(state.activeBatchIdx));
     localStorage.setItem('pancakeFlightActiveCategories', state.activeCategories.join(','));
     localStorage.setItem('pancakeFlightShoppingListExpanded', state.shoppingListExpanded ? '1' : '0');
+    // v3.0.0-rc.3
+    localStorage.setItem('pancakeFlightGroupLayout', state.groupLayout);
+    localStorage.setItem('pancakeFlightBatchLayout', state.batchLayout);
   } catch (_) {}
 }
 
@@ -3412,6 +3521,17 @@ function renderFlightOutput() {
     return `<span class="fdc-batch-label">· B${batchIdx + 1}</span>`;
   }
 
+  // v3.0.0-rc.3: hoisted from inside the visibleFlavorCount>0 block so Mode B
+  // per-category Cook content can call it during Setup-body composition.
+  function deltaCardHtmlForTuple(tuple, showHeat) {
+    const f = tuple.flavor;
+    const inner = flavorDeltaCardHtml(f, sizeIdx, { showHeat });
+    const syrupRow = `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
+        <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
+      </ul>`;
+    return `<div class="flavor-delta-card"><h6>${f.label} ${batchLabelFor(tuple.batchIdx)}</h6>${inner}${syrupRow}</div>`;
+  }
+
   // Per-category flavor count for the active-category pill badges.
   const catCounts = { clean: 0, savory: 0, candy: 0 };
   state.batches.forEach(b => {
@@ -3609,8 +3729,12 @@ function renderFlightOutput() {
   // Build the Setup phase body.
   let setupBodyHtml;
   if (useCategorySections) {
-    // Mode B: one section per visible category.
-    setupBodyHtml = visibleCategoriesOrdered.map(cat => {
+    // Mode B: one .category-section per visible category, wrapped in .groups-row.
+    // Each section contains: header + cs-setup (batch columns) + cs-cook
+    // (flavor delta cards for this cat) + cs-tier (tier cards for this cat).
+    // The standalone Cook-phase and Tier-section blocks at the bottom of the
+    // output are SUPPRESSED in Mode B (their content is distributed here).
+    const sectionsHtml = visibleCategoriesOrdered.map(cat => {
       const idxsInCat = visibleBatchIdxs.filter(idx => {
         const b = state.batches[idx];
         if (b.batch === null) return false;
@@ -3620,33 +3744,124 @@ function renderFlightOutput() {
         });
       });
       if (idxsInCat.length === 0) return '';
-      const heat = effectiveHeatForGroup(cat, visibleTuples.filter(t => t.flavor.cookGroup === cat).map(t => t.flavor.id));
+      const catTuples = visibleTuples.filter(t => t.flavor.cookGroup === cat);
+      const heat = effectiveHeatForGroup(cat, catTuples.map(t => t.flavor.id));
+
       const columnsHtml = idxsInCat.map(idx => renderBatchColumnHtml(idx, { categoryFilter: cat })).filter(h => h).join('');
-      const scrollHintHtml = idxsInCat.length > 1
-        ? `<p class="scroll-hint" data-scroll-hint-for="cat-${cat}" hidden><span class="arrow">←</span> scroll horizontally to see all batches <span class="arrow">→</span></p>`
+      const scrollHintHtml = (state.batchLayout === 'side' && idxsInCat.length > 1)
+        ? `<p class="scroll-hint" data-scroll-hint-for="cat-${cat}" hidden><span class="arrow">←</span> scroll <span class="arrow">→</span></p>`
         : '';
+
+      // Per-category Cook flavor cards. Sort by sub-order.
+      const subOrder = state.recommendedSubOrder;
+      const sortedCatTuples = catTuples.slice().sort((a, b) => {
+        if (subOrder === 'menu') return FLAVOR_INDEX[a.flavor.id] - FLAVOR_INDEX[b.flavor.id];
+        if (a.batchIdx !== b.batchIdx) return a.batchIdx - b.batchIdx;
+        return a.batch.flavors.indexOf(a.flavor.id) - b.batch.flavors.indexOf(b.flavor.id);
+      });
+      const cookGridAttr = `data-cook-layout="${state.cookLayout}"`;
+      const cookSideStyle = state.cookLayout === 'side'
+        ? ` style="grid-template-columns: repeat(${sortedCatTuples.length}, minmax(220px, 1fr))"` : '';
+      const catCookHtml = `<div class="cs-cook">
+        <h4>Cook · per flavor</h4>
+        <div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyle}>
+          ${sortedCatTuples.map(t => deltaCardHtmlForTuple(t, false)).join('')}
+        </div>
+      </div>`;
+
+      // Per-category Tier — dedupe by flavor id, build shared + per-flavor blocks.
+      const catByFlavor = {};
+      catTuples.forEach(t => {
+        if (!catByFlavor[t.flavor.id]) catByFlavor[t.flavor.id] = { flavor: t.flavor, batchIdxs: [] };
+        catByFlavor[t.flavor.id].batchIdxs.push(t.batchIdx);
+      });
+      const catUnique = Object.values(catByFlavor);
+      let catTierHtml;
+      if (catUnique.length === 1) {
+        const u = catUnique[0];
+        const labelHtml = `${u.flavor.label} ${u.batchIdxs.map(i => batchLabelFor(i)).join(' ')}`;
+        catTierHtml = `<div class="cs-tier">
+          <h4>Quality Tier (Chef → Avoid) — ${labelHtml}</h4>
+          ${tierGridHtml(u.flavor)}
+        </div>`;
+      } else {
+        const flavorsArr = catUnique.map(u => u.flavor);
+        const cmp = compareTiers(flavorsArr);
+        const sharedHtml = cmp.shared.length
+          ? `<div class="tiers-shared">
+              <h5>Shared across ${catUnique.length} flavors in this group</h5>
+              <ul>
+                ${cmp.shared.map(s => `<li>
+                  <span class="tier-badge ${s.tier}">${s.tierLabel}</span>
+                  <span class="tier-slot">${s.slotLabel}</span>
+                  <span class="tier-val">${s.value}</span>
+                </li>`).join('')}
+              </ul>
+            </div>`
+          : `<div class="tiers-shared"><h5>Shared across ${catUnique.length} flavors in this group</h5><p class="tiers-shared-empty">Nothing in common across these — see per-flavor below.</p></div>`;
+        const tierSideStyle = state.tierLayout === 'side'
+          ? ` style="grid-template-columns: repeat(${catUnique.length}, minmax(240px, 1fr))"` : '';
+        const tierGridClass = state.tierLayout === 'side' ? 'tiers-per-flavor tier-side-grid' : 'tiers-per-flavor';
+        const perFlavorHtml = `<div class="${tierGridClass}" data-tier-layout="${state.tierLayout}"${tierSideStyle}>
+          ${catUnique.map(u => {
+            const entries = cmp.perFlavor[u.flavor.id];
+            const labelHtml = `${u.flavor.label} ${u.batchIdxs.map(i => batchLabelFor(i)).join(' ')}`;
+            if (!entries.length) {
+              return `<div class="flavor-tiers-card"><h5>${labelHtml}</h5><div class="all-match">All quality tiers match the shared set above.</div></div>`;
+            }
+            return `<div class="flavor-tiers-card">
+              <h5>${labelHtml}</h5>
+              <div class="compact-tiers">
+                ${entries.map(e => `<div class="compact-tier-row">
+                  <span class="tier-badge ${e.tier}">${e.tierLabel}</span>
+                  <span class="ti-slot">${e.slotLabel}</span>
+                  <span class="ti-val">${e.value}</span>
+                </div>`).join('')}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+        catTierHtml = `<div class="cs-tier">
+          <h4>Quality Tier (Chef → Avoid)</h4>
+          ${sharedHtml}
+          ${perFlavorHtml}
+        </div>`;
+      }
+
       return `<div class="category-section">
         <div class="category-section-header">
           <h3>${COOK_GROUP_LABEL[cat]}</h3>
           <span class="cs-temp">${heat.temp}</span>
           <span class="cs-blurb">${COOK_GROUP_BLURB[cat]}</span>
         </div>
-        <div class="batches-row" data-batches-row="cat-${cat}">${columnsHtml}</div>
-        ${scrollHintHtml}
+        <div class="cs-setup">
+          <h4 class="section-title">Prep · per batch</h4>
+          <div class="batches-row" data-batches-row="cat-${cat}" data-batch-layout="${state.batchLayout}">${columnsHtml}</div>
+          ${scrollHintHtml}
+        </div>
+        ${catCookHtml}
+        ${catTierHtml}
       </div>`;
     }).join('');
+    setupBodyHtml = `<div class="groups-row" data-group-layout="${state.groupLayout}" data-groups-row="all">${sectionsHtml}</div>`;
   } else {
-    // Mode A: single horizontal-scroll row.
+    // Mode A: single horizontal-scroll row honoring data-batch-layout.
     const columnsHtml = visibleBatchIdxs.map(idx => renderBatchColumnHtml(idx)).filter(h => h).join('');
-    const scrollHintHtml = visibleBatchIdxs.length > 1
+    const scrollHintHtml = (state.batchLayout === 'side' && visibleBatchIdxs.length > 1)
       ? `<p class="scroll-hint" data-scroll-hint-for="all" hidden><span class="arrow">←</span> scroll horizontally to see all batches <span class="arrow">→</span></p>`
       : '';
-    setupBodyHtml = `<div class="batches-row" data-batches-row="all">${columnsHtml}</div>${scrollHintHtml}`;
+    setupBodyHtml = `<div class="batches-row" data-batches-row="all" data-batch-layout="${state.batchLayout}">${columnsHtml}</div>${scrollHintHtml}`;
   }
 
-  // Layout switchers for F&S and Toppings (session-wide), only shown when
-  // there are 2+ visible flavors total (otherwise nothing to lay out).
-  const layoutSwitchersHtml = visibleFlavorCount > 1
+  // Layout switchers (session-wide). Group/Batch are always relevant for the
+  // output shape; Spices/Toppings only matter when there are 2+ visible flavors.
+  const groupBatchSwitchersHtml = `<div class="setup-layout-toggles">
+        <span class="slt-label">Group:</span>
+        ${layoutSwitcherHtml('group', state.groupLayout)}
+        <span class="slt-label">Batches:</span>
+        ${layoutSwitcherHtml('batch', state.batchLayout)}
+      </div>`;
+  const subcardSwitchersHtml = visibleFlavorCount > 1
     ? `<div class="setup-layout-toggles">
         <span class="slt-label">Spices:</span>
         ${layoutSwitcherHtml('spices', state.spicesLayout)}
@@ -3654,6 +3869,7 @@ function renderFlightOutput() {
         ${layoutSwitcherHtml('toppings', state.toppingsLayout)}
       </div>`
     : '';
+  const layoutSwitchersHtml = groupBatchSwitchersHtml + subcardSwitchersHtml;
 
   const renderedBatchCount = visibleBatchIdxs.length;
 
@@ -3664,20 +3880,12 @@ function renderFlightOutput() {
   let tierSectionHtml = '';
   let masterShoppingListHtml = '';
 
-  if (visibleFlavorCount > 0) {
+  if (visibleFlavorCount > 0 && !useCategorySections) {
+    // Mode A only — in Mode B, Cook + Tier content is rendered inside
+    // each .category-section by the Setup-body code above.
     // Collect all candy flavor ids across visible tuples for heat computation.
     const allVisibleFlavorIds = visibleTuples.map(t => t.flavor.id);
     const allVisibleFlavors = visibleTuples.map(t => t.flavor);
-
-    // Build the per-flavor delta card HTML, with batch label.
-    const deltaCardHtmlForTuple = (tuple, showHeat) => {
-      const f = tuple.flavor;
-      const inner = flavorDeltaCardHtml(f, sizeIdx, { showHeat });
-      const syrupRow = `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
-          <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
-        </ul>`;
-      return `<div class="flavor-delta-card"><h6>${f.label} ${batchLabelFor(tuple.batchIdx)}</h6>${inner}${syrupRow}</div>`;
-    };
 
     // Combined syrup groupings across all visible flavors (deduped by syrup).
     const syrupGroupings = getSyrupGroupings(allVisibleFlavors);
@@ -3846,7 +4054,9 @@ function renderFlightOutput() {
       </div>`;
     }
 
-    // Master shopping list placeholder.
+  }
+  // v3.0.0-rc.3: master shopping list renders in BOTH Mode A and Mode B.
+  if (visibleFlavorCount > 0) {
     masterShoppingListHtml = `<div class="tier-section">
       <h4>Master Shopping List</h4>
       <p style="color:var(--muted); font-style:italic; font-size:12px;">Computed totals across all batches arrive in v3.0.0 final.</p>
@@ -4044,6 +4254,7 @@ function resetToDefaults() {
     'pancakeFlightBatches', 'pancakeFlightActiveBatchIdx',
     'pancakeFlightActiveCategories', 'pancakeFlightAllowMultiBatchFlavor',
     'pancakeFlightShoppingListExpanded',
+    'pancakeFlightGroupLayout', 'pancakeFlightBatchLayout',
   ];
   contentKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
 
@@ -4071,6 +4282,8 @@ function resetToDefaults() {
   state.activeCategories = ['clean', 'savory', 'candy'];
   state.allowMultiBatchFlavor = false;
   state.shoppingListExpanded = false;
+  state.groupLayout = 'side';
+  state.batchLayout = 'side';
 
   // Reflect Single mode in the switcher UI.
   const ms = document.getElementById('mode-switcher');
@@ -4275,6 +4488,9 @@ function attachToggleHandlers() {
   bindLayoutPills('data-wet-layout',      'wetLayout',      'pancakeFlightWetLayout');
   bindLayoutPills('data-spices-layout',   'spicesLayout',   'pancakeFlightSpicesLayout');
   bindLayoutPills('data-toppings-layout', 'toppingsLayout', 'pancakeFlightToppingsLayout');
+  // v3.0.0-rc.3
+  bindLayoutPills('data-group-layout',    'groupLayout',    'pancakeFlightGroupLayout');
+  bindLayoutPills('data-batch-layout',    'batchLayout',    'pancakeFlightBatchLayout');
 }
 
 // v2.7.0: ResizeObserver keeps --picker-region-h, --psb-h, --controls-h fresh
