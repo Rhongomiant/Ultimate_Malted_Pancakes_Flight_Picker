@@ -247,7 +247,9 @@
   .layout-switcher { display: inline-flex; gap: 6px; align-items: center;
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 4px 6px 4px 12px; font-size: 0.78rem; color: var(--muted);
-    margin: 0 0 24px; }
+    /* v2.10.1: removed margin-bottom 24px — was breaking vertical alignment in the
+       v2.10.0 single-row controls layout. */
+    margin: 0; }
   .layout-switcher .ls-label { letter-spacing: 0.04em; text-transform: uppercase;
     font-weight: 600; font-size: 0.7rem; }
   .layout-switcher .ls-btn { border: 0; background: transparent; padding: 6px 12px;
@@ -288,7 +290,8 @@
   .theme-switcher { display: inline-flex; gap: 6px; align-items: center;
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 4px 6px 4px 12px; font-size: 0.78rem; color: var(--muted);
-    margin: 0 0 24px 8px; }
+    /* v2.10.1: removed margin-bottom 24px (kept left 8px for inter-switcher gap). */
+    margin: 0 0 0 8px; }
   .theme-switcher .ts-label { letter-spacing: 0.04em; text-transform: uppercase;
     font-weight: 600; font-size: 0.7rem; }
   .theme-switcher .ts-btn { border: 0; background: transparent; padding: 6px 12px;
@@ -300,7 +303,8 @@
   .cardscale-switcher { display: inline-flex; gap: 4px; align-items: center;
     flex-wrap: wrap; background: var(--card); border: 1px solid var(--line);
     border-radius: 999px; padding: 4px 10px 4px 12px; font-size: 0.78rem;
-    color: var(--muted); margin: 0 0 24px 8px; }
+    /* v2.10.1: removed margin-bottom 24px (kept left 8px for inter-switcher gap). */
+    color: var(--muted); margin: 0 0 0 8px; }
   .cardscale-switcher .cs-label { letter-spacing: 0.04em; text-transform: uppercase;
     font-weight: 600; font-size: 0.7rem; margin-right: 2px; }
   .cardscale-switcher .cs-btn { border: 0; background: transparent; padding: 6px 10px;
@@ -331,7 +335,8 @@
   .mode-switcher { display: inline-flex; gap: 6px; align-items: center;
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 4px 6px 4px 12px; font-size: 0.78rem; color: var(--muted);
-    margin: 0 8px 24px 0; }
+    /* v2.10.1: removed margin-bottom 24px (kept right 8px for inter-switcher gap). */
+    margin: 0 8px 0 0; }
   .mode-switcher .ms-label { letter-spacing: 0.04em; text-transform: uppercase;
     font-weight: 600; font-size: 0.7rem; }
   .mode-switcher .ms-btn { border: 0; background: transparent; padding: 6px 12px;
@@ -546,9 +551,12 @@
     details:not([open]) { display: none; }
   }
 
-  /* === v2.1.1: sticky controls + collapse === */
+  /* === v2.1.1: sticky controls + collapse ===
+     v2.10.1: margin-bottom 16px → 8px to reduce the gap between the controls row
+     and the picker below (matches the existing side-by-side override which already
+     uses 8px; consistency across layouts). */
   .controls-row { position: sticky; top: 0; z-index: 60;
-    background: var(--bg); padding: 8px 0; margin-bottom: 16px;
+    background: var(--bg); padding: 8px 0; margin-bottom: 8px;
     display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .controls-toggle { margin-left: auto; border: 1px solid var(--line);
     background: var(--card); border-radius: 999px; padding: 6px 14px;
@@ -1297,7 +1305,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.10.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.10.1</div>
 </div>
 
 <script>
