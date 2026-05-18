@@ -128,7 +128,7 @@
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased; line-height: 1.45; }
-  .wrap { max-width: 1600px; margin: 0 auto; padding: 24px 18px 96px; }
+  .wrap { max-width: 1800px; margin: 0 auto; padding: 24px 18px 96px; }
   h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; text-align: center; }
   h1 .em { color: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; text-align: center; }
@@ -259,7 +259,7 @@
   /* === Side-by-side layout (>= 1000px viewport only) === */
   /* v2.2.0: pancake-size-bar lives at top of right column above .output-pane */
   @media (min-width: 1000px) {
-    body[data-layout="side"] .wrap { max-width: 1600px;
+    body[data-layout="side"] .wrap { max-width: 1800px;
       display: grid; grid-template-columns: 360px 1fr;
       column-gap: 28px; align-items: start; }
     body[data-layout="side"] h1,
@@ -506,12 +506,10 @@
   .controls-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
   body[data-layout="side"] .controls-row { margin-bottom: 8px; }
 
-  /* v2.8.0: center the main four switchers. .controls-actions has margin-left:auto
-     (line ~775) which pushes it right; pairing margin-left:auto on the first switcher
-     (.mode-switcher) splits the remaining space evenly on both sides, centering the
-     middle group. When .controls-collapsed hides the switchers, only the actions are
-     left and they remain right-aligned via their own auto-margin. */
-  .controls-row .mode-switcher { margin-left: auto; }
+  /* v2.10.0: all controls left-aligned. .controls-actions moved to leftmost
+     position in DOM. No auto-margin tricks; everything flows natural left-to-right.
+     Page max-width bumped to 1800px so the full single-row controls fit on common
+     1920px-wide displays without flex-wrap kicking in. */
 
   /* In print, force the light palette regardless of theme */
   @media print {
@@ -788,8 +786,8 @@
   body:not([data-order-mode="recommended"]) .order-toggle .order-sub { display: none; }
 
 
-  /* === v2.2.0: controls-row actions container (Hide Options + Hide Controls grouped right) === */
-  .controls-actions { margin-left: auto; display: inline-flex; gap: 8px; align-items: center; }
+  /* === v2.10.0: controls-row actions container (Hide Options + Hide Controls, now leftmost) === */
+  .controls-actions { display: inline-flex; gap: 8px; align-items: center; }
   .options-toggle, .controls-toggle { border: 1px solid var(--line);
     background: var(--card); border-radius: 999px; padding: 6px 14px;
     font-size: 0.78rem; cursor: pointer; color: var(--muted);
@@ -797,7 +795,8 @@
   .options-toggle:hover, .controls-toggle:hover { color: var(--ink); }
   .controls-toggle { margin-left: 0; } /* override v2.1.1 auto-margin */
   body[data-controls-collapsed="1"] .controls-row > :not(.controls-actions) { display: none; }
-  body[data-controls-collapsed="1"] .controls-actions { margin-left: auto; }
+  /* v2.10.0: removed `body[data-controls-collapsed="1"] .controls-actions { margin-left: auto }`
+     — actions are leftmost by default in v2.10.0, no auto-margin needed when collapsed. */
   body:not([data-options-collapsed="1"]) .options-toggle .expand-label { display: none; }
   body[data-options-collapsed="1"] .options-toggle .collapse-label { display: none; }
 
@@ -888,6 +887,18 @@
   <h1>🥞 Ultimate Malted Pancakes <span class="em">Flight</span> Picker</h1>
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
   <div class="controls-row" id="controls-row">
+    <div class="controls-actions" id="controls-actions">
+      <button type="button" class="options-toggle" id="options-toggle"
+              aria-label="Toggle picker options visibility">
+        <span class="collapse-label">◀ Hide Options</span>
+        <span class="expand-label">▶ Show Options</span>
+      </button>
+      <button type="button" class="controls-toggle" id="controls-toggle"
+              aria-label="Toggle controls visibility">
+        <span class="collapse-label">▲ Hide Controls</span>
+        <span class="expand-label">▼ Show Controls</span>
+      </button>
+    </div>
     <div class="mode-switcher" id="mode-switcher">
       <span class="ms-label">Mode</span>
       <button type="button" data-mode-pick="single" class="ms-btn active">Single</button>
@@ -919,18 +930,6 @@
       <button type="button" data-step="1"  class="cs-btn">1%</button>
       <button type="button" data-step="5"  class="cs-btn active">5%</button>
       <button type="button" data-step="10" class="cs-btn">10%</button>
-    </div>
-    <div class="controls-actions" id="controls-actions">
-      <button type="button" class="options-toggle" id="options-toggle"
-              aria-label="Toggle picker options visibility">
-        <span class="collapse-label">◀ Hide Options</span>
-        <span class="expand-label">▶ Show Options</span>
-      </button>
-      <button type="button" class="controls-toggle" id="controls-toggle"
-              aria-label="Toggle controls visibility">
-        <span class="collapse-label">▲ Hide Controls</span>
-        <span class="expand-label">▼ Show Controls</span>
-      </button>
     </div>
   </div><!-- /controls-row -->
 
@@ -1298,7 +1297,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.9.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.10.0</div>
 </div>
 
 <script>
