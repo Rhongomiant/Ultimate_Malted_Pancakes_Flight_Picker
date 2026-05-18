@@ -15,12 +15,13 @@
     --accent-soft: #fde9c8;
     --good: #166534;
     --warn: #b91c1c;
+    --info: #1e40af;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 18px 96px; }
+    -webkit-font-smoothing: antialiased; line-height: 1.45; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 24px 18px 96px; }
   h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
   h1 .em { color: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; }
@@ -34,7 +35,7 @@
     transition: all .12s; user-select: none; }
   .opt:hover { border-color: var(--accent); }
   .opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .toggle { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.95rem; }
+  .toggle { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.95rem; cursor: pointer; }
   .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
   .out { background: #fff; border: 1px solid var(--line); border-radius: 14px;
     padding: 20px; margin-top: 8px; }
@@ -51,31 +52,80 @@
   ul.list li:last-child { border-bottom: 0; }
   ul.list li .v { color: var(--ink); font-weight: 600; text-align: right; }
   ul.list li .k { color: var(--muted); }
-  .callout { border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin-top: 12px; }
+  .max-limit { background: #fff; border: 1px dashed var(--accent); color: var(--accent);
+    padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 8px;
+    text-align: center; font-weight: 600; }
+  .callout { border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin-top: 10px; }
   .callout.warn { background: #fef2f2; border: 1px solid #fecaca; color: var(--warn); }
   .callout.info { background: var(--accent-soft); border: 1px solid #f5d9a8; color: #7c3a00; }
   .callout.good { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--good); }
-  .steps { margin: 14px 0 0; padding: 0 0 0 22px; font-size: 0.94rem; line-height: 1.5; }
+  .steps { margin: 14px 0 0; padding: 0 0 0 22px; font-size: 0.94rem; line-height: 1.55; }
   .steps li { padding: 3px 0; }
   .syrup { display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
     background: #fff8e6; border: 1px solid #f3dca4; padding: 10px 12px; border-radius: 10px;
-    margin-top: 12px; }
-  .syrup .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+    margin-top: 14px; }
+  .syrup .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .tiers { margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  @media (max-width: 700px) { .tiers { grid-template-columns: 1fr 1fr; } }
+  .tier { padding: 10px; border-radius: 8px; font-size: 0.85rem; }
+  .tier .tier-h { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; margin-bottom: 4px; }
+  .tier-best { background: #fef9c3; border: 1px solid #fde68a; }
+  .tier-best .tier-h { color: #92400e; }
+  .tier-good { background: #ecfccb; border: 1px solid #d9f99d; }
+  .tier-good .tier-h { color: #3f6212; }
+  .tier-ok   { background: #fed7aa; border: 1px solid #fdba74; }
+  .tier-ok .tier-h { color: #9a3412; }
+  .tier-bad  { background: #fee2e2; border: 1px solid #fecaca; }
+  .tier-bad .tier-h { color: #991b1b; }
+  .tier .syr { font-weight: 600; display: block; }
+  .tier .ing { color: #555; }
+
   .footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
-  @media print {
-    body { background: #fff; }
-    .card:not(.out-card) { display: none; }
-    .footer, .toggle { display: none; }
-  }
   .print-btn { background: var(--accent); color: #fff; border: 0; padding: 10px 16px;
     border-radius: 8px; cursor: pointer; font-size: 0.92rem; margin-top: 8px; }
   .print-btn:hover { background: #92400e; }
+
+  details { background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    margin-bottom: 10px; overflow: hidden; }
+  details summary { padding: 14px 18px; cursor: pointer; font-weight: 600;
+    font-size: 0.98rem; user-select: none; list-style: none; display: flex;
+    align-items: center; justify-content: space-between; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: "+"; font-size: 1.3rem; color: var(--accent); }
+  details[open] summary::after { content: "−"; }
+  details[open] summary { border-bottom: 1px solid var(--line); }
+  details .body { padding: 14px 18px 18px; font-size: 0.92rem; line-height: 1.6; color: #3a2f23; }
+  details .body h5 { margin: 14px 0 6px; font-size: 0.85rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.05em; }
+  details .body h5:first-child { margin-top: 0; }
+  details .body p { margin: 6px 0; }
+  details .body ul { margin: 6px 0; padding-left: 22px; }
+  details .body li { margin: 4px 0; }
+  details .body table { border-collapse: collapse; width: 100%; margin: 8px 0;
+    font-size: 0.88rem; }
+  details .body th, details .body td { border: 1px solid var(--line); padding: 6px 8px;
+    text-align: left; }
+  details .body th { background: #fbf6ec; }
+  details .body code { background: #fbf6ec; padding: 1px 6px; border-radius: 4px;
+    font-size: 0.9em; }
+
+  .section-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 24px 6px 10px; font-weight: 600; }
+
+  @media print {
+    body { background: #fff; }
+    .card:not(.out-card) { display: none; }
+    .footer, .print-btn { display: none; }
+    details { page-break-inside: avoid; }
+    details:not([open]) { display: none; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>🥞 Pancake <span class="em">Flight</span> Picker</h1>
-  <p class="sub">Pick your options. The recipe below updates as you choose.</p>
+  <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
 
   <div class="card">
     <h2>1. Batch size</h2>
@@ -105,35 +155,267 @@
     <button class="print-btn" onclick="window.print()">🖨 Print this recipe</button>
   </div>
 
-  <div class="footer">Based on The Master Pancake Flight Manual</div>
+  <div class="section-title">Reference (tap to expand)</div>
+
+  <details>
+    <summary>📦 Bulk Pantry Mix (4× batch) + jar storage</summary>
+    <div class="body">
+      <p>Makes a large dry-only mix to keep on the shelf. Do <b>not</b> include liquids, wet items, or spice add-ins.</p>
+      <h5>Recipe</h5>
+      <ul>
+        <li>6 cups All-purpose flour</li>
+        <li>½ cup Yellow corn flour</li>
+        <li>½ cup Non-diastatic malt powder</li>
+        <li>1 cup Cultured buttermilk powder</li>
+        <li>2 Tbsp Sugar</li>
+        <li>2½ Tbsp Baking powder</li>
+        <li>2 tsp Baking soda</li>
+        <li>2 tsp Salt</li>
+      </ul>
+      <p>Mix well. Fits a standard 64 fl-oz Ball Wide Mouth glass mason jar.</p>
+
+      <h5>Storage</h5>
+      <ul>
+        <li><b>Pantry (airtight, not vacuum):</b> 6–9 months</li>
+        <li><b>Pantry (dry vacuum sealed):</b> 1–2 years</li>
+        <li><b>Refrigerator:</b> 12–18 months (seal tight — dry mixes absorb odors)</li>
+        <li><b>Freezer:</b> ❌ Do <b>not</b> freeze a 64-oz glass jar — Ball says they aren't freezer-safe; thermal shock cracks the glass.</li>
+      </ul>
+
+      <h5>"Re-canning" lifespan</h5>
+      <ul>
+        <li>If you just screw the lid back on after scooping: <b>3–6 months</b> useful life on remaining mix.</li>
+        <li>If you pull a fresh vacuum seal every time you open it: <b>1–2 years</b>.</li>
+      </ul>
+
+      <h5>Canning rule (critical)</h5>
+      <p><b>Never</b> water-bath or pressure can a dry flour mix — heat and moisture destroy the baking powder and turn flour into gummy dough. Use <b>Dry Vacuum Sealing</b> only: clean bone-dry jar → coffee filter over the powder → lid → jar-hood vacuum machine.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🔤 Vocabulary cheat sheet</summary>
+    <div class="body">
+      <ul>
+        <li><b>Trace Dusting:</b> fraction of a drop — touch dry fingertip to spice, tap into bowl.</li>
+        <li><b>Drop:</b> 1/64 tsp (very tiny dusting / dip fingertip).</li>
+        <li><b>Smidgen:</b> 1/32 tsp.</li>
+        <li><b>Pinch:</b> 1/16 tsp.</li>
+        <li><b>Dash:</b> ⅛ tsp (≈ two normal finger pinches).</li>
+        <li><b>Scant:</b> fill the measure just below the upper brim.</li>
+        <li><b>Batter Shield / Seal Method:</b> spoon a tiny drizzle of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the pan.</li>
+        <li><b>Ghee:</b> clarified butter (milk solids strained out). Deep, toasted, brown-butter note — pairs with malt powder.</li>
+        <li><b>Avocado Oil:</b> very high smoke point, flavorless. Best pan grease for sugar combos; used <i>inside</i> the batter for loud flavor combos (bacon, triple-threat).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🥣 Mixing &amp; resting — the rules</summary>
+    <div class="body">
+      <h5>Electric mixing</h5>
+      <ul>
+        <li>Use a handheld frother with the whisk attachment on its <b>lowest</b> setting.</li>
+        <li>Only use it on the <b>wet bowl</b> (milk, egg, spices, liquid fat) to emulsify.</li>
+        <li>Do <b>not</b> use the electric tool on the dry powders alone.</li>
+        <li>Combining wet + dry: lowest setting, <b>5–7 seconds max</b>.</li>
+      </ul>
+      <h5>How to know it's mixed well</h5>
+      <p>Stop while it still looks <b>thick and lumpy</b>. Small dry-flour streaks are fine. If it goes smooth/shiny/elastic — over-mixed → rubbery pancakes.</p>
+
+      <h5>The 10-minute rest</h5>
+      <ul>
+        <li>Let the batter sit completely undisturbed for 10 minutes.</li>
+        <li>Buttermilk powder activates the leavening; dry streaks hydrate.</li>
+        <li>Ready when it looks puffy, airy, slightly surface-bubbly.</li>
+        <li><b>Do not stir or whisk after the rest</b> — pops the gas pockets and deflates them.</li>
+        <li>Ladle exception: a gentle swirl to scoop is fine. No beating / folding / whipping.</li>
+      </ul>
+
+      <h5>Cooking window</h5>
+      <p>Cook the full batch within <b>20–40 minutes</b> of the rest finishing. After 40 min the chemical leavening exhausts itself and pancakes go flat.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🍳 Liquid troubleshooting (thick / thin batter)</summary>
+    <div class="body">
+      <p>Check after the 10-minute rest.</p>
+      <ul>
+        <li><b>Too THICK</b> (paste / heavy scoopable dough) — common with 2% Lactaid, whole milk, heavy nut milks. <b>Fix:</b> whisk in <b>1 Tbsp water at a time</b> until it falls off the spoon in a slow ribbon.</li>
+        <li><b>Too THIN</b> (watery / runs across the pan) — common with skim, oat, soy milks. <b>Fix:</b> whisk in <b>1 Tbsp All-Purpose flour at a time</b> until pourable-milkshake consistency.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🔁 Flipping technique</summary>
+    <div class="body">
+      <h5>When to flip</h5>
+      <ul>
+        <li>Bubbles form on the surface and pop, leaving small holes that <b>stay open</b> (don't refill).</li>
+        <li>The wet sheen on top starts to look <b>matte and dry around the edges</b>.</li>
+      </ul>
+      <h5>The motion</h5>
+      <p>Slide the spatula completely under the center. Lift it 1–2 inches off the griddle. Flip with a quick gentle turn of your wrist. <b>Don't toss high</b> — wet batter splashes.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🧹 Cooking order &amp; between-batch cleanup</summary>
+    <div class="body">
+      <h5>Order: cleanest → stickiest</h5>
+      <ol>
+        <li><b>First — Plain &amp; Chocolate Chips:</b> stay mostly contained; pan oil still clear.</li>
+        <li><b>Second — Bacon &amp; Banana Nut:</b> bacon = savory grease, bananas = fruit sugar. Wipe pan with dry paper towel after.</li>
+        <li><b>Last — Toffee &amp; Caramel combos:</b> sticky sugar residue. Save them for the end so they don't contaminate other pancakes.</li>
+      </ol>
+
+      <h5>30-second between-batch cleanup</h5>
+      <ol>
+        <li><b>Scrape</b> — flat sharp edge of metal spatula → trash bowl.</li>
+        <li><b>Ice Trick</b> — for hardened candy, drop one ice cube (or 1 Tbsp water) on the hot sticky spot. Steam blasts the sugar off.</li>
+        <li><b>Wipe</b> — thick-folded paper towel pressed with spatula across the surface.</li>
+        <li><b>Re-Oil</b> — fresh tsp avocado oil, wipe around to a micro-thin film, pour the next batch.</li>
+      </ol>
+
+      <h5>Ladle prep (between every pour)</h5>
+      <p>Keep a container of ice water next to the cooking area. Before each scoop, dip ladle in ice water a few seconds → tap on towel to drop water beads → wipe inside with a tiny drop of avocado oil. Sticky batter releases cleanly.</p>
+
+      <h5>Pan grease amount</h5>
+      <p>You want a <b>micro-thin shimmering mirror</b> — not a puddle. If tilting the pan makes the oil pool to one side, you used too much. Drop a tsp of avocado oil, then immediately wipe across the surface with a folded paper towel to leave a thin glossy film.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🧊 Storage &amp; leftovers</summary>
+    <div class="body">
+      <ul>
+        <li><b>Whole nutmeg seeds:</b> 4–5+ years in a sealed glass jar, cool/dark/dry pantry. Never above the stove (heat + steam ruin oils). Don't freeze — condensation rots them.</li>
+        <li><b>Leftover whisked egg (from half-batches):</b> keep covered in fridge up to <b>2 days</b>. Use in scrambled eggs, egg wash, or another half-batch tomorrow.</li>
+        <li><b>Leftover mixed wet batter:</b> ❌ Discard. The cold kills leavening — overnight batter = flat, gummy paste. If you can't finish a full batch, mix a half-batch instead.</li>
+        <li><b>Leftover dry mix:</b> 6–9 months sealed; 1–2 years dry-vacuum-sealed.</li>
+        <li><b>Leftover cooked pancakes:</b> freeze beautifully. Cool fully → stack with parchment between → heavy-duty freezer bag. Reheat from frozen in toaster.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🧈 Advanced cooking tips</summary>
+    <div class="body">
+      <h5>Salted vs. unsalted butter</h5>
+      <p>Always use <b>unsalted butter</b> in the wet mix. The dry recipe already has a precise salt amount tuned to malt + Lactaid. Salted butter brands vary wildly and can push sweet pancakes into salty territory.</p>
+
+      <h5>Managing melted fats across multiple flights</h5>
+      <p>Melted butter/ghee solidifies on contact with cold Lactaid, disrupting even fat distribution. Two methods:</p>
+      <ul>
+        <li><b>Warm-water bath (best):</b> melt butter + ghee into small glass jars. Set jars in a skillet/bowl filled with hot tap water (water up to halfway). Residual heat keeps fats liquid for over an hour — refresh hot water between flights.</li>
+        <li><b>Microwave nuke-as-you-go:</b> right before each batch, cut cold fat into a small cup, microwave 10–15 sec until melted, sit 1 minute so it isn't boiling.</li>
+      </ul>
+
+      <h5>Vanilla bean paste vs. extract</h5>
+      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot pan. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Chocolate (anchors cocoa).</p>
+
+      <h5>Freshly grated vs. pre-ground nutmeg</h5>
+      <p>Freshly grated = bright, sweet, intensely warm oils. Pre-ground = dusty/woody/medicinal. Fresh is mandatory to cut through heavy sugars cleanly.</p>
+
+      <h5>Best nutmeg tool</h5>
+      <p>Manual <b>Microplane Premium Classic Zester</b>. Hold at 45° over the wet bowl. Slide whole seed across teeth. Stop when seed shrinks to marble/pea size (finger safety). Avoid stick blenders (nutmeg shatters them) and electric grinders (can't grind tiny amounts).</p>
+
+      <h5>Toasting pine nuts</h5>
+      <p>Raw pine nuts taste chalky. Dry skillet, medium-low, <b>no oil</b>, shake constantly. The exact second they turn light golden and smell intensely fragrant (~2–3 min) → pour into a cool bowl to stop the cook.</p>
+
+      <h5>Banana thickness</h5>
+      <p>Slice ⅛"–¼" thick (ideally 3/16" — two stacked coins), sharp paring knife, right before cooking. Too thick = tears pancake on flip. Too thin = dissolves into mush, sticks to pan.</p>
+
+      <h5>Caramel prep</h5>
+      <p>Buy baking caramel bits, chop micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the griddle.</p>
+
+      <h5>Banana Nut experimentation</h5>
+      <ul>
+        <li><b>Traditional Bakery Profile:</b> Melted Ghee + Cinnamon + Fresh Nutmeg.</li>
+        <li><b>Exotic Modern Cafe Profile:</b> Melted Butter + Cinnamon + Ground Cardamom.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🍁 Syrup grade reference</summary>
+    <div class="body">
+      <p>Use <b>100% Pure Grade A Maple Syrup</b>. Never commercial table syrups (Aunt Jemima, Log Cabin = HFCS + artificial flavor).</p>
+      <ul>
+        <li><b>Grade A Amber Rich:</b> balanced &amp; classic — Plain, Chocolate Chips Only, Plain Banana Nut. Won't mask subtle dough flavor.</li>
+        <li><b>Grade A Dark Robust:</b> heavy &amp; caramelized — Bacon Only, Banana Nut + Chocolate Chips. Reliable for most candy combos.</li>
+        <li><b>Grade A Very Dark Strong:</b> intense, concentrated, complex — Banana Nut + Bacon, Toffee Only, Caramel Only, all complex candy combos including the Triple Threat.</li>
+      </ul>
+
+      <h5>The Syrup Scaling Law</h5>
+      <p>As the flavor profile gets heavier (fats, roasted nuts, complex candies), syrup must scale Amber → Dark → Very Dark. A delicate Amber syrup on a candy/bacon stack washes out into flat sweetness instead of true maple.</p>
+
+      <h5>The Structural Conflict Rule</h5>
+      <p>Ripe banana discs release water-sugar compounds when seared. Combining bananas with pure melting candies (toffee/caramel) is locked in the "Bad" tier — it liquefies the pancake interior, causing tear-on-flip and burning.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🛒 Component sourcing guide</summary>
+    <div class="body">
+      <table>
+        <thead><tr><th>Component</th><th>Recommended</th><th>Avoid</th></tr></thead>
+        <tbody>
+          <tr><td>Malt</td><td>King Arthur Baking Non-Diastatic Malt Powder</td><td>Ovaltine, malted milkshake syrups, diastatic malt (turns batter gummy)</td></tr>
+          <tr><td>Buttermilk</td><td>Saco Pantry Cultured Buttermilk Blend Powder</td><td>Generic plain-milk-powder shortcuts</td></tr>
+          <tr><td>Espresso</td><td>King Arthur Baking Espresso Powder</td><td>Ground coffee beans (grit), supermarket instant (acidic)</td></tr>
+          <tr><td>Pine nuts</td><td>Nuts.com Mediterranean Pine Nuts (Pignolias) — Spain/Italy/Portugal</td><td>Generic bulk-bin Chinese pine nuts (<i>Pinus armandii</i>) → "pine mouth" metallic aftertaste</td></tr>
+          <tr><td>Vanilla</td><td>Nielsen-Massey Madagascar Bourbon Vanilla Bean Paste</td><td>Imitation vanilla, cheap alcohol extracts (burn off on the griddle)</td></tr>
+          <tr><td>Corn flour</td><td>Bob's Red Mill Organic Yellow Corn Flour <i>or</i> Maseca Corn Masa Flour</td><td>Yellow cornmeal (too coarse — makes pancakes gritty)</td></tr>
+          <tr><td>Maple syrup</td><td>Runamok "Sugarmaker's Cut", Crown Maple, Butternut Mountain Farm</td><td>Any HFCS-based table syrup</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>🥄 Ladle / pancake size reference</summary>
+    <div class="body">
+      <ul>
+        <li><b>0.5 oz (1 Tbsp scoop):</b> 1.5–2" sample bite. Drop toppings the second you pour — they cook fast. 8 of these = one normal stack.</li>
+        <li><b>1.0 oz (2 Tbsp scoop):</b> 2.5–3" silver dollar — the tasting-flight size. Single-serving batch yields 4 of these.</li>
+        <li><b>2.0 oz (¼ cup):</b> 4" standard diner pancake. Easiest size for practicing flips.</li>
+        <li><b>3.0 oz (⅜ cup):</b> 5" thick-stack. Leave on griddle slightly longer so the center cooks through.</li>
+        <li><b>4.0 oz (½ cup):</b> 6–7" plate-sized flapjack. Hardest to flip; best for laying down whole bacon strips.</li>
+      </ul>
+    </div>
+  </details>
+
+  <div class="footer">Based on The Master Pancake Flight Manual · v2</div>
 </div>
 
 <script>
 const BATCHES = [
-  { id: 'quarter', label: 'Quarter', desc: '1 small portion' },
+  { id: 'quarter', label: 'Quarter', desc: '1 portion' },
   { id: 'half',    label: 'Half',    desc: '2 portions' },
   { id: 'three',   label: 'Three-Quarter', desc: '3 portions' },
   { id: 'full',    label: 'Full',    desc: '4 portions' },
 ];
 
 const SIZES = [
-  { id: 's05', label: '0.5 oz (mini bite)', detail: '1 Tbsp scoop · 1.5–2"' },
-  { id: 's10', label: '1.0 oz (silver dollar)', detail: '2 Tbsp scoop · 2.5–3" — tasting flight size' },
-  { id: 's20', label: '2.0 oz (diner)', detail: '¼ cup · 4" — easiest to flip' },
-  { id: 's30', label: '3.0 oz (thick stack)', detail: '⅜ cup · 5"' },
-  { id: 's40', label: '4.0 oz (plate-sized)', detail: '½ cup · 6–7"' },
+  { id: 's05', label: '0.5 oz (mini bite)',     detail: '1 Tbsp scoop · 1.5–2"',           maxCombined: '¼ tsp total' },
+  { id: 's10', label: '1.0 oz (silver dollar)', detail: '2 Tbsp scoop · 2.5–3" tasting flight', maxCombined: '½ Tbsp total' },
+  { id: 's20', label: '2.0 oz (diner)',         detail: '¼ cup · 4"',                       maxCombined: '1 Tbsp total' },
+  { id: 's30', label: '3.0 oz (thick stack)',   detail: '⅜ cup · 5"',                       maxCombined: '1½ Tbsp total' },
+  { id: 's40', label: '4.0 oz (plate)',         detail: '½ cup · 6–7"',                     maxCombined: '2 Tbsp total' },
 ];
 
-// idx 0=quarter, 1=half, 2=three, 3=full
 const DRY = {
   flour:       ['⅜ cup (¼ cup + 2 Tbsp)', '¾ cup', '1⅛ cups (1 cup + 2 Tbsp)', '1½ cups'],
-  cornFlour:   ['½ Tbsp (1½ tsp)', '1 Tbsp', '1½ Tbsp', '2 Tbsp'],
-  malt:        ['½ Tbsp (1½ tsp)', '1 Tbsp', '1½ Tbsp', '2 Tbsp'],
-  buttermilk:  ['1 Tbsp', '2 Tbsp', '3 Tbsp', '¼ cup (4 Tbsp)'],
-  sugar:       ['⅜ tsp (~a fat ¼ tsp)', '¾ tsp', '1⅛ tsp', '1½ tsp'],
-  bakingPwd:   ['½ tsp', '1 tsp', '1½ tsp', '2 tsp'],
-  bakingSoda:  ['⅛ tsp', '¼ tsp', '⅜ tsp', '½ tsp'],
-  salt:        ['⅛ tsp', '¼ tsp', '⅜ tsp', '½ tsp'],
+  cornFlour:   ['½ Tbsp (1½ tsp)',        '1 Tbsp', '1½ Tbsp',                  '2 Tbsp'],
+  malt:        ['½ Tbsp (1½ tsp)',        '1 Tbsp', '1½ Tbsp',                  '2 Tbsp'],
+  buttermilk:  ['1 Tbsp',                 '2 Tbsp', '3 Tbsp',                   '¼ cup (4 Tbsp)'],
+  sugar:       ['⅜ tsp (~a fat ¼ tsp)',   '¾ tsp',  '1⅛ tsp (~1 tsp + a pinch)','1½ tsp'],
+  bakingPwd:   ['½ tsp',                  '1 tsp',  '1½ tsp',                   '2 tsp'],
+  bakingSoda:  ['⅛ tsp',                  '¼ tsp',  '⅜ tsp (¼ tsp + ⅛ tsp)',    '½ tsp'],
+  salt:        ['⅛ tsp',                  '¼ tsp',  '⅜ tsp (¼ tsp + ⅛ tsp)',    '½ tsp'],
 };
 
 const WET = {
@@ -143,174 +425,248 @@ const WET = {
 
 const BULK_SCOOP = ['½ cup', '1 cup', '1½ cups', '2 cups'];
 
-// Wet fat ladder by batch size (used by most flavors)
 const FAT = ['1½ tsp', '1 Tbsp', '1½ Tbsp', '2 Tbsp'];
+
+const SPICE = {
+  cinnamon: ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)',     'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
+  nutmeg:   ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+  cardamom: ['Trace Dusting',    'Drop (1/64 tsp)',  'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
+  vanilla:  ['¼ tsp',            '½ tsp',            '¾ tsp',                  '1 tsp'],
+  vanillaPaste: ['¼ tsp',        '½ tsp',            '¾ tsp',                  '1 tsp'],
+  salt:     ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)',     'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
+  blackPepper: ['Drop (1/64 tsp)','Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)','Pinch (1/16 tsp)'],
+  cayenne:  ['Trace Dusting',    'Drop (1/64 tsp)',  'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
+  espresso: ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+  seaSalt:  ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)','Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+};
 
 const FLAVORS = [
   {
     id: 'plain',
     label: 'Plain',
     strategy: 'Standard. Brush with butter after cooking.',
-    spices: ['No additional spices'],
+    spices: [],
     fat: 'Melted Unsalted Butter',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Amber Rich',
-    notes: [],
+    tiers: {
+      best: ['Grade A Amber Rich', 'Brushed with Unsalted Butter'],
+      good: ['Grade A Dark Robust', 'Melted Butter inside batter'],
+      ok:   ['Grade A Very Dark Strong', 'Salted Butter inside batter'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Savory fats mixed in plain dough'],
+    },
   },
   {
     id: 'choc',
     label: 'Chocolate Chips Only',
     strategy: 'Scatter chips onto wet top. Flip when bubbles pop.',
     spices: [
-      ['Vanilla Extract', ['¼ tsp', '½ tsp', '¾ tsp', '1 tsp']],
-      ['Salt', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
+      { name: 'Vanilla Extract', amounts: SPICE.vanilla },
+      { name: 'Salt',            amounts: SPICE.salt },
     ],
     fat: 'Melted Unsalted Butter',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Dark Robust',
-    notes: ['Best with dark chocolate chips.'],
+    tiers: {
+      best: ['Grade A Dark Robust', 'Dark Chocolate Chips'],
+      good: ['Grade A Amber Rich', 'Semi-Sweet Chocolate Chips'],
+      ok:   ['Grade A Very Dark Strong', 'Standard Milk Chocolate Chips'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Cheap waxy baking morsels'],
+    },
   },
   {
     id: 'bnut',
     label: 'Banana Nut Only',
     strategy: 'Sprinkle pine nuts first, then lay thin banana discs.',
     spices: [
-      ['Cinnamon', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
-      ['Nutmeg',   ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
-      ['OR Cardamom', ['Trace dusting', 'Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Cinnamon', amounts: SPICE.cinnamon },
+      { name: 'Nutmeg',   amounts: SPICE.nutmeg, note: 'OR' },
+      { name: 'Cardamom (instead of nutmeg)', amounts: SPICE.cardamom },
     ],
     fat: 'Melted Ghee',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Dark Robust',
-    notes: ['Bananas: slice 1/8" to 1/4" thick (about 3/16"). Cut right before cooking.'],
+    tiers: {
+      best: ['Grade A Dark Robust', 'Toasted Mediterranean Pine Nuts'],
+      good: ['Grade A Amber Rich', 'Finely Chopped English Walnuts'],
+      ok:   ['Grade A Very Dark Strong', 'Un-toasted / Raw Tree Nuts'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Over-ripe, mushy mashed banana'],
+    },
   },
   {
     id: 'bnut_choc',
     label: 'Banana Nut + Chocolate Chips',
-    strategy: 'Pine nuts & bananas first. Chips in open spaces.',
+    strategy: 'Pine nuts &amp; bananas first. Chips in open spaces.',
     spices: [
-      ['Cinnamon', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
-      ['Nutmeg',   ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
-      ['Vanilla Extract', ['¼ tsp', '½ tsp', '¾ tsp', '1 tsp']],
+      { name: 'Cinnamon',        amounts: SPICE.cinnamon },
+      { name: 'Nutmeg',          amounts: SPICE.nutmeg },
+      { name: 'Vanilla Extract', amounts: SPICE.vanilla },
     ],
     fat: 'Melted Ghee',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Dark Robust',
-    notes: [],
+    tiers: {
+      best: ['Grade A Dark Robust', 'Toasted Pine Nuts + Dark Chips'],
+      good: ['Grade A Very Dark Strong', 'Chopped Walnuts + Semi-Sweet'],
+      ok:   ['Grade A Amber Rich', 'Raw Tree Nuts + Milk Chips'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Large un-chopped walnut chunks'],
+    },
   },
   {
     id: 'bacon',
     label: 'Bacon Only',
-    strategy: 'Cook bacon crisp first (during the 10-min rest). Press crumbles into wet top.',
+    strategy: 'Cook bacon crisp during the 10-min rest. Press crumbles into wet top.',
     spices: [
-      ['Black Pepper', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
-      ['Cayenne',      ['Trace Dusting', 'Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Black Pepper', amounts: SPICE.blackPepper },
+      { name: 'Cayenne',      amounts: SPICE.cayenne },
     ],
     fat: 'Rendered Bacon Grease',
     panGrease: 'Rendered Bacon Grease',
     syrup: 'Grade A Very Dark Strong',
-    notes: ['Wet fat = bacon grease (not butter).'],
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Crisp Bacon seared in Bacon Fat'],
+      good: ['Grade A Dark Robust', 'Standard Crisp Bacon crumbles'],
+      ok:   ['Grade A Amber Rich', 'Thick-cut chewy bacon chunks'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Raw or under-cooked bacon strips'],
+    },
   },
   {
     id: 'bnut_bacon',
     label: 'Banana Nut + Bacon',
-    strategy: 'Pine nuts & bananas first. Press bacon into wet top.',
+    strategy: 'Pine nuts &amp; bananas first. Press bacon into wet top.',
     spices: [
-      ['Cinnamon', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
-      ['Nutmeg',   ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
-      ['Black Pepper', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Cinnamon',     amounts: SPICE.cinnamon },
+      { name: 'Nutmeg',       amounts: SPICE.nutmeg },
+      { name: 'Black Pepper', amounts: SPICE.blackPepper },
     ],
     fat: 'Avocado Oil (in batter)',
     panGrease: 'Rendered Bacon Grease',
     syrup: 'Grade A Very Dark Strong',
-    notes: [],
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Toasted Pine Nuts + Bacon Grease'],
+      good: ['Grade A Dark Robust', 'Chopped Walnuts + Butter Pan'],
+      ok:   ['Grade A Amber Rich', 'Raw tree nuts + Standard skillet'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Adding caramel/toffee to this row'],
+    },
   },
   {
     id: 'toffee',
     label: 'Toffee Only',
     strategy: 'BATTER SHIELD required. Espresso anchors the toffee flavor.',
     spices: [
-      ['Espresso Powder', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Espresso Powder', amounts: SPICE.espresso },
     ],
     fat: 'Melted Ghee',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
-    notes: ['Use the Batter Shield — drizzle plain batter over toppings before flipping.'],
     shield: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Plain Heath Bits \'O Brickle'],
+      good: ['Grade A Dark Robust', 'Standard store-brand toffee pieces'],
+      ok:   ['Grade A Amber Rich', 'Chocolate-coated toffee pieces'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Skipping the Batter Shield step'],
+    },
   },
   {
     id: 'caramel',
     label: 'Caramel Only',
     strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
     spices: [
-      ['Sea Salt Flakes', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt },
     ],
     fat: 'Melted Ghee',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
-    notes: ['Use frozen / 10-min flash-frozen baking caramel bits. Batter Shield required.'],
     shield: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Frozen Baking Caramel Bits'],
+      good: ['Grade A Dark Robust', 'Micro-chopped Kraft Caramel Bits'],
+      ok:   ['Grade A Amber Rich', 'Chopped standard caramel squares'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Liquid caramel sauce in wet mix'],
+    },
   },
   {
     id: 'toffee_caramel',
     label: 'Toffee + Caramel',
-    strategy: 'BATTER SHIELD required. Lower griddle temp to 325°F.',
+    strategy: 'BATTER SHIELD required. Lower griddle to 325°F.',
     spices: [
-      ['Nutmeg', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Nutmeg', amounts: SPICE.nutmeg },
     ],
     fat: 'Melted Ghee',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
-    notes: ['Drop griddle to 325°F (lower than the usual 375°F).'],
     shield: true,
     lowHeat: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Micro-candy + Fresh Nutmeg'],
+      good: ['Grade A Dark Robust', 'Standard candy + Jar Nutmeg'],
+      ok:   ['Grade A Amber Rich', 'Standard candy + No Nutmeg'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Griddle surface heat above 325°F'],
+    },
   },
   {
     id: 'toffee_choc',
     label: 'Toffee + Chocolate',
     strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
     spices: [
-      ['Vanilla Bean Paste', ['¼ tsp', '½ tsp', '¾ tsp', '1 tsp']],
+      { name: 'Vanilla Bean Paste', amounts: SPICE.vanillaPaste },
     ],
     fat: 'Melted Unsalted Butter',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
-    notes: [],
     shield: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Plain Toffee + Dark Chips'],
+      good: ['Grade A Dark Robust', 'Store Toffee + Semi-Sweet Chips'],
+      ok:   ['Grade A Amber Rich', 'Choc-Toffee bits + Milk Chips'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Mixing candy into dry mix bowl'],
+    },
   },
   {
     id: 'caramel_choc',
     label: 'Caramel + Chocolate',
     strategy: 'BATTER SHIELD required. Encase candy completely inside.',
     spices: [
-      ['Cinnamon', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Cinnamon', amounts: SPICE.nutmeg /* PDF: Drop/Smidgen/Scant Pinch/Pinch — same ladder as nutmeg */ },
     ],
     fat: 'Melted Unsalted Butter',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
-    notes: [],
     shield: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Frozen Caramel + Dark Chips'],
+      good: ['Grade A Dark Robust', 'Store Caramel + Semi-Sweet'],
+      ok:   ['Grade A Amber Rich', 'Store Caramel + Milk Chips'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Skipping the 10-min candy freeze'],
+    },
   },
   {
     id: 'triple',
     label: 'Toffee + Caramel + Chocolate',
     strategy: 'DOUBLE SHIELD required. Heat low: 300–325°F.',
     spices: [
-      ['Espresso Powder', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
-      ['Sea Salt Flakes', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      { name: 'Espresso Powder', amounts: SPICE.espresso },
+      { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt },
     ],
     fat: 'Avocado Oil (in batter)',
     panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong',
-    notes: ['The Triple Threat — keep griddle at 300–325°F, double shield.'],
     shield: true,
+    doubleShield: true,
     lowHeat: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Micro-candy + Avocado Oil Base'],
+      good: ['Grade A Dark Robust', 'Standard candy + Ghee Base'],
+      ok:   ['Grade A Amber Rich', 'Standard candy + Butter Base'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Regular coffee grounds in batter'],
+    },
   },
 ];
 
-// Topping limits per pancake size index (0–4)
-// Each flavor that has toppings provides a per-size topping list (array of strings).
+// Toppings per pancake size — each entry is an array of lines.
+// Sizes: 0=0.5oz, 1=1.0oz, 2=2.0oz, 3=3.0oz, 4=4.0oz
 const TOPPINGS = {
+  plain: null, // brushed with butter after, no in-pan toppings
   choc: [
     ['3–4 standard chips (or 6 mini)'],
     ['6–8 standard chips (or 12 mini)'],
@@ -326,28 +682,28 @@ const TOPPINGS = {
     ['4–5 slices banana (¼")', '2 Tbsp toasted pine nuts'],
   ],
   bnut_choc: [
-    ['1 half-slice banana', '2 toasted pine nuts', '2 chocolate chips'],
-    ['1 disc banana', '4–5 toasted pine nuts', '4 chocolate chips'],
-    ['2 slices banana', '2 tsp toasted pine nuts', '6–8 chocolate chips'],
-    ['3 slices banana', '1 Tbsp toasted pine nuts', '10–12 chocolate chips'],
-    ['4 slices banana', '1½ Tbsp toasted pine nuts', '15–20 chocolate chips'],
+    ['1 half-slice banana (⅛")', '2 toasted pine nuts', '2 chocolate chips'],
+    ['1 disc banana (⅛–¼")', '4–5 toasted pine nuts', '4 chocolate chips'],
+    ['2 slices banana (¼")', '2 tsp toasted pine nuts', '6–8 chocolate chips'],
+    ['3 slices banana (¼")', '1 Tbsp toasted pine nuts', '10–12 chocolate chips'],
+    ['4 slices banana (¼")', '1½ Tbsp toasted pine nuts', '15–20 chocolate chips'],
   ],
   bacon: [
-    ['Pinch (1/16 tsp) bacon (~2–3 flakes)'],
+    ['Pinch (1/16 tsp) bacon (~2–3 tiny flakes)'],
     ['1 tsp crumbled bacon'],
     ['1 Tbsp crumbled bacon'],
     ['1½ Tbsp crumbled bacon'],
-    ['2 Tbsp crumbled bacon (or 2 whole strips flat)'],
+    ['2 Tbsp crumbled bacon — OR 2 whole strips laid flat'],
   ],
   bnut_bacon: [
-    ['1 half-slice banana', '2 toasted pine nuts', '1 tiny pinch bacon'],
+    ['1 half-slice banana', '2 toasted pine nuts', '1 tiny pinch bacon crumbles'],
     ['1 disc banana', '4–5 toasted pine nuts', '½ tsp bacon crumbles'],
     ['2 slices banana', '2 tsp toasted pine nuts', '2 tsp bacon crumbles'],
     ['3 slices banana', '1 Tbsp toasted pine nuts', '1 Tbsp bacon crumbles'],
     ['4 slices banana', '1½ Tbsp toasted pine nuts', '1½ Tbsp bacon crumbles'],
   ],
   toffee: [
-    ['Smidgen (1/32 tsp) finely chopped toffee (4–5 specks)'],
+    ['Smidgen (1/32 tsp) finely chopped toffee bits — OR 4–5 specks'],
     ['½ tsp toffee bits'],
     ['1 tsp toffee bits'],
     ['1½ tsp toffee bits'],
@@ -360,57 +716,55 @@ const TOPPINGS = {
     ['12–14 chopped caramel bits'],
     ['16–18 chopped caramel bits'],
   ],
+  // Combo candy flavors: only the individual ingredient limits are explicit in the PDF.
+  // The PDF only gives one explicit combo formula (Triple at 1.0 oz).
+  // For others, we show the per-ingredient max + the overall Max Combined Volume.
   toffee_caramel: [
-    ['1 pinch toffee + 1 caramel speck'],
-    ['1 pinch toffee + 2 caramel bits'],
-    ['½ tsp toffee + 4 caramel bits'],
-    ['¾ tsp toffee + 6 caramel bits'],
-    ['1 tsp toffee + 8 caramel bits'],
+    ['Stay under the Max Combined limit, split how you like:', '• up to ~Smidgen toffee + ~2 caramel bits'],
+    ['• up to ~½ tsp toffee + up to ~5 caramel bits'],
+    ['• up to ~1 tsp toffee + up to ~10 caramel bits'],
+    ['• up to ~1½ tsp toffee + up to ~14 caramel bits'],
+    ['• up to ~2 tsp toffee + up to ~18 caramel bits'],
   ],
   toffee_choc: [
-    ['Smidgen toffee + 2 chocolate chips'],
-    ['¼ tsp toffee + 4 chocolate chips'],
-    ['½ tsp toffee + 6–8 chips'],
-    ['¾ tsp toffee + 10–12 chips'],
-    ['1 tsp toffee + 15–20 chips'],
+    ['• up to ~Smidgen toffee + ~4 chips'],
+    ['• up to ~½ tsp toffee + ~8 chips'],
+    ['• up to ~1 tsp toffee + ~15 chips'],
+    ['• up to ~1½ tsp toffee + ~20 chips'],
+    ['• up to ~2 tsp toffee + ~30 chips'],
   ],
   caramel_choc: [
-    ['2 caramel bits + 2 chocolate chips'],
-    ['4 caramel bits + 4 chocolate chips'],
-    ['6 caramel bits + 6–8 chips'],
-    ['10 caramel bits + 10–12 chips'],
-    ['14 caramel bits + 15–20 chips'],
+    ['• up to ~2 caramel bits + ~4 chips'],
+    ['• up to ~5 caramel bits + ~8 chips'],
+    ['• up to ~10 caramel bits + ~15 chips'],
+    ['• up to ~14 caramel bits + ~20 chips'],
+    ['• up to ~18 caramel bits + ~30 chips'],
   ],
   triple: [
-    ['2 chips + 2 caramel bits + 1 pinch toffee'],
-    ['4 chips + 2 caramel + 1 pinch toffee (≤ ½ Tbsp total)'],
-    ['6 chips + 4 caramel + ½ tsp toffee (≤ 1 Tbsp total)'],
-    ['10 chips + 6 caramel + 1 tsp toffee (≤ 1½ Tbsp total)'],
-    ['15 chips + 10 caramel + 1½ tsp toffee (≤ 2 Tbsp total)'],
+    ['• ~Smidgen toffee + 2 caramel bits + 2 chocolate chips'],
+    ['📐 PDF Formula: 2 chocolate chips + 2 chopped caramel bits + 1 tiny pinch of toffee bits'],
+    ['• up to ~½ tsp toffee + ~5 caramel bits + ~8 chips'],
+    ['• up to ~1 tsp toffee + ~10 caramel bits + ~15 chips'],
+    ['• up to ~1½ tsp toffee + ~14 caramel bits + ~20 chips'],
   ],
 };
 
 const state = { batch: 1, flavor: 'plain', size: 1, bulk: false };
 
 function render() {
-  // Render option chips
-  const batchEl = document.getElementById('batch-opts');
-  batchEl.innerHTML = BATCHES.map((b, i) =>
+  document.getElementById('batch-opts').innerHTML = BATCHES.map((b, i) =>
     `<div class="opt ${state.batch === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
   ).join('');
 
-  const flavorEl = document.getElementById('flavor-opts');
-  flavorEl.innerHTML = FLAVORS.map(f =>
+  document.getElementById('flavor-opts').innerHTML = FLAVORS.map(f =>
     `<div class="opt ${state.flavor === f.id ? 'active' : ''}" data-flavor="${f.id}">${f.label}</div>`
   ).join('');
 
-  const sizeEl = document.getElementById('size-opts');
-  sizeEl.innerHTML = SIZES.map((s, i) =>
+  document.getElementById('size-opts').innerHTML = SIZES.map((s, i) =>
     `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
   ).join('');
 
   document.getElementById('bulk-toggle').checked = state.bulk;
-
   renderOutput();
 }
 
@@ -420,74 +774,102 @@ function renderOutput() {
   const sizeIdx = state.size;
   const sizeInfo = SIZES[sizeIdx];
 
-  // Dry section
-  let dryHtml;
-  if (state.bulk) {
-    dryHtml = `<ul class="list">
-      <li><span class="k">Bulk dry mix from jar</span><span class="v">${BULK_SCOOP[b]}</span></li>
-    </ul>`;
-  } else {
-    dryHtml = `<ul class="list">
-      <li><span class="k">All-Purpose Flour</span><span class="v">${DRY.flour[b]}</span></li>
-      <li><span class="k">Yellow Corn Flour</span><span class="v">${DRY.cornFlour[b]}</span></li>
-      <li><span class="k">Non-Diastatic Malt Powder</span><span class="v">${DRY.malt[b]}</span></li>
-      <li><span class="k">Cultured Buttermilk Powder</span><span class="v">${DRY.buttermilk[b]}</span></li>
-      <li><span class="k">Sugar</span><span class="v">${DRY.sugar[b]}</span></li>
-      <li><span class="k">Baking Powder</span><span class="v">${DRY.bakingPwd[b]}</span></li>
-      <li><span class="k">Baking Soda</span><span class="v">${DRY.bakingSoda[b]}</span></li>
-      <li><span class="k">Salt</span><span class="v">${DRY.salt[b]}</span></li>
-    </ul>`;
-  }
+  // Dry block
+  let dryHtml = state.bulk
+    ? `<ul class="list"><li><span class="k">Bulk dry mix from jar</span><span class="v">${BULK_SCOOP[b]}</span></li></ul>
+       <p style="margin:8px 0 0;color:var(--muted);font-size:.85rem">Recipe for the bulk mix is in the reference section below.</p>`
+    : `<ul class="list">
+        <li><span class="k">All-Purpose Flour</span><span class="v">${DRY.flour[b]}</span></li>
+        <li><span class="k">Yellow Corn Flour</span><span class="v">${DRY.cornFlour[b]}</span></li>
+        <li><span class="k">Non-Diastatic Malt Powder</span><span class="v">${DRY.malt[b]}</span></li>
+        <li><span class="k">Cultured Buttermilk Powder</span><span class="v">${DRY.buttermilk[b]}</span></li>
+        <li><span class="k">Sugar</span><span class="v">${DRY.sugar[b]}</span></li>
+        <li><span class="k">Baking Powder</span><span class="v">${DRY.bakingPwd[b]}</span></li>
+        <li><span class="k">Baking Soda</span><span class="v">${DRY.bakingSoda[b]}</span></li>
+        <li><span class="k">Salt</span><span class="v">${DRY.salt[b]}</span></li>
+      </ul>`;
 
-  // Wet section
+  // Wet block
   const wetHtml = `<ul class="list">
     <li><span class="k">2% Lactaid Milk</span><span class="v">${WET.milk[b]}</span></li>
     <li><span class="k">Egg</span><span class="v">${WET.egg[b]}</span></li>
     <li><span class="k">${flavor.fat}</span><span class="v">${FAT[b]}</span></li>
   </ul>`;
 
-  // Spices
+  // Spices block
   let spicesHtml;
-  if (flavor.spices.length === 1 && flavor.spices[0] === 'No additional spices') {
+  if (!flavor.spices.length) {
     spicesHtml = `<p style="margin:4px 0;color:var(--muted);font-size:.92rem">No additional spices for plain.</p>`;
   } else {
-    spicesHtml = `<ul class="list">` + flavor.spices.map(s => {
-      if (Array.isArray(s)) {
-        return `<li><span class="k">${s[0]}</span><span class="v">${s[1][b]}</span></li>`;
-      }
-      return `<li><span class="k">${s}</span><span class="v">—</span></li>`;
-    }).join('') + `</ul>`;
+    spicesHtml = `<ul class="list">` + flavor.spices.map(s =>
+      `<li><span class="k">${s.note ? '<i>' + s.note + '</i> ' : ''}${s.name}</span><span class="v">${s.amounts[b]}</span></li>`
+    ).join('') + `</ul>`;
+    if (flavor.id === 'bnut') {
+      spicesHtml += `<p style="margin:8px 0 0;color:var(--muted);font-size:.85rem">Cinnamon is always added. Choose <b>either</b> Nutmeg <b>or</b> Cardamom — not both.</p>`;
+    }
   }
 
-  // Toppings
+  // Toppings block
   const toppingsList = TOPPINGS[flavor.id];
   let toppingsHtml = '';
   if (toppingsList) {
     toppingsHtml = `<div class="block">
-      <h4>Toppings per pancake (${sizeInfo.label})</h4>
-      <ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="k">•</span><span class="v">${t}</span></li>`).join('')}</ul>
+      <h4>Toppings per pancake</h4>
+      <ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="v" style="text-align:left;font-weight:500">${t}</span></li>`).join('')}</ul>
+      <div class="max-limit">Max Combined Volume Limit: ${sizeInfo.maxCombined}</div>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Keep toppings tight in the center — leave a clean batter perimeter (needed for the Batter Shield seal).</p>
     </div>`;
+  } else if (flavor.id === 'plain') {
+    toppingsHtml = `<div class="block"><h4>Toppings per pancake</h4><p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p></div>`;
   }
 
-  // Cooking notes
+  // Cooking callouts
   const callouts = [];
-  if (flavor.shield) {
-    callouts.push(`<div class="callout warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Otherwise the candy welds to the pan.</div>`);
+  if (flavor.doubleShield) {
+    callouts.push(`<div class="callout warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the pan otherwise.</div>`);
+  } else if (flavor.shield) {
+    callouts.push(`<div class="callout warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the pan otherwise.</div>`);
   }
   if (flavor.lowHeat) {
-    callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle:</b> 300–325°F (not the usual 375°F).</div>`);
+    callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle:</b> ${flavor.id === 'triple' ? '300–325°F' : '325°F'} (not the usual 375°F).</div>`);
+  }
+  if (flavor.fat.toLowerCase().includes('butter')) {
+    callouts.push(`<div class="callout info">🧈 Use <b>unsalted</b> butter. The dry base is already salt-balanced.</div>`);
   }
   if (flavor.id === 'bacon' || flavor.id === 'bnut_bacon') {
     callouts.push(`<div class="callout info">🥓 Cook the bacon during the 10-minute batter rest.</div>`);
   }
-  if (flavor.notes.length) {
-    callouts.push(`<div class="callout info">💡 ${flavor.notes.join(' ')}</div>`);
+  if (flavor.id === 'bnut' || flavor.id === 'bnut_choc' || flavor.id === 'bnut_bacon') {
+    callouts.push(`<div class="callout info">🍌 Slice bananas ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
+    callouts.push(`<div class="callout info">🌰 Toast pine nuts in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
   }
+  if (flavor.id === 'caramel' || flavor.id === 'caramel_choc' || flavor.id === 'toffee_caramel' || flavor.id === 'triple') {
+    callouts.push(`<div class="callout info">🧊 Buy <b>baking</b> caramel bits, micro-chop them, and use deep-frozen (or 10-min flash-frozen) so they don't melt too fast on the griddle.</div>`);
+  }
+
+  // Quality Tier
+  const t = flavor.tiers;
+  const tiersHtml = `<div class="tiers">
+    <div class="tier tier-best"><div class="tier-h">🥇 Best</div><span class="syr">${t.best[0]}</span><span class="ing">${t.best[1]}</span></div>
+    <div class="tier tier-good"><div class="tier-h">🥈 Good</div><span class="syr">${t.good[0]}</span><span class="ing">${t.good[1]}</span></div>
+    <div class="tier tier-ok"><div class="tier-h">🥉 OK in a pinch</div><span class="syr">${t.ok[0]}</span><span class="ing">${t.ok[1]}</span></div>
+    <div class="tier tier-bad"><div class="tier-h">❌ Avoid</div><span class="syr">${t.bad[0]}</span><span class="ing">${t.bad[1]}</span></div>
+  </div>`;
+
+  // Steps
+  const heatLine = flavor.lowHeat
+    ? (flavor.id === 'triple' ? '300–325°F (very low for the Triple)' : '325°F (low for caramel/toffee combo)')
+    : '375°F (Med-Low / Med on most stoves)';
+  const bakeBaconStep = (flavor.id === 'bacon' || flavor.id === 'bnut_bacon')
+    ? 'Cook bacon now (during the rest).'
+    : 'At the 7-min mark, heat the pan and add the pan grease.';
+  const shieldStep = flavor.doubleShield ? ' Apply <b>double</b> Batter Shield (two layers of plain batter over toppings).' :
+                     flavor.shield ? ' Apply Batter Shield (drizzle plain batter over toppings).' : '';
 
   const out = document.getElementById('output');
   out.innerHTML = `
     <h3>${flavor.label} · ${BATCHES[b].label} batch · ${sizeInfo.label}</h3>
-    <p class="desc">${flavor.strategy} · Griddle ${flavor.lowHeat ? '300–325°F' : '375°F (Med-Low / Med)'}.</p>
+    <p class="desc">${flavor.strategy} · Griddle: <b>${heatLine}</b>.</p>
 
     <div class="grid">
       <div class="block">
@@ -505,6 +887,7 @@ function renderOutput() {
       <div class="block">
         <h4>Pan Grease</h4>
         <ul class="list"><li><span class="k">Use</span><span class="v">${flavor.panGrease}</span></li></ul>
+        <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Apply 1 tsp, then wipe across with paper towel to a micro-thin shimmering film. No puddles.</p>
       </div>
       ${toppingsHtml}
     </div>
@@ -513,17 +896,21 @@ function renderOutput() {
 
     <div class="syrup"><span class="dot"></span><b>Recommended syrup:</b> ${flavor.syrup}</div>
 
+    <h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Quality Tier (Chef → Avoid)</h4>
+    ${tiersHtml}
+
+    <h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Cooking Steps</h4>
     <ol class="steps">
-      <li>Mix dry ingredients in one bowl. Mix wet ingredients + spices + fat in a second bowl (whisk on low).</li>
-      <li>Pour wet into dry. Blend on lowest speed <b>5–7 seconds</b> only. Leave it lumpy — a few dry streaks are fine.</li>
-      <li>Rest the batter <b>10 minutes, undisturbed</b>. ${flavor.id === 'bacon' || flavor.id === 'bnut_bacon' ? 'Cook bacon during this rest.' : 'At the 7-min mark heat the pan and add grease.'}</li>
-      <li>Cook within 40 minutes. Pour ${sizeInfo.detail.split('·')[0].trim()} portions. Add toppings to wet top.${flavor.shield ? ' Drizzle plain batter over candy toppings (Batter Shield).' : ''}</li>
-      <li>Flip when surface bubbles stay open and edges look matte. Cook ~1 min on second side.</li>
+      <li>Measure dry ingredients into one bowl. Mix wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()} into a second bowl. Use a handheld frother on lowest setting to emulsify the wet mix only.</li>
+      <li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix.</b></li>
+      <li>Rest the batter <b>10 minutes, undisturbed</b>. ${bakeBaconStep} Set up your ladle ice bath.</li>
+      <li>Pour ${sizeInfo.detail.split('·')[0].trim()} portions onto the hot greased pan. Drop toppings tightly in the center.${shieldStep}</li>
+      <li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>
+      <li>Between every pancake: scrape → ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>
     </ol>
   `;
 }
 
-// Event delegation
 document.getElementById('batch-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-batch]');
   if (!opt) return;
