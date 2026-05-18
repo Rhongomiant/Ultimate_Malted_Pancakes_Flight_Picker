@@ -586,7 +586,10 @@
   }
   .groups-row[data-group-layout="side"]::-webkit-scrollbar-thumb:hover { background: var(--accent); }
   .groups-row[data-group-layout="side"] > .category-section {
-    flex: 0 0 auto; min-width: 360px;
+    flex: 0 0 auto;
+    /* rc.6: dropped min-width: 360px so the category sizes naturally to
+       its inner .batches-row. The 360px floor was leaving huge horizontal
+       gaps when a category had a single narrow batch. */
   }
   .groups-row[data-group-layout="grid"] {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
@@ -732,12 +735,10 @@
   .output-grouping-row button.active {
     background: var(--accent); color: var(--on-accent);
   }
-  /* rc.5: placeholder pills — visually muted, not clickable. */
-  .output-grouping-row button.placeholder {
-    opacity: 0.7; cursor: not-allowed;
-  }
-  .output-grouping-row button.placeholder.active {
-    opacity: 0.9;
+  /* rc.6: scoped-header annotation in Mode B's shared cooking instructions. */
+  .cook-shared .shared-scope {
+    font-size: 0.7rem; color: var(--muted); font-weight: 400;
+    font-style: italic; margin-left: 4px;
   }
 
   /* Reset button in controls row. */
@@ -768,10 +769,11 @@
   }
   .batches-row::-webkit-scrollbar-thumb:hover { background: var(--accent); }
   .batches-row > .batch-column {
-    flex: 0 0 auto; min-width: 320px; max-width: 480px;
-    /* rc.5: cap max-width so columns stay readable instead of ballooning
-       with their inner content (F&S sub-cards stretching to 1fr would
-       otherwise expand the column to fit). */
+    flex: 0 0 auto; min-width: 320px;
+    /* rc.6: removed max-width hard cap from rc.5. The ballooning that
+       prompted the cap was actually sub-card overflow inside F&S/Toppings
+       grids — see .subcard min-width:0 rule below. Now columns can grow
+       to use available space without overflowing. */
     overflow: hidden;
   }
   .scroll-hint {
@@ -1112,7 +1114,11 @@
     .subcards-grid { grid-template-columns: 1fr !important; }
   }
   .subcards-grid .subcard { background: var(--block-bg); border: 1px solid var(--line);
-    border-radius: 10px; padding: 12px 14px; min-width: 0; }
+    border-radius: 10px; padding: 12px 14px; min-width: 0; overflow: hidden;
+    /* rc.6: overflow: hidden ensures sub-card content (which often has
+       wide-ish unbreakable strings like measurement names) cannot push
+       the card past its grid track width. */
+    word-wrap: break-word; overflow-wrap: anywhere; }
   .subcards-grid .subcard h5 { margin: 0 0 8px; font-size: 0.78rem;
     text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent);
     font-weight: 700; }
@@ -1496,10 +1502,6 @@
       <div class="opts" id="flavor-opts"></div>
       <p class="picker-hint" id="flavor-hint" hidden></p>
       <div class="flavor-block-msg" id="flavor-block-msg" hidden></div>
-      <div class="bcr-group" id="output-grouping-group" hidden style="margin-top:12px;">
-        <span class="bcr-label" title="Coming soon. For now, this auto-tracks Recommended Order: multi-category recommended order → By Category; menu/selection order → By Batch.">Group output by</span>
-        <div class="output-grouping-row" id="output-grouping-row"></div>
-      </div>
       <div class="candy-row">
         <div id="caramel-inline" class="candy-cell" style="display:none;">
           <h3 class="sub-h">Caramel preparation</h3>
@@ -1830,7 +1832,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.5</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.6</div>
 </div>
 
 <script>
@@ -3266,8 +3268,6 @@ function render() {
   // on the multi-batch affordance). Label is rendered outside in .bcr-label.
   const batchQuantityGroup = document.getElementById('batch-quantity-group');
   const multiBatchGroup = document.getElementById('multi-batch-group');
-  const outputGroupingGroup = document.getElementById('output-grouping-group');
-  const outputGroupingRow = document.getElementById('output-grouping-row');
   if (state.mode === 'flight') {
     const ab = getActiveBatch();
     const cnt = ab ? (ab.count || 1) : 1;
@@ -3281,34 +3281,11 @@ function render() {
     batchCountRow.hidden = false;
     batchQuantityGroup.hidden = false;
     multiBatchGroup.hidden = false;
-    // rc.5: output-grouping is a UI placeholder. Pills are disabled and the
-    // active pill tracks the auto-derived useCategorySections state, so the
-    // user can see the current grouping but cannot override it yet.
-    // (We compute the same condition here that renderFlightOutput uses
-    // — it depends on the picker state, not state.outputGrouping.)
-    const wouldUseCatHere = state.orderMode === 'recommended' && (function() {
-      const cats = new Set();
-      state.batches.forEach(b => {
-        if (b.batch === null) return;
-        b.flavors.forEach(fid => {
-          const f = flavorById(fid);
-          if (f) cats.add(f.cookGroup);
-        });
-      });
-      return cats.size > 1;
-    })();
-    const effectiveGrouping = wouldUseCatHere ? 'category' : 'batch';
-    outputGroupingRow.innerHTML =
-      `<button type="button" data-output-grouping="batch" disabled class="${effectiveGrouping === 'batch' ? 'active' : ''} placeholder">By Batch</button>` +
-      `<button type="button" data-output-grouping="category" disabled class="${effectiveGrouping === 'category' ? 'active' : ''} placeholder">By Category</button>`;
-    outputGroupingGroup.hidden = false;
   } else {
     batchCountRow.hidden = true;
     batchCountRow.innerHTML = '';
     batchQuantityGroup.hidden = true;
     multiBatchGroup.hidden = true;
-    outputGroupingGroup.hidden = true;
-    outputGroupingRow.innerHTML = '';
   }
 
   document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
@@ -3554,17 +3531,27 @@ function renderSingleOutput() {
 // =========================================================================
 
 // v3.0.0-rc: hoisted out of renderFlightOutput so the v3 render path can call it.
+// rc.6: shorter button labels ("Recommended" not "Recommended Order"); the
+// "within groups" and new "output" sub-controls are only emitted when
+// orderMode === 'recommended'.
 function buildOrderToggle(suffix) {
-  return `<div class="inline-toggle order-toggle" data-toggle-group="order-mode-${suffix}">
-    <span class="label">Order</span>
-    <button type="button" data-order-mode="recommended" class="${state.orderMode === 'recommended' ? 'active' : ''}">Recommended Order</button>
-    <button type="button" data-order-mode="menu"        class="${state.orderMode === 'menu'        ? 'active' : ''}">Menu Order</button>
-    <button type="button" data-order-mode="selection"   class="${state.orderMode === 'selection'   ? 'active' : ''}">Selection Order</button>
+  const subControls = state.orderMode === 'recommended' ? `
     <span class="order-sub">
       <span class="label">within groups</span>
       <button type="button" data-rec-sub-order="menu"      class="${state.recommendedSubOrder === 'menu'      ? 'active' : ''}">Menu</button>
       <button type="button" data-rec-sub-order="selection" class="${state.recommendedSubOrder === 'selection' ? 'active' : ''}">Selection</button>
     </span>
+    <span class="order-sub">
+      <span class="label">output</span>
+      <button type="button" data-output-grouping="batch"    class="${state.outputGrouping === 'batch'    ? 'active' : ''}">By Recipe</button>
+      <button type="button" data-output-grouping="category" class="${state.outputGrouping === 'category' ? 'active' : ''}">By Category</button>
+    </span>` : '';
+  return `<div class="inline-toggle order-toggle" data-toggle-group="order-mode-${suffix}">
+    <span class="label">Order</span>
+    <button type="button" data-order-mode="recommended" class="${state.orderMode === 'recommended' ? 'active' : ''}">Recommended</button>
+    <button type="button" data-order-mode="menu"        class="${state.orderMode === 'menu'        ? 'active' : ''}">Menu</button>
+    <button type="button" data-order-mode="selection"   class="${state.orderMode === 'selection'   ? 'active' : ''}">Selection</button>
+    ${subControls}
   </div>`;
 }
 
@@ -3810,13 +3797,40 @@ function renderFlightOutput() {
   const visibleCategoriesSet = new Set();
   visibleTuples.forEach(t => visibleCategoriesSet.add(t.flavor.cookGroup));
   const visibleCategoriesOrdered = COOK_GROUP_ORDER.filter(g => visibleCategoriesSet.has(g));
-  // rc.5: restore the rc.3 auto-derivation. Mode B runs when recommended
-  // order has 2+ visible categories. The outputGrouping toggle (rc.4) is
-  // kept as a UI placeholder for future explicit override but is currently
-  // disabled and does not drive layout.
-  const useCategorySections = isRecommended && visibleCategoriesOrdered.length > 1;
+  // rc.6: outputGrouping drives Mode A/B explicitly under recommended order.
+  // When orderMode is menu or selection, the output is always By Recipe
+  // (Mode A) — categories aren't a meaningful grouping in those modes since
+  // the user is requesting a flat ordering. When orderMode is recommended
+  // and there's only one visible category, By Category is structurally
+  // identical to By Recipe so we still use Mode A to skip the wrapping.
+  const useCategorySections =
+    isRecommended &&
+    state.outputGrouping === 'category' &&
+    visibleCategoriesOrdered.length > 1;
 
   // Build the Setup phase body.
+  // rc.6: sharedCookCardHtml needs to be built BEFORE setupBodyHtml because
+  // Mode B's setupBodyHtml embeds it above the .groups-row. Mode A uses it
+  // later inside cookPhaseHtml.
+  let sharedCookCardHtml = '';
+  if (visibleFlavorCount > 0) {
+    const allVisibleFlavorsForShared = visibleTuples.map(t => t.flavor);
+    const syrupGroupingsShared = getSyrupGroupings(allVisibleFlavorsForShared);
+    const sharedSyrupHtmlEarly = syrupGroupingsShared.length > 0 ? `<div class="cook-shared-syrups">
+      <h5>Recommended syrups (one line per distinct syrup)</h5>
+      <ul>
+        ${syrupGroupingsShared.map(sg =>
+          `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
+        ).join('')}
+      </ul>
+    </div>` : '';
+    sharedCookCardHtml = `<div class="cook-shared">
+      <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
+      <ol class="steps">${sharedCookingFlowHtml(allVisibleFlavorsForShared, sizeIdx)}</ol>
+      ${sharedSyrupHtmlEarly}
+    </div>`;
+  }
+
   let setupBodyHtml;
   if (useCategorySections) {
     // Mode B: one .category-section per visible category, wrapped in .groups-row.
@@ -3933,7 +3947,16 @@ function renderFlightOutput() {
         ${catTierHtml}
       </div>`;
     }).join('');
-    setupBodyHtml = `<div class="groups-row" data-group-layout="${state.groupLayout}" data-groups-row="all">${sectionsHtml}</div>`;
+    // rc.6: shared cooking instructions sit ABOVE the .groups-row as a
+    // preamble, with a header that clarifies the scope (one instruction set
+    // applies across all categories below).
+    const modeBSharedCookHtml = sharedCookCardHtml
+      ? sharedCookCardHtml.replace(
+          'Shared Cooking Instructions',
+          'Shared Cooking Instructions <span class="shared-scope">(applies to all categories below)</span>'
+        )
+      : '';
+    setupBodyHtml = `${modeBSharedCookHtml}<div class="groups-row" data-group-layout="${state.groupLayout}" data-groups-row="all">${sectionsHtml}</div>`;
   } else {
     // Mode A: single horizontal-scroll row honoring data-batch-layout.
     const columnsHtml = visibleBatchIdxs.map(idx => renderBatchColumnHtml(idx)).filter(h => h).join('');
@@ -3969,27 +3992,6 @@ function renderFlightOutput() {
   let cookPhaseHtml = '';
   let tierSectionHtml = '';
   let masterShoppingListHtml = '';
-  // rc.5 fix #1: sharedCookCard is universal — render once at the top of the
-  // output in both Mode A and Mode B (in Mode B it sits above the .groups-row).
-  let sharedCookCardHtml = '';
-
-  if (visibleFlavorCount > 0) {
-    const allVisibleFlavors = visibleTuples.map(t => t.flavor);
-    const syrupGroupings = getSyrupGroupings(allVisibleFlavors);
-    const sharedSyrupHtml = syrupGroupings.length > 0 ? `<div class="cook-shared-syrups">
-      <h5>Recommended syrups (one line per distinct syrup)</h5>
-      <ul>
-        ${syrupGroupings.map(sg =>
-          `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
-        ).join('')}
-      </ul>
-    </div>` : '';
-    sharedCookCardHtml = `<div class="cook-shared">
-      <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
-      <ol class="steps">${sharedCookingFlowHtml(allVisibleFlavors, sizeIdx)}</ol>
-      ${sharedSyrupHtml}
-    </div>`;
-  }
 
   if (visibleFlavorCount > 0 && !useCategorySections) {
     // Mode A only — in Mode B, Cook + Tier content is rendered inside
@@ -4072,6 +4074,7 @@ function renderFlightOutput() {
       <h3>Cook phase</h3>
     </div>
     <div class="phase-section">
+      ${sharedCookCardHtml}
       <div class="phase-options">${buildOrderToggle('cook')}${cookLayoutSwitcher}</div>
       ${cookGroupsHtml}
     </div>`;
@@ -4168,13 +4171,13 @@ function renderFlightOutput() {
   const orderToggleSetupHtml = buildOrderToggle('setup');
 
   // -------------------------------------------------------------------
-  // Final assembly. rc.5: sharedCookCardHtml shows once between the prep
-  // callouts and Setup phase, in both Mode A and Mode B.
+  // Final assembly. rc.6: sharedCookCardHtml is no longer hoisted to the
+  // top of the output. Mode A emits it inside cookPhaseHtml (where it
+  // belongs structurally — Cook phase context). Mode B emits it above
+  // .groups-row inside setupBodyHtml with a scoped header.
   // -------------------------------------------------------------------
   out.innerHTML = `
     ${prepHtml}
-
-    ${sharedCookCardHtml}
 
     <div class="phase-header">
       <h3>Setup phase</h3>
@@ -4391,16 +4394,9 @@ function resetToDefaults() {
 }
 document.getElementById('reset-btn').addEventListener('click', resetToDefaults);
 
-// v3.0.0-rc.4: output-grouping toggle handler.
-document.getElementById('output-grouping-row').addEventListener('click', e => {
-  const btn = e.target.closest('[data-output-grouping]');
-  if (!btn) return;
-  const v = btn.dataset.outputGrouping;
-  if (v !== 'batch' && v !== 'category') return;
-  state.outputGrouping = v;
-  try { localStorage.setItem('pancakeFlightOutputGrouping', v); } catch (_) {}
-  render();
-});
+// v3.0.0-rc.6: output-grouping click handling is now done by per-button
+// onclick binding in attachToggleHandlers (since the buttons live inside
+// the order toggle inside #output, not a fixed picker element).
 
 // v3.0.0-rc: active-category pill handlers (delegated on #output).
 document.getElementById('output').addEventListener('click', e => {
@@ -4552,6 +4548,17 @@ function attachToggleHandlers() {
     };
   });
   // Recommended sub-order
+  // rc.6: output-grouping pills inside the order toggle.
+  document.querySelectorAll('#output button[data-output-grouping]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const v = btn.dataset.outputGrouping;
+      if (v !== 'batch' && v !== 'category') return;
+      state.outputGrouping = v;
+      try { localStorage.setItem('pancakeFlightOutputGrouping', v); } catch (_) {}
+      render();
+    };
+  });
   document.querySelectorAll('#output button[data-rec-sub-order]').forEach(btn => {
     btn.onclick = (e) => {
       e.stopPropagation();
