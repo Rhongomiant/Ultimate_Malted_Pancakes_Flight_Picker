@@ -323,6 +323,172 @@
     text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600;
     color: var(--muted); margin-right: 2px; }
 
+  /* === Mode switcher (Single / Flight) === */
+  .mode-switcher { display: inline-flex; gap: 6px; align-items: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px 6px 4px 12px; font-size: 0.78rem; color: var(--muted);
+    margin: 0 8px 24px 0; }
+  .mode-switcher .ms-label { letter-spacing: 0.04em; text-transform: uppercase;
+    font-weight: 600; font-size: 0.7rem; }
+  .mode-switcher .ms-btn { border: 0; background: transparent; padding: 6px 12px;
+    border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.82rem;
+    font-family: inherit; }
+  .mode-switcher .ms-btn.active { background: var(--accent); color: var(--on-accent);
+    font-weight: 600; }
+
+  /* === Flight-mode pickers & output === */
+  .flavor-status { display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin: 10px 0 8px; color: var(--muted); font-size: 0.85rem; }
+  .flavor-status .clear-btn { background: transparent; border: 0; color: var(--accent);
+    cursor: pointer; font-size: 0.85rem; padding: 0; font-family: inherit; }
+  .flavor-status .clear-btn:hover { text-decoration: underline; }
+  .flavor-status .clear-btn[hidden] { display: none; }
+  .picker-hint { margin: 8px 0 0; color: var(--muted); font-size: 0.82rem; }
+
+  .empty-state { padding: 32px 16px; text-align: center; color: var(--muted);
+    background: var(--block-bg); border: 1px dashed var(--line); border-radius: 12px;
+    font-size: 0.95rem; }
+
+  /* Phase headers (Setup / Cook) */
+  .phase-header { display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap; margin: 22px 0 12px; padding-bottom: 6px;
+    border-bottom: 2px solid var(--accent-soft); }
+  .phase-header h3 { font-size: 1rem; margin: 0; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  .phase-header .phase-sub { color: var(--muted); font-size: 0.85rem; }
+  .phase-header { page-break-after: avoid; }
+  .phase-section { page-break-inside: avoid; }
+
+  /* Wet bowls per flavor (flight mode) */
+  .wet-flavors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px; }
+  .wet-flavor { background: var(--block-bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; }
+  .wet-flavor h5 { margin: 0 0 8px; font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--accent); font-weight: 700; }
+  .wet-flavor .wf-spice-head { margin: 12px 0 4px; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    font-weight: 700; }
+
+  /* Toppings per flavor (flight mode) */
+  .toppings-by-flavor { display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px; margin-top: 8px; }
+  .toppings-by-flavor .flavor-toppings-card { background: var(--block-bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .toppings-by-flavor .flavor-toppings-card h5 { margin: 0 0 8px; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent);
+    font-weight: 700; }
+
+  /* Cooking-surface grease list by group */
+  .grease-lines { background: var(--block-bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; }
+  .grease-lines h4 { margin: 0 0 8px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent); font-weight: 700; }
+  .grease-lines ul { margin: 0; padding: 0; list-style: none; }
+  .grease-lines li { padding: 4px 0; border-bottom: 1px dashed var(--list-divider);
+    font-size: 0.9rem; }
+  .grease-lines li:last-child { border-bottom: 0; }
+  .grease-lines li .grease-group { color: var(--accent); font-weight: 700;
+    font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* Cook-group sub-blocks (flight mode) */
+  .cook-group { background: var(--block-bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px 16px; margin: 10px 0;
+    page-break-inside: avoid; }
+  .cook-group .cg-head { display: flex; align-items: baseline;
+    justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 10px; }
+  .cook-group .cg-title { font-size: 0.85rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent); font-weight: 700; }
+  .cook-group .cg-heat { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+  .cook-group .cg-flavors { color: var(--ink-soft); font-size: 0.88rem; margin: 0 0 10px; }
+  .cook-group .cg-stagger { color: var(--info-fg); font-size: 0.84rem;
+    background: var(--info-bg); border: 1px solid var(--info-border);
+    border-radius: 6px; padding: 8px 10px; margin: 6px 0 10px; }
+  .cook-group .transition { margin: 12px 0 0; padding: 8px 12px;
+    background: var(--accent-soft); color: var(--info-fg);
+    border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+  .cook-group ol.steps { margin: 8px 0 0; }
+  .cook-group .flavor-section { padding: 10px 0; border-top: 1px dashed var(--list-divider); }
+  .cook-group .flavor-section:first-of-type { border-top: 0; padding-top: 4px; }
+  .cook-group .flavor-section h6 { margin: 0 0 6px; font-size: 0.82rem;
+    color: var(--accent); font-weight: 700; }
+
+  /* Inline pill toggles (cook-group + tier-layout) shown in the output */
+  .inline-toggle { display: inline-flex; gap: 4px; align-items: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px 4px 3px 10px; font-size: 0.74rem; }
+  .inline-toggle .label { font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: 600; color: var(--muted); margin-right: 4px; }
+  .inline-toggle button { border: 0; background: transparent; padding: 4px 10px;
+    border-radius: 999px; cursor: pointer; color: var(--muted);
+    font-size: 0.74rem; font-family: inherit; }
+  .inline-toggle button:hover { color: var(--ink); }
+  .inline-toggle button.active { background: var(--accent); color: var(--on-accent);
+    font-weight: 600; }
+
+  /* Quality tier - Shared block */
+  .tiers-shared { background: var(--block-bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; margin: 0 0 12px; }
+  .tiers-shared h5 { margin: 0 0 8px; font-size: 0.74rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--accent); font-weight: 700; }
+  .tiers-shared .tiers-shared-empty { color: var(--muted); font-style: italic;
+    font-size: 0.85rem; }
+  .tiers-shared ul { margin: 0; padding: 0; list-style: none; }
+  .tiers-shared li { padding: 5px 0; border-bottom: 1px dashed var(--list-divider);
+    font-size: 0.9rem; display: flex; gap: 10px; align-items: baseline;
+    flex-wrap: wrap; }
+  .tiers-shared li:last-child { border-bottom: 0; }
+  .tier-badge { font-size: 0.66rem; padding: 2px 8px;
+    border-radius: 999px; font-weight: 700; flex-shrink: 0;
+    text-transform: uppercase; letter-spacing: 0.04em; }
+  .tier-badge.best { background: var(--tier-best-bg);
+    color: var(--tier-best-fg); border: 1px solid var(--tier-best-border); }
+  .tier-badge.good { background: var(--tier-good-bg);
+    color: var(--tier-good-fg); border: 1px solid var(--tier-good-border); }
+  .tier-badge.ok { background: var(--tier-ok-bg);
+    color: var(--tier-ok-fg); border: 1px solid var(--tier-ok-border); }
+  .tier-badge.bad { background: var(--tier-bad-bg);
+    color: var(--tier-bad-fg); border: 1px solid var(--tier-bad-border); }
+  .tiers-shared .tier-slot { color: var(--muted); font-weight: 600;
+    font-size: 0.82rem; min-width: 7em; }
+  .tiers-shared .tier-val { flex: 1 1 auto; color: var(--ink); }
+
+  /* Quality tier - Per-flavor blocks with layout switcher */
+  .tiers-per-flavor { display: grid; gap: 12px; }
+  .tiers-per-flavor[data-tier-layout="side"]  { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .tiers-per-flavor[data-tier-layout="stack"] { grid-template-columns: 1fr; }
+  .tiers-per-flavor[data-tier-layout="grid"]  { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px) {
+    .tiers-per-flavor[data-tier-layout="grid"],
+    .tiers-per-flavor[data-tier-layout="side"] { grid-template-columns: 1fr; }
+  }
+  .tiers-per-flavor .flavor-tiers-card { background: var(--block-bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  .tiers-per-flavor .flavor-tiers-card h5 { margin: 0 0 8px; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent);
+    font-weight: 700; }
+  .tiers-per-flavor .compact-tiers { display: grid; grid-template-columns: 1fr; gap: 4px; }
+  .tiers-per-flavor .compact-tier-row { display: flex;
+    align-items: baseline; gap: 8px; font-size: 0.84rem; padding: 3px 0;
+    flex-wrap: wrap; }
+  .tiers-per-flavor .compact-tier-row .ti-slot {
+    color: var(--muted); font-size: 0.78rem; min-width: 5.5em; }
+  .tiers-per-flavor .compact-tier-row .ti-val {
+    color: var(--ink); flex: 1 1 auto; }
+  .tiers-per-flavor .all-match { color: var(--muted);
+    font-style: italic; font-size: 0.85rem; padding: 6px 0; }
+
+  /* Header row above per-flavor tiers + above cook phase: toggle on the right */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px; margin: 14px 0 8px; }
+  .toggle-row h4 { margin: 0; font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+
+  /* Title block for flight mode (overrides .out h3 spacing) */
+  .out .flight-title-row { display: flex; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; margin: 0 0 4px; }
+
   /* Recipe-card scale variable — applied via CSS `zoom` so layout, fonts, and
      padding all scale proportionally (rem-based child sizes wouldn't respond
      to font-size scaling on a parent). */
@@ -377,6 +543,11 @@
   <h1>🥞 Ultimate Malted Pancakes <span class="em">Flight</span> Picker</h1>
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
   <div class="controls-row">
+    <div class="mode-switcher" id="mode-switcher">
+      <span class="ms-label">Mode</span>
+      <button type="button" data-mode-pick="single" class="ms-btn active">Single</button>
+      <button type="button" data-mode-pick="flight" class="ms-btn">Flight</button>
+    </div>
     <div class="layout-switcher" id="layout-switcher">
       <span class="ls-label">Layout</span>
       <button type="button" data-mode="side" class="ls-btn active">Side-by-side</button>
@@ -416,7 +587,12 @@
 
   <div class="card">
     <h2>2. Flavor combination</h2>
+    <div class="flavor-status" id="flavor-status" hidden>
+      <span id="flavor-status-text">Selected: 0 flavors</span>
+      <button type="button" class="clear-btn" id="flavor-clear" hidden>Clear all</button>
+    </div>
     <div class="opts" id="flavor-opts"></div>
+    <p class="picker-hint" id="flavor-hint" hidden></p>
     <div class="candy-row">
       <div id="caramel-inline" class="candy-cell" style="display:none;">
         <h3 class="sub-h">Caramel preparation</h3>
@@ -725,7 +901,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.0.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.1.0</div>
 </div>
 
 <script>
@@ -918,7 +1094,7 @@ const SPICE = {
 };
 
 const FLAVORS = [
-  { id: 'plain', label: 'Plain',
+  { id: 'plain', cookGroup: 'clean', label: 'Plain',
     strategy: 'Standard. Brush with butter after cooking.',
     spices: [], fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Amber Rich',
@@ -929,7 +1105,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Savory fats mixed in plain dough'],
     },
   },
-  { id: 'choc', label: 'Chocolate',
+  { id: 'choc', cookGroup: 'clean', label: 'Chocolate',
     strategy: 'Scatter chips onto the wet pancake top. Flip when bubbles pop.',
     spices: [
       { name: 'Vanilla Extract', amounts: SPICE.vanilla },
@@ -944,7 +1120,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Cheap waxy baking morsels'],
     },
   },
-  { id: 'bacon', label: 'Bacon',
+  { id: 'bacon', cookGroup: 'savory', label: 'Bacon',
     strategy: 'Cook bacon crisp during the 10-min rest. Press crumbles into the wet pancake top.',
     spices: [
       { name: 'Black Pepper', amounts: SPICE.blackPepper },
@@ -959,7 +1135,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Raw or under-cooked bacon strips'],
     },
   },
-  { id: 'bnut', label: 'Banana Nut',
+  { id: 'bnut', cookGroup: 'clean', label: 'Banana Nut',
     strategy: 'Sprinkle pine nuts onto the wet pancake top first, then lay thin banana discs on top of the nuts.',
     spices: [ { name: 'Cinnamon', amounts: SPICE.cinnamon } ],
     pickOneSpices: {
@@ -978,7 +1154,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Over-ripe, mushy mashed banana'],
     },
   },
-  { id: 'bnut_bacon', label: 'Bacon + Banana Nut',
+  { id: 'bnut_bacon', cookGroup: 'savory', label: 'Bacon + Banana Nut',
     strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first, then press bacon crumbles into the wet top.',
     spices: [
       { name: 'Cinnamon',     amounts: SPICE.cinnamon },
@@ -994,7 +1170,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Adding caramel/toffee to this row'],
     },
   },
-  { id: 'bnut_choc', label: 'Banana Nut + Chocolate',
+  { id: 'bnut_choc', cookGroup: 'clean', label: 'Banana Nut + Chocolate',
     strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first; drop chocolate chips into the open spaces.',
     spices: [
       { name: 'Cinnamon',        amounts: SPICE.cinnamon },
@@ -1010,7 +1186,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Large un-chopped walnut chunks'],
     },
   },
-  { id: 'caramel', label: 'Caramel',
+  { id: 'caramel', cookGroup: 'candy', label: 'Caramel',
     strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
     spices: [ { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
@@ -1022,7 +1198,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Liquid caramel sauce in wet mix'],
     },
   },
-  { id: 'toffee', label: 'Toffee',
+  { id: 'toffee', cookGroup: 'candy', label: 'Toffee',
     strategy: 'BATTER SHIELD required. Espresso anchors the toffee flavor.',
     spices: [ { name: 'Espresso Powder', amounts: SPICE.espresso } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
@@ -1034,7 +1210,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Skipping the Batter Shield step'],
     },
   },
-  { id: 'caramel_choc', label: 'Caramel + Chocolate',
+  { id: 'caramel_choc', cookGroup: 'candy', label: 'Caramel + Chocolate',
     strategy: 'BATTER SHIELD required. Encase candy completely inside.',
     spices: [ { name: 'Cinnamon', amounts: SPICE.nutmeg } ],
     fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
@@ -1046,7 +1222,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Skipping the 10-min candy freeze'],
     },
   },
-  { id: 'toffee_caramel', label: 'Caramel + Toffee',
+  { id: 'toffee_caramel', cookGroup: 'candy', label: 'Caramel + Toffee',
     strategy: 'BATTER SHIELD required.',
     spices: [ { name: 'Nutmeg', amounts: SPICE.nutmeg } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
@@ -1058,7 +1234,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Cooking-surface heat above 325°F'],
     },
   },
-  { id: 'toffee_choc', label: 'Toffee + Chocolate',
+  { id: 'toffee_choc', cookGroup: 'candy', label: 'Toffee + Chocolate',
     strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
     spices: [ { name: 'Vanilla Bean Paste', amounts: SPICE.vanillaPaste } ],
     fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
@@ -1070,7 +1246,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Mixing candy into dry mix bowl'],
     },
   },
-  { id: 'triple', label: 'Toffee + Caramel + Chocolate',
+  { id: 'triple', cookGroup: 'candy', label: 'Toffee + Caramel + Chocolate',
     strategy: 'DOUBLE SHIELD required.',
     spices: [
       { name: 'Espresso Powder', amounts: SPICE.espresso },
@@ -1173,69 +1349,57 @@ const CANDY_PREPS = [
   { id: 'deep',  label: 'Deep-frozen (long-term)', desc: 'Takes longer to melt — lower heat 325°F (300°F for Triple).' },
 ];
 
-const state = { batch: 1, flavor: 'plain', size: 1, bulk: false, caramelPrep: 'flash', toffeePrep: 'flash' };
+const state = {
+  mode: 'single',                  // 'single' | 'flight'
+  batch: 1,
+  flavor: 'plain',                 // single mode
+  selectedFlavors: ['plain'],      // flight mode
+  size: 1,
+  bulk: false,
+  caramelPrep: 'flash',
+  toffeePrep: 'flash',
+  groupByCookOrder: true,          // flight cook-phase grouping toggle
+  tierLayout: 'side',              // 'side' | 'stack' | 'grid' (flight tier layout)
+};
 
-function render() {
-  document.getElementById('batch-opts').innerHTML = BATCHES.map((b, i) =>
-    `<div class="opt ${state.batch === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
-  ).join('');
+// Restore persisted mode + cook grouping + tier layout
+try {
+  const m = localStorage.getItem('pancakeFlightMode');
+  if (m === 'flight' || m === 'single') state.mode = m;
+  const g = localStorage.getItem('pancakeFlightGroupByCook');
+  if (g === '0') state.groupByCookOrder = false;
+  if (g === '1') state.groupByCookOrder = true;
+  const tl = localStorage.getItem('pancakeFlightTierLayout');
+  if (tl === 'side' || tl === 'stack' || tl === 'grid') state.tierLayout = tl;
+} catch (_) {}
 
-  document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
-    `<div class="opt ${state.bulk === o.bulk ? 'active' : ''}" data-bulk="${o.bulk}">${o.label}</div>`
-  ).join('');
+// =========================================================================
+// Helpers used by both Single and Flight renderers
+// =========================================================================
 
-  document.getElementById('flavor-opts').innerHTML = FLAVORS.map(f =>
-    `<div class="opt ${state.flavor === f.id ? 'active' : ''}" data-flavor="${f.id}">${f.label}</div>`
-  ).join('');
+const COOK_GROUP_ORDER = ['clean', 'savory', 'candy'];
+const COOK_GROUP_LABEL = { clean: 'Clean', savory: 'Savory', candy: 'Candy' };
+const COOK_GROUP_BLURB = {
+  clean:  'No bacon grease, no sticky candy. Cook these first while the cooking surface is clean.',
+  savory: 'Bacon grease coats the surface. Cook after Clean; wipe surface before moving on.',
+  candy:  'Sticky sugar residue. Cook last; use the Ice Trick between every pancake.',
+};
 
-  document.getElementById('size-opts').innerHTML = SIZES.map((s, i) =>
-    `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
-  ).join('');
+function flavorById(id) { return FLAVORS.find(f => f.id === id); }
 
-  const flavor = FLAVORS.find(f => f.id === state.flavor);
+function cookGroupOf(flavor) { return flavor.cookGroup; }
 
-  // Caramel prep selector
-  const caramelInline = document.getElementById('caramel-inline');
-  if (flavor && flavor.hasCaramel) {
-    caramelInline.style.display = '';
-    document.getElementById('caramel-opts').innerHTML = CANDY_PREPS.map(p =>
-      `<div class="opt ${state.caramelPrep === p.id ? 'active' : ''}" data-caramel="${p.id}" title="${p.desc}">${p.label}</div>`
-    ).join('');
-  } else {
-    caramelInline.style.display = 'none';
-  }
-
-  // Toffee prep selector
-  const toffeeInline = document.getElementById('toffee-inline');
-  if (flavor && flavor.hasToffee) {
-    toffeeInline.style.display = '';
-    document.getElementById('toffee-opts').innerHTML = CANDY_PREPS.map(p =>
-      `<div class="opt ${state.toffeePrep === p.id ? 'active' : ''}" data-toffee="${p.id}" title="${p.desc}">${p.label}</div>`
-    ).join('');
-  } else {
-    toffeeInline.style.display = 'none';
-  }
-
-  // Single shared hint covering whichever candy selectors are visible
-  const candyHint = document.getElementById('candy-hint');
-  if (flavor && flavor.hasCaramel && flavor.hasToffee) {
-    candyHint.innerHTML = 'Caramel and toffee prep affect the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat. <b>When both candies are present, either being deep-frozen forces the lower temp.</b>';
-    candyHint.style.display = '';
-  } else if (flavor && flavor.hasCaramel) {
-    candyHint.innerHTML = 'Caramel prep affects the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat.';
-    candyHint.style.display = '';
-  } else if (flavor && flavor.hasToffee) {
-    candyHint.innerHTML = 'Toffee prep affects the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat.';
-    candyHint.style.display = '';
-  } else {
-    candyHint.style.display = 'none';
-  }
-
-  renderOutput();
+function groupSelectedByCooking(ids) {
+  const out = { clean: [], savory: [], candy: [] };
+  ids.forEach(id => {
+    const f = flavorById(id);
+    if (f) out[f.cookGroup].push(id);
+  });
+  return out;
 }
 
-// Returns 'flash', 'deep', or null. When both candies are present,
-// either being deep-frozen forces 'deep' (the lower-temp path).
+// Returns 'flash', 'deep', or null for one flavor.
+// When both candies are present, either being deep-frozen forces 'deep'.
 function getEffectivePrep(flavor) {
   const c = flavor.hasCaramel, t = flavor.hasToffee;
   if (c && t) {
@@ -1246,37 +1410,124 @@ function getEffectivePrep(flavor) {
   return null;
 }
 
-function renderOutput() {
-  const b = state.batch;
-  const flavor = FLAVORS.find(f => f.id === state.flavor);
-  const sizeIdx = state.size;
-  const sizeInfo = SIZES[sizeIdx];
-  const sv = SHIELD_VOLUMES[sizeInfo.id];
-  const batchInfo = BATCHES[b];
-  const isBacon = flavor.id === 'bacon' || flavor.id === 'bnut_bacon';
-  const hasBanana = flavor.id === 'bnut' || flavor.id === 'bnut_choc' || flavor.id === 'bnut_bacon';
+// Effective heat for one flavor (returns { heatLine, calloutHtml })
+function heatInfoForFlavor(flavor) {
   const hasCandy = flavor.hasCaramel || flavor.hasToffee;
   const effPrep = getEffectivePrep(flavor);
-
-  // Yield
-  const yieldCount = Math.max(1, Math.round(batchInfo.oz / sizeInfo.oz));
-  const yieldText = `Yields ~${yieldCount} pancake${yieldCount === 1 ? '' : 's'}`;
-
-  // Prep notes
-  const prepNotes = [];
-  if (hasBanana) {
-    prepNotes.push(`<div class="callout info">🌰 <b>Toast pine nuts</b> in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
-    prepNotes.push(`<div class="callout info">🍌 <b>Slice bananas</b> ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
+  if (flavor.id === 'triple') {
+    if (effPrep === 'deep') {
+      return {
+        heatLine: '300°F (low — deep-frozen Triple)',
+        calloutHtml: `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 300°F</b> — Triple-Threat with at least one deep-frozen candy. Heat above this welds the candies to the cooking surface.</div>`,
+      };
+    }
+    return {
+      heatLine: '325°F (low — flash-frozen Triple)',
+      calloutHtml: `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — Triple-Threat with both candies flash-frozen. Triple requires low heat in every prep state.</div>`,
+    };
   }
-  const prepStackHtml = prepNotes.length
-    ? `<div class="prep-stack">${prepNotes.join('')}</div>`
-    : '';
+  if (hasCandy && effPrep === 'deep') {
+    const which = (flavor.hasCaramel && flavor.hasToffee)
+      ? 'at least one candy is deep-frozen'
+      : (flavor.hasCaramel ? 'deep-frozen caramel' : 'deep-frozen toffee');
+    return {
+      heatLine: '325°F (low — deep-frozen candy)',
+      calloutHtml: `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — ${which}, which takes longer to melt and burns at the normal 375°F.</div>`,
+    };
+  }
+  return { heatLine: '375°F (Med-Low / Med on most stoves)', calloutHtml: '' };
+}
 
-  // Dry block
-  let dryHtml = state.bulk
-    ? `<ul class="list"><li><span class="k">Bulk Dry Mix</span><span class="v">${BULK_SCOOP[b]}</span></li></ul>
-       <p style="margin:8px 0 0;color:var(--muted);font-size:.85rem">Recipe for the bulk mix is in the reference section below.</p>`
-    : `<ul class="list">
+// Effective heat for a cooking-order group. Clean/Savory always 375°F.
+// Candy group respects colder-candy-wins across the candy flavors that
+// are actually present in this group.
+function effectiveHeatForGroup(group, candyFlavorIds) {
+  if (group !== 'candy') return { temp: '375°F', detail: 'Med-Low / Med on most stoves', isLow: false };
+  const flavors = candyFlavorIds.map(flavorById);
+  const hasTriple = flavors.some(f => f.id === 'triple');
+  const anyDeep = (flavors.some(f => f.hasCaramel) && state.caramelPrep === 'deep')
+               || (flavors.some(f => f.hasToffee)  && state.toffeePrep  === 'deep');
+  if (hasTriple) {
+    return anyDeep
+      ? { temp: '300°F', detail: 'low — Triple + deep-frozen candy', isLow: true }
+      : { temp: '325°F', detail: 'low — Triple (any prep state)',    isLow: true };
+  }
+  if (anyDeep) return { temp: '325°F', detail: 'low — deep-frozen candy',    isLow: true };
+  return       { temp: '375°F', detail: 'all candy flash-frozen — normal heat', isLow: false };
+}
+
+// Distinct cooking-surface greases by cooking-order group.
+// Returns [{ group, grease, flavorLabels }] for display.
+function distinctGreasesByGroup(idsByGroup) {
+  const out = [];
+  COOK_GROUP_ORDER.forEach(g => {
+    if (!idsByGroup[g] || !idsByGroup[g].length) return;
+    const byGrease = new Map();
+    idsByGroup[g].forEach(id => {
+      const f = flavorById(id);
+      if (!byGrease.has(f.panGrease)) byGrease.set(f.panGrease, []);
+      byGrease.get(f.panGrease).push(f.label);
+    });
+    byGrease.forEach((labels, grease) => {
+      out.push({ group: g, grease, flavorLabels: labels });
+    });
+  });
+  return out;
+}
+
+// Total yield: per-flavor batch × number of flavor batches.
+function totalYield(batchIdx, sizeIdx, flavorCount) {
+  const perFlavor = Math.max(1, Math.round(BATCHES[batchIdx].oz / SIZES[sizeIdx].oz));
+  return perFlavor * flavorCount;
+}
+
+// Dedupe prep callouts across multiple flavors.
+function prepCalloutsFor(flavorIds) {
+  const out = [];
+  const banana = flavorIds.some(id => ['bnut', 'bnut_choc', 'bnut_bacon'].includes(id));
+  const caramel = flavorIds.some(id => { const f = flavorById(id); return f && f.hasCaramel; });
+  const toffee  = flavorIds.some(id => { const f = flavorById(id); return f && f.hasToffee;  });
+  if (banana) {
+    out.push(`<div class="callout info">🌰 <b>Toast pine nuts</b> in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
+    out.push(`<div class="callout info">🍌 <b>Slice bananas</b> ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
+  }
+  if (caramel && toffee) {
+    const cState = state.caramelPrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
+    const tState = state.toffeePrep  === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
+    out.push(`<div class="callout info">🧊 <b>Candy prep:</b> chop caramel and toffee micro-fine and freeze before scattering onto wet batter. <b>Caramel:</b> ${cState}. <b>Toffee:</b> ${tState}.</div>`);
+  } else if (caramel) {
+    const text = state.caramelPrep === 'flash'
+      ? `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+      : `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
+    out.push(`<div class="callout info">${text}</div>`);
+  } else if (toffee) {
+    const text = state.toffeePrep === 'flash'
+      ? `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+      : `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
+    out.push(`<div class="callout info">${text}</div>`);
+  }
+  return out;
+}
+
+// Single-flavor prep notes (banana only) used inside Single mode's existing prep-stack
+function singlePrepNotes(flavor) {
+  const out = [];
+  const hasBanana = ['bnut', 'bnut_choc', 'bnut_bacon'].includes(flavor.id);
+  if (hasBanana) {
+    out.push(`<div class="callout info">🌰 <b>Toast pine nuts</b> in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
+    out.push(`<div class="callout info">🍌 <b>Slice bananas</b> ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
+  }
+  return out;
+}
+
+// Dry-bowl ingredient HTML (same content in single & flight modes).
+function dryBowlHtml(batchIdx, bulk) {
+  const b = batchIdx;
+  if (bulk) {
+    return `<ul class="list"><li><span class="k">Bulk Dry Mix</span><span class="v">${BULK_SCOOP[b]}</span></li></ul>
+       <p style="margin:8px 0 0;color:var(--muted);font-size:.85rem">Recipe for the bulk mix is in the reference section below.</p>`;
+  }
+  return `<ul class="list">
         <li><span class="k">All-Purpose Flour</span><span class="v">${DRY.flour[b]}</span></li>
         <li><span class="k">Yellow Corn Flour</span><span class="v">${DRY.cornFlour[b]}</span></li>
         <li><span class="k">Non-Diastatic Malt Powder</span><span class="v">${DRY.malt[b]}</span></li>
@@ -1286,122 +1537,324 @@ function renderOutput() {
         <li><span class="k">Baking Soda</span><span class="v">${DRY.bakingSoda[b]}</span></li>
         <li><span class="k">Salt</span><span class="v">${DRY.salt[b]}</span></li>
       </ul>`;
+}
 
-  // Wet block
-  const wetHtml = `<ul class="list">
+// Wet-bowl HTML (milk + egg + fat), batch- and flavor-specific
+function wetBowlHtml(flavor, batchIdx) {
+  const b = batchIdx;
+  return `<ul class="list">
     <li><span class="k">2% Lactaid Milk</span><span class="v">${WET.milk[b]}</span></li>
     <li><span class="k">Egg</span><span class="v">${WET.egg[b]}</span></li>
     <li><span class="k">${flavor.fat}</span><span class="v">${FAT[b]}</span></li>
   </ul>`;
+}
 
-  // Spices block
-  let spicesHtml;
+// Spices HTML for a flavor (with pickOne support)
+function spicesHtml(flavor, batchIdx) {
+  const b = batchIdx;
   if (!flavor.spices.length && !flavor.pickOneSpices) {
-    spicesHtml = `<p style="margin:4px 0;color:var(--muted);font-size:.92rem">No additional spices for plain.</p>`;
-  } else {
-    spicesHtml = '';
-    if (flavor.spices.length) {
-      spicesHtml += `<ul class="list">` + flavor.spices.map(s =>
-        `<li><span class="k">${s.name}</span><span class="v">${s.amounts[b]}</span></li>`
-      ).join('') + `</ul>`;
-    }
-    if (flavor.pickOneSpices) {
-      const grp = flavor.pickOneSpices;
-      spicesHtml += `
+    return `<p style="margin:4px 0;color:var(--muted);font-size:.92rem">No additional spices for plain.</p>`;
+  }
+  let html = '';
+  if (flavor.spices.length) {
+    html += `<ul class="list">` + flavor.spices.map(s =>
+      `<li><span class="k">${s.name}</span><span class="v">${s.amounts[b]}</span></li>`
+    ).join('') + `</ul>`;
+  }
+  if (flavor.pickOneSpices) {
+    const grp = flavor.pickOneSpices;
+    html += `
         <p style="margin:10px 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700">${grp.label}</p>
         <ul class="list">` + grp.options.map(o =>
           `<li><span class="k">${o.name}</span><span class="v">${o.amounts[b]}</span></li>`
         ).join('') + `</ul>
         <p style="margin:6px 0 0;color:var(--muted);font-size:.82rem">Add <b>one</b> of these to the wet bowl — not both.</p>`;
-    }
   }
+  return html;
+}
 
-  // Heat logic
-  let heatLine;
-  let lowHeatCalloutHtml = '';
-  if (flavor.id === 'triple') {
-    if (effPrep === 'deep') {
-      heatLine = '300°F (low — deep-frozen Triple)';
-      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 300°F</b> — Triple-Threat with at least one deep-frozen candy. Heat above this welds the candies to the cooking surface.</div>`;
-    } else {
-      heatLine = '325°F (low — flash-frozen Triple)';
-      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — Triple-Threat with both candies flash-frozen. Triple requires low heat in every prep state.</div>`;
-    }
-  } else if (hasCandy && effPrep === 'deep') {
-    heatLine = '325°F (low — deep-frozen candy)';
-    const which = (flavor.hasCaramel && flavor.hasToffee)
-      ? 'at least one candy is deep-frozen'
-      : (flavor.hasCaramel ? 'deep-frozen caramel' : 'deep-frozen toffee');
-    lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — ${which}, which takes longer to melt and burns at the normal 375°F.</div>`;
-  } else {
-    heatLine = '375°F (Med-Low / Med on most stoves)';
-  }
-
-  // Toppings block
+// Inner HTML of a Toppings block for one flavor at a given size.
+// `opts.includeCandyPrep` controls whether candy prep notes are inlined here
+// (Single mode wants them inline; Flight mode renders candy prep globally).
+function toppingsInnerHtml(flavor, sizeIdx, opts) {
+  opts = opts || {};
+  const sizeInfo = SIZES[sizeIdx];
+  const sv = SHIELD_VOLUMES[sizeInfo.id];
   const toppingsList = TOPPINGS[flavor.id];
-  let toppingsInner = '';
+  let inner = '';
   if (toppingsList) {
-    toppingsInner = `<ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="v" style="text-align:left;font-weight:500">${t}</span></li>`).join('')}</ul>
+    inner = `<ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="v" style="text-align:left;font-weight:500">${t}</span></li>`).join('')}</ul>
       <div class="max-limit">Max Combined Volume Limit: ${sizeInfo.maxCombined}</div>
       <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Keep toppings tight in the center — leave a clean batter perimeter (needed for the Batter Shield seal).</p>`;
   } else if (flavor.id === 'plain') {
-    toppingsInner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
+    inner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
   }
 
-  // Single Batter Shield (only when shield && not doubleShield)
   if (flavor.shield && !flavor.doubleShield) {
-    toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, scoop <b>${sv.volume}</b> of cold plain batter with a <b>1-oz Winco ladle</b> (soaked <b>45&ndash;60 sec</b> in the ice bath) and seal before flipping. ${sv.execution} Candy will weld to the cooking surface otherwise.</div>`;
+    inner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, scoop <b>${sv.volume}</b> of cold plain batter with a <b>1-oz Winco ladle</b> (soaked <b>45&ndash;60 sec</b> in the ice bath) and seal before flipping. ${sv.execution} Candy will weld to the cooking surface otherwise.</div>`;
   }
 
-  // Candy prep note (combined when both candies present)
-  if (flavor.hasCaramel && flavor.hasToffee) {
-    const cState = state.caramelPrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
-    const tState = state.toffeePrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
-    toppingsInner += `<div class="topping-note info">🧊 <b>Candy prep:</b> chop caramel and toffee micro-fine and freeze before scattering onto wet batter. <b>Caramel:</b> ${cState}. <b>Toffee:</b> ${tState}.</div>`;
-  } else if (flavor.hasCaramel) {
-    const text = state.caramelPrep === 'flash'
-      ? `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
-      : `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
-    toppingsInner += `<div class="topping-note info">${text}</div>`;
-  } else if (flavor.hasToffee) {
-    const text = state.toffeePrep === 'flash'
-      ? `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
-      : `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
-    toppingsInner += `<div class="topping-note info">${text}</div>`;
+  if (opts.includeCandyPrep) {
+    if (flavor.hasCaramel && flavor.hasToffee) {
+      const cState = state.caramelPrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
+      const tState = state.toffeePrep  === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
+      inner += `<div class="topping-note info">🧊 <b>Candy prep:</b> chop caramel and toffee micro-fine and freeze before scattering onto wet batter. <b>Caramel:</b> ${cState}. <b>Toffee:</b> ${tState}.</div>`;
+    } else if (flavor.hasCaramel) {
+      const text = state.caramelPrep === 'flash'
+        ? `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+        : `🧊 <b>Caramel prep:</b> chop caramel micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
+      inner += `<div class="topping-note info">${text}</div>`;
+    } else if (flavor.hasToffee) {
+      const text = state.toffeePrep === 'flash'
+        ? `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+        : `🧊 <b>Toffee prep:</b> chop toffee micro-fine and freeze hard (long-term frozen). Keep frozen until the moment you scatter onto wet batter.`;
+      inner += `<div class="topping-note info">${text}</div>`;
+    }
   }
 
-  // Double Batter Shield (Triple)
   if (flavor.doubleShield) {
-    toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> Scoop <b>${sv.volume}</b> of cold plain batter with a <b>1-oz Winco ladle</b> (soaked <b>45&ndash;60 sec</b> in the ice bath) and apply <b>twice in two layered coats</b> before flipping. ${sv.execution} Triple-Threat candies will weld to the cooking surface without the second coat.</div>`;
+    inner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> Scoop <b>${sv.volume}</b> of cold plain batter with a <b>1-oz Winco ladle</b> (soaked <b>45&ndash;60 sec</b> in the ice bath) and apply <b>twice in two layered coats</b> before flipping. ${sv.execution} Triple-Threat candies will weld to the cooking surface without the second coat.</div>`;
   }
 
-  const toppingsHtml = toppingsInner
-    ? `<div class="block full-row"><h4>Toppings per pancake</h4>${toppingsInner}</div>`
-    : '';
+  return inner;
+}
 
-  // Below-grid callouts
+// Below-grid callouts (heat info + unsalted butter reminder)
+function flavorCallouts(flavor) {
   const callouts = [];
+  const hasCandy = flavor.hasCaramel || flavor.hasToffee;
+  const effPrep = getEffectivePrep(flavor);
   if (hasCandy && effPrep === 'flash' && flavor.id !== 'triple') {
     callouts.push(`<div class="callout info">🌡 Normal cooking-surface temp (375°F) is fine — you picked flash-frozen candy.</div>`);
   }
   if (flavor.fat.toLowerCase().includes('butter')) {
     callouts.push(`<div class="callout info">🧈 Use <b>unsalted</b> butter. The dry base is already salt-balanced.</div>`);
   }
+  return callouts;
+}
 
-  // Quality Tier
+// Standard 4-card Quality Tier grid (Single mode + degenerate-flight case)
+function tierGridHtml(flavor) {
   const t = flavor.tiers;
-  const tiersHtml = `<div class="tiers">
+  return `<div class="tiers">
     <div class="tier tier-best"><div class="tier-h">🥇 Best</div><span class="syr">${t.best[0]}</span><span class="ing">${t.best[1]}</span></div>
     <div class="tier tier-good"><div class="tier-h">🥈 Good</div><span class="syr">${t.good[0]}</span><span class="ing">${t.good[1]}</span></div>
     <div class="tier tier-ok"><div class="tier-h">🥉 OK in a pinch</div><span class="syr">${t.ok[0]}</span><span class="ing">${t.ok[1]}</span></div>
     <div class="tier tier-bad"><div class="tier-h">❌ Avoid</div><span class="syr">${t.bad[0]}</span><span class="ing">${t.bad[1]}</span></div>
   </div>`;
+}
 
-  // ===== Cooking steps =====
+// Compute shared vs. per-flavor tier slots across N >= 2 flavors.
+// Returns { shared: [{tier, slot, value}], perFlavor: { flavorId: [{tier, slot, value}] } }
+const TIER_DEFS = [
+  { tier: 'best', label: '🥇 Best',           slots: [['syr', 'Syrup'],     ['ing', 'Ingredient']] },
+  { tier: 'good', label: '🥈 Good',           slots: [['syr', 'Syrup'],     ['ing', 'Ingredient']] },
+  { tier: 'ok',   label: '🥉 OK in a pinch',  slots: [['syr', 'Syrup'],     ['ing', 'Ingredient']] },
+  { tier: 'bad',  label: '❌ Avoid',          slots: [['syr', 'Syrup'],     ['ing', 'Ingredient']] },
+];
+function compareTiers(flavors) {
+  const shared = [];
+  const perFlavor = {};
+  flavors.forEach(f => perFlavor[f.id] = []);
+  TIER_DEFS.forEach(def => {
+    def.slots.forEach((slotPair, slotIdx) => {
+      const [slotKey, slotLabel] = slotPair;
+      const values = flavors.map(f => f.tiers[def.tier][slotIdx]);
+      const first = values[0];
+      const allSame = values.every(v => v === first);
+      if (allSame) {
+        shared.push({ tier: def.tier, tierLabel: def.label, slotLabel: slotLabel, value: first });
+      } else {
+        flavors.forEach((f, i) => {
+          perFlavor[f.id].push({ tier: def.tier, tierLabel: def.label, slotLabel: slotLabel, value: values[i] });
+        });
+      }
+    });
+  });
+  return { shared, perFlavor };
+}
+
+// Render a single cooking-steps list for one flavor inside a cook-phase group.
+// Used by the flight cook-phase renderer; in Single mode the original
+// step-by-step prose is kept inline (see renderSingleOutput).
+function flightCookStepsForFlavor(flavor, sizeIdx) {
+  const sizeInfo = SIZES[sizeIdx];
+  const sv = SHIELD_VOLUMES[sizeInfo.id];
+  const isBacon = flavor.id === 'bacon' || flavor.id === 'bnut_bacon';
+  const steps = [];
+
+  steps.push(`<li>Measure dry ingredients into one bowl. In a second bowl, combine the wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()}. Frother on lowest to emulsify the wet mix only.</li>`);
+  steps.push(`<li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix</b> or pancakes turn rubbery.</li>`);
+
+  const restSubSteps = [];
+  restSubSteps.push(`<li>Fill a bowl (or any container that fits your ladles) with ice and water. Submerge the ladle scoops to keep them ice-cold.</li>`);
+  if (isBacon) {
+    restSubSteps.push(`<li>Cook the bacon crisp — its rendered grease becomes your cooking-surface grease.</li>`);
+    restSubSteps.push(`<li>At the <b>7-min mark</b>, prep the cooking surface to cook pancakes in the bacon grease.</li>`);
+  } else {
+    restSubSteps.push(`<li>At the <b>7-min mark</b>, heat the cooking surface and apply the grease.</li>`);
+  }
+  steps.push(`<li><b>Rest the batter 10 minutes, undisturbed.</b> During the rest:<ul class="sub-steps">${restSubSteps.join('')}</ul></li>`);
+
+  const scoopSubSteps = [];
+  scoopSubSteps.push(`<li>2–3 quick pours can be done in succession before you need to chill the ladle again.</li>`);
+  scoopSubSteps.push(`<li>Drop toppings tightly in the center.</li>`);
+  steps.push(`<li><b>When ready to scoop:</b> pull a ${sizeInfo.oz} oz ladle from the ice bath (it must have soaked a <b>minimum of 45&ndash;60 seconds</b>), tap it once on a clean towel to drop loose water, wipe the inside with a tiny dot of avocado oil. Scoop the batter quickly and pour it straight onto the heated grease.<ul class="sub-steps">${scoopSubSteps.join('')}</ul></li>`);
+
+  if (flavor.id !== 'plain') {
+    steps.push(`<li><b>Apply toppings:</b> place the items from the <i>Toppings per pancake</i> chart above onto the wet pancake top, tightly clustered in the dead center. Stay under the Max Combined Volume Limit and leave a clean batter perimeter — that ring is the seal zone for the Batter Shield.</li>`);
+  }
+
+  if (flavor.doubleShield) {
+    steps.push(`<li><b>Apply Double Batter Shield:</b> Immediately grab your dedicated shielding <b>1-oz Winco ladle</b> from the ice bath (it must have soaked <b>45&ndash;60 sec minimum</b>). Scoop <b>${sv.volume}</b> of cold plain batter (${sv.fill}). ${sv.execution} Apply this drizzle <b>twice in two layered coats</b>, smoothing each coat with the back of a chilled spoon. Ensure the outer rim of the baseline pancake remains clean to form a perfect seal upon flipping. Triple-Threat candies will weld to the cooking surface during the flip if you skip the second coat — it's non-negotiable for this combination.</li>`);
+  } else if (flavor.shield) {
+    steps.push(`<li><b>Apply Batter Shield:</b> Immediately grab your dedicated shielding <b>1-oz Winco ladle</b> from the ice bath (it must have soaked <b>45&ndash;60 sec minimum</b>). Scoop <b>${sv.volume}</b> of cold plain batter (${sv.fill}). ${sv.execution} Ensure the outer rim of the baseline pancake remains clean to form a perfect seal upon flipping. This locks the sugars inside the dough so they melt smoothly during the flip instead of welding to the cooking surface.</li>`);
+  }
+
+  steps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
+  steps.push(`<li>Between every pancake: scrape → use the ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>`);
+
+  return steps.join('');
+}
+
+// =========================================================================
+// render() — top-level controller
+// =========================================================================
+
+function render() {
+  // --- Card 1: batch (always single-select) ---
+  document.getElementById('batch-opts').innerHTML = BATCHES.map((b, i) =>
+    `<div class="opt ${state.batch === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
+  ).join('');
+
+  document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
+    `<div class="opt ${state.bulk === o.bulk ? 'active' : ''}" data-bulk="${o.bulk}">${o.label}</div>`
+  ).join('');
+
+  // --- Card 2: flavors (single-select in single mode, multi-select in flight mode) ---
+  const flavorOptsEl = document.getElementById('flavor-opts');
+  if (state.mode === 'single') {
+    flavorOptsEl.innerHTML = FLAVORS.map(f =>
+      `<div class="opt ${state.flavor === f.id ? 'active' : ''}" data-flavor="${f.id}">${f.label}</div>`
+    ).join('');
+  } else {
+    flavorOptsEl.innerHTML = FLAVORS.map(f =>
+      `<div class="opt ${state.selectedFlavors.includes(f.id) ? 'active' : ''}" data-flavor="${f.id}">${f.label}</div>`
+    ).join('');
+  }
+
+  // Flavor status header (flight mode only)
+  const statusEl = document.getElementById('flavor-status');
+  const statusText = document.getElementById('flavor-status-text');
+  const clearBtn = document.getElementById('flavor-clear');
+  const hint = document.getElementById('flavor-hint');
+  if (state.mode === 'flight') {
+    const n = state.selectedFlavors.length;
+    statusEl.hidden = false;
+    statusText.textContent = n === 0
+      ? 'Select one or more flavors below'
+      : (n === 1 ? 'Selected: 1 flavor' : `Selected: ${n} flavors`);
+    clearBtn.hidden = (n === 0);
+    hint.hidden = false;
+    hint.textContent = 'Each selected flavor is its own complete batch at the chosen batch size. Tap pills to include/exclude.';
+  } else {
+    statusEl.hidden = true;
+    hint.hidden = true;
+  }
+
+  // --- Card 2: candy prep pickers ---
+  const showCaramel = (state.mode === 'single')
+    ? !!(FLAVORS.find(f => f.id === state.flavor) || {}).hasCaramel
+    : state.selectedFlavors.some(id => (FLAVORS.find(f => f.id === id) || {}).hasCaramel);
+  const showToffee  = (state.mode === 'single')
+    ? !!(FLAVORS.find(f => f.id === state.flavor) || {}).hasToffee
+    : state.selectedFlavors.some(id => (FLAVORS.find(f => f.id === id) || {}).hasToffee);
+
+  const caramelInline = document.getElementById('caramel-inline');
+  if (showCaramel) {
+    caramelInline.style.display = '';
+    document.getElementById('caramel-opts').innerHTML = CANDY_PREPS.map(p =>
+      `<div class="opt ${state.caramelPrep === p.id ? 'active' : ''}" data-caramel="${p.id}" title="${p.desc}">${p.label}</div>`
+    ).join('');
+  } else {
+    caramelInline.style.display = 'none';
+  }
+
+  const toffeeInline = document.getElementById('toffee-inline');
+  if (showToffee) {
+    toffeeInline.style.display = '';
+    document.getElementById('toffee-opts').innerHTML = CANDY_PREPS.map(p =>
+      `<div class="opt ${state.toffeePrep === p.id ? 'active' : ''}" data-toffee="${p.id}" title="${p.desc}">${p.label}</div>`
+    ).join('');
+  } else {
+    toffeeInline.style.display = 'none';
+  }
+
+  const candyHint = document.getElementById('candy-hint');
+  if (showCaramel && showToffee) {
+    candyHint.innerHTML = 'Caramel and toffee prep affect the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat. <b>When both candies are present, either being deep-frozen forces the lower temp.</b>';
+    candyHint.style.display = '';
+  } else if (showCaramel) {
+    candyHint.innerHTML = 'Caramel prep affects the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat.';
+    candyHint.style.display = '';
+  } else if (showToffee) {
+    candyHint.innerHTML = 'Toffee prep affects the cooking-surface temperature: deep-frozen → lower heat; flash-frozen → normal heat.';
+    candyHint.style.display = '';
+  } else {
+    candyHint.style.display = 'none';
+  }
+
+  // --- Card 3: pancake size (single-select in both modes) ---
+  document.getElementById('size-opts').innerHTML = SIZES.map((s, i) =>
+    `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
+  ).join('');
+
+  // --- Output ---
+  if (state.mode === 'single') renderSingleOutput();
+  else                          renderFlightOutput();
+}
+
+// =========================================================================
+// renderSingleOutput — uses shared helpers, output byte-identical to v2.0.0
+// =========================================================================
+
+function renderSingleOutput() {
+  const b = state.batch;
+  const flavor = flavorById(state.flavor);
+  const sizeIdx = state.size;
+  const sizeInfo = SIZES[sizeIdx];
+  const batchInfo = BATCHES[b];
+
+  const yieldCount = Math.max(1, Math.round(batchInfo.oz / sizeInfo.oz));
+  const yieldText = `Yields ~${yieldCount} pancake${yieldCount === 1 ? '' : 's'}`;
+
+  const prepNotes = singlePrepNotes(flavor);
+  const prepStackHtml = prepNotes.length
+    ? `<div class="prep-stack">${prepNotes.join('')}</div>`
+    : '';
+
+  const dryHtml = dryBowlHtml(b, state.bulk);
+  const wetHtml = wetBowlHtml(flavor, b);
+  const spcHtml = spicesHtml(flavor, b);
+
+  const heat = heatInfoForFlavor(flavor);
+  const heatLine = heat.heatLine;
+  const lowHeatCalloutHtml = heat.calloutHtml;
+
+  const toppingsInner = toppingsInnerHtml(flavor, sizeIdx, { includeCandyPrep: true });
+  const toppingsHtml = toppingsInner
+    ? `<div class="block full-row"><h4>Toppings per pancake</h4>${toppingsInner}</div>`
+    : '';
+
+  const callouts = flavorCallouts(flavor);
+  const tiersHtml = tierGridHtml(flavor);
+
+  // Cooking steps (same as v2.0.0 — kept inline to ensure byte-identity)
+  const isBacon = flavor.id === 'bacon' || flavor.id === 'bnut_bacon';
+  const sv = SHIELD_VOLUMES[sizeInfo.id];
   const cookingSteps = [];
 
   cookingSteps.push(`<li>Measure dry ingredients into one bowl. In a second bowl, combine the wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()}. Frother on lowest to emulsify the wet mix only.</li>`);
-
   cookingSteps.push(`<li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix</b> or pancakes turn rubbery.</li>`);
 
   const restSubSteps = [];
@@ -1430,7 +1883,6 @@ function renderOutput() {
   }
 
   cookingSteps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
-
   cookingSteps.push(`<li>Between every pancake: scrape → use the ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>`);
 
   const out = document.getElementById('output');
@@ -1454,7 +1906,7 @@ function renderOutput() {
         </div>
         <div class="block">
           <h4>Spices (into wet bowl)</h4>
-          ${spicesHtml}
+          ${spcHtml}
         </div>
         <div class="block">
           <h4>Cooking Surface Grease</h4>
@@ -1481,6 +1933,272 @@ function renderOutput() {
   `;
 }
 
+// =========================================================================
+// renderFlightOutput — multi-flavor with Setup + Cook phases
+// =========================================================================
+
+function renderFlightOutput() {
+  const out = document.getElementById('output');
+  const ids = state.selectedFlavors.slice();
+  const n = ids.length;
+
+  if (n === 0) {
+    out.innerHTML = `<div class="empty-state">
+      <p style="margin:0 0 6px;font-size:1.05rem;color:var(--ink)">No flavors selected yet.</p>
+      <p style="margin:0">Pick one or more flavors above to build a flight. Each flavor becomes its own batch at the chosen batch size.</p>
+    </div>`;
+    return;
+  }
+
+  const b = state.batch;
+  const sizeIdx = state.size;
+  const sizeInfo = SIZES[sizeIdx];
+  const batchInfo = BATCHES[b];
+
+  const flavors = ids.map(flavorById);
+  const total = totalYield(b, sizeIdx, n);
+
+  // ---- Title ----
+  const title = `<div class="flight-title-row">
+    <h3 style="margin:0">Flight · ${n} flavor${n === 1 ? '' : 's'} · ${batchInfo.label} batch each · ${sizeInfo.label}</h3>
+  </div>
+  <p class="yield">Yields ~${total} pancakes total (${Math.round(total / n)} per flavor)</p>`;
+
+  // ---- Prep mise en place (deduped) ----
+  const prepCallouts = prepCalloutsFor(ids);
+  const prepHtml = prepCallouts.length
+    ? `<div class="prep-stack">${prepCallouts.join('')}</div>` : '';
+
+  // ---- Setup phase ----
+  const dryBlock = `<div class="block">
+    <h4>Dry Bowl (× ${n} — one per flavor)</h4>
+    ${dryBowlHtml(b, state.bulk)}
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">${n === 1
+      ? 'Measure once into a single dry bowl.'
+      : `Either prepare <b>${n} separate ${batchInfo.label.toLowerCase()} dry bowls</b>, <b>or</b> measure <b>${n}× the recipe above</b> into one large bowl and split into ${n} equal portions before adding wet.`}</p>
+  </div>`;
+
+  const wetBlocks = `<div class="block">
+    <h4>Wet Bowls (${n} total — one per flavor)</h4>
+    <div class="wet-flavors-grid">
+      ${flavors.map(f => `
+        <div class="wet-flavor">
+          <h5>${f.label}</h5>
+          ${wetBowlHtml(f, b)}
+          <div class="wf-spice-head">Spices (into this wet bowl)</div>
+          ${spicesHtml(f, b)}
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  // Group flavors for grease + heat + cook
+  const grouped = groupSelectedByCooking(ids);
+  const greases = distinctGreasesByGroup(grouped);
+  const greaseBlock = `<div class="grease-lines">
+    <h4>Cooking-Surface Grease (one line per distinct grease type)</h4>
+    <ul>
+      ${greases.map(g => `<li>
+        <span class="grease-group">${COOK_GROUP_LABEL[g.group]}</span> &middot;
+        <b>${g.grease}</b> &middot; <span style="color:var(--muted)">for ${g.flavorLabels.join(', ')}</span>
+      </li>`).join('')}
+    </ul>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Apply 1 tsp, then wipe across with paper towel to a micro-thin shimmering film. No puddles.</p>
+  </div>`;
+
+  // Per-flavor toppings cards
+  const toppingsByFlavor = `<h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Toppings per pancake (one block per flavor)</h4>
+    <div class="toppings-by-flavor">
+      ${flavors.map(f => `
+        <div class="flavor-toppings-card">
+          <h5>${f.label}</h5>
+          ${toppingsInnerHtml(f, sizeIdx, { includeCandyPrep: false })}
+        </div>`).join('')}
+    </div>`;
+
+  // Below-grid callouts (unsalted butter reminder, etc.) — dedupe across flavors
+  const calloutSet = new Set();
+  flavors.forEach(f => flavorCallouts(f).forEach(c => calloutSet.add(c)));
+  const calloutsHtml = Array.from(calloutSet).join('');
+
+  // Recommended syrups (one line per distinct syrup, listing flavors)
+  const syrupMap = new Map();
+  flavors.forEach(f => {
+    if (!syrupMap.has(f.syrup)) syrupMap.set(f.syrup, []);
+    syrupMap.get(f.syrup).push(f.label);
+  });
+  const syrupsHtml = `<div class="syrup">
+    <span class="dot"></span>
+    <div>
+      <b>Recommended syrups:</b><br>
+      ${Array.from(syrupMap.entries()).map(([s, fl]) =>
+        `<span><b>${s}</b> <span style="color:var(--muted)">— for ${fl.join(', ')}</span></span>`
+      ).join('<br>')}
+    </div>
+  </div>`;
+
+  // ---- Quality Tiers ----
+  let tiersBlockHtml;
+  if (n === 1) {
+    tiersBlockHtml = `<h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Quality Tier (Chef → Avoid) — ${flavors[0].label}</h4>
+      ${tierGridHtml(flavors[0])}`;
+  } else {
+    const cmp = compareTiers(flavors);
+    const sharedHtml = cmp.shared.length
+      ? `<div class="tiers-shared">
+          <h5>Shared across all ${n} flavors</h5>
+          <ul>
+            ${cmp.shared.map(s => `<li>
+              <span class="tier-badge ${s.tier}">${s.tierLabel}</span>
+              <span class="tier-slot">${s.slotLabel}</span>
+              <span class="tier-val">${s.value}</span>
+            </li>`).join('')}
+          </ul>
+        </div>`
+      : `<div class="tiers-shared"><h5>Shared across all ${n} flavors</h5><p class="tiers-shared-empty">Nothing in common across these flavors' quality tiers — see per-flavor blocks below.</p></div>`;
+
+    const perFlavorHtml = `<div class="tiers-per-flavor" data-tier-layout="${state.tierLayout}">
+      ${flavors.map(f => {
+        const entries = cmp.perFlavor[f.id];
+        if (!entries.length) {
+          return `<div class="flavor-tiers-card"><h5>${f.label}</h5><div class="all-match">All quality tiers match the shared set above.</div></div>`;
+        }
+        return `<div class="flavor-tiers-card">
+          <h5>${f.label}</h5>
+          <div class="compact-tiers">
+            ${entries.map(e => `<div class="compact-tier-row">
+              <span class="tier-badge ${e.tier}">${e.tierLabel}</span>
+              <span class="ti-slot">${e.slotLabel}</span>
+              <span class="ti-val">${e.value}</span>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+    tiersBlockHtml = `<div class="toggle-row">
+      <h4>Quality Tier (Chef → Avoid) — shared + per flavor</h4>
+      <div class="inline-toggle" data-toggle-group="tier-layout">
+        <span class="label">Layout</span>
+        <button type="button" data-tier-layout="side"  class="${state.tierLayout === 'side'  ? 'active' : ''}">Side-by-side</button>
+        <button type="button" data-tier-layout="stack" class="${state.tierLayout === 'stack' ? 'active' : ''}">Stacked</button>
+        <button type="button" data-tier-layout="grid"  class="${state.tierLayout === 'grid'  ? 'active' : ''}">Grid</button>
+      </div>
+    </div>
+    ${sharedHtml}
+    ${perFlavorHtml}`;
+  }
+
+  // ---- Cook phase ----
+  // Decide grouping
+  const groupingOrder = state.groupByCookOrder
+    ? COOK_GROUP_ORDER.filter(g => grouped[g].length)
+    : ['__selection_order__'];
+
+  let cookBlocksHtml;
+  if (state.groupByCookOrder) {
+    cookBlocksHtml = groupingOrder.map((g, idx) => {
+      const groupFlavorIds = grouped[g];
+      const groupFlavors = groupFlavorIds.map(flavorById);
+      const heat = effectiveHeatForGroup(g, groupFlavorIds);
+      const isLast = (idx === groupingOrder.length - 1);
+
+      const staggerNote = groupFlavors.length > 1
+        ? `<div class="cg-stagger">Stagger the rests: mix flavor 1's bowls, start its 10-min rest, then mix flavor 2's while flavor 1 is resting (flavor 2's rest finishes ~7 min after flavor 1's). Cook flavor 1 the moment its rest is up, then flavor 2.</div>`
+        : '';
+
+      const flavorSections = groupFlavors.map(f => {
+        const heatInfo = heatInfoForFlavor(f);
+        return `<div class="flavor-section">
+          <h6>${f.label}</h6>
+          <p style="margin:0 0 6px;color:var(--muted);font-size:.85rem">${f.strategy}${heatInfo.calloutHtml ? '' : ` · Cooking surface: <b>${heatInfo.heatLine}</b>.`}</p>
+          <ol class="steps">${flightCookStepsForFlavor(f, sizeIdx)}</ol>
+        </div>`;
+      }).join('');
+
+      const transition = isLast ? '' :
+        `<div class="transition">→ Wipe the cooking surface clean, re-apply grease for the <b>${COOK_GROUP_LABEL[groupingOrder[idx + 1]]}</b> group, then continue.</div>`;
+
+      return `<div class="cook-group">
+        <div class="cg-head">
+          <span class="cg-title">${COOK_GROUP_LABEL[g]} group</span>
+          <span class="cg-heat">${heat.temp} <span style="opacity:.7">(${heat.detail})</span></span>
+        </div>
+        <p class="cg-flavors"><b>Flavors:</b> ${groupFlavors.map(f => f.label).join(' · ')} &mdash; <span style="color:var(--muted)">${COOK_GROUP_BLURB[g]}</span></p>
+        ${staggerNote}
+        ${flavorSections}
+        ${transition}
+      </div>`;
+    }).join('');
+  } else {
+    // Selection-order rendering — one block per flavor, no group headers/transitions
+    cookBlocksHtml = flavors.map(f => {
+      const heatInfo = heatInfoForFlavor(f);
+      return `<div class="cook-group">
+        <div class="cg-head">
+          <span class="cg-title">${f.label}</span>
+          <span class="cg-heat">Cooking surface: <b>${heatInfo.heatLine}</b></span>
+        </div>
+        <p class="cg-flavors" style="margin-bottom:6px"><span style="color:var(--muted)">${f.strategy}</span></p>
+        <ol class="steps">${flightCookStepsForFlavor(f, sizeIdx)}</ol>
+      </div>`;
+    }).join('');
+  }
+
+  // ---- Final assembly ----
+  out.innerHTML = `
+    ${title}
+    ${prepHtml}
+
+    <div class="phase-header">
+      <h3>Setup phase</h3>
+      <span class="phase-sub">Measure everything. No cooking yet.</span>
+    </div>
+    <div class="phase-section">
+      <div class="grid">
+        <div class="col">${dryBlock}</div>
+        <div class="col">${wetBlocks}</div>
+        <div class="full-row">${greaseBlock}</div>
+      </div>
+      ${toppingsByFlavor}
+    </div>
+
+    ${calloutsHtml}
+
+    ${syrupsHtml}
+
+    ${tiersBlockHtml}
+
+    <div class="phase-header">
+      <h3>Cook phase</h3>
+      <div class="inline-toggle" data-toggle-group="cook-group">
+        <span class="label">Group by</span>
+        <button type="button" data-cook-grouping="1" class="${state.groupByCookOrder ? 'active' : ''}">Cooking order</button>
+        <button type="button" data-cook-grouping="0" class="${state.groupByCookOrder ? '' : 'active'}">Selection order</button>
+      </div>
+    </div>
+    <div class="phase-section">
+      ${cookBlocksHtml}
+    </div>
+  `;
+}
+
+// =========================================================================
+// Event listeners
+// =========================================================================
+
+document.getElementById('mode-switcher').addEventListener('click', e => {
+  const btn = e.target.closest('[data-mode-pick]');
+  if (!btn) return;
+  const m = btn.dataset.modePick;
+  if (m !== 'single' && m !== 'flight') return;
+  state.mode = m;
+  // Reflect active state on buttons
+  document.getElementById('mode-switcher').querySelectorAll('[data-mode-pick]').forEach(b =>
+    b.classList.toggle('active', b.dataset.modePick === m));
+  try { localStorage.setItem('pancakeFlightMode', m); } catch (_) {}
+  render();
+});
+
 document.getElementById('batch-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-batch]');
   if (!opt) return;
@@ -1496,7 +2214,18 @@ document.getElementById('bulk-opts').addEventListener('click', e => {
 document.getElementById('flavor-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-flavor]');
   if (!opt) return;
-  state.flavor = opt.dataset.flavor;
+  const id = opt.dataset.flavor;
+  if (state.mode === 'single') {
+    state.flavor = id;
+  } else {
+    const i = state.selectedFlavors.indexOf(id);
+    if (i >= 0) state.selectedFlavors.splice(i, 1);
+    else        state.selectedFlavors.push(id);
+  }
+  render();
+});
+document.getElementById('flavor-clear').addEventListener('click', e => {
+  state.selectedFlavors = [];
   render();
 });
 document.getElementById('size-opts').addEventListener('click', e => {
@@ -1517,6 +2246,31 @@ document.getElementById('toffee-opts').addEventListener('click', e => {
   state.toffeePrep = opt.dataset.toffee;
   render();
 });
+
+// Delegated listener on the output card for cook-group toggle + tier-layout toggle
+document.getElementById('output').addEventListener('click', e => {
+  const cookBtn = e.target.closest('[data-cook-grouping]');
+  if (cookBtn) {
+    state.groupByCookOrder = (cookBtn.dataset.cookGrouping === '1');
+    try { localStorage.setItem('pancakeFlightGroupByCook', state.groupByCookOrder ? '1' : '0'); } catch (_) {}
+    render();
+    return;
+  }
+  const tierBtn = e.target.closest('[data-tier-layout]');
+  if (tierBtn) {
+    const v = tierBtn.dataset.tierLayout;
+    if (v === 'side' || v === 'stack' || v === 'grid') {
+      state.tierLayout = v;
+      try { localStorage.setItem('pancakeFlightTierLayout', v); } catch (_) {}
+      render();
+    }
+    return;
+  }
+});
+
+// Initial mode-switcher active state (apply persisted)
+document.getElementById('mode-switcher').querySelectorAll('[data-mode-pick]').forEach(b =>
+  b.classList.toggle('active', b.dataset.modePick === state.mode));
 
 render();
 </script>
