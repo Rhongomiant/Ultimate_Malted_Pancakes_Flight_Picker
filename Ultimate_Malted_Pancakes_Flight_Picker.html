@@ -237,7 +237,7 @@
       </ul>
       <h5>Other terms</h5>
       <ul>
-        <li><b>Batter Shield / Seal Method:</b> spoon a tiny drizzle of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the cooking surface.</li>
+        <li><b>Batter Shield / Seal Method:</b> using a 1-oz Winco ladle or spring-loaded 2-Tbsp cookie scoop, drizzle a thin layer of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the cooking surface.</li>
         <li><b>Ghee:</b> clarified butter (milk solids strained out). Deep, toasted, brown-butter note — pairs with malt powder.</li>
         <li><b>Avocado Oil:</b> very high smoke point, flavorless. Best cooking-surface grease for sugar combos; used <i>inside</i> the batter for loud flavor combos (bacon, triple-threat).</li>
       </ul>
@@ -294,6 +294,8 @@
       <p>Buy baking caramel bits (e.g. Peter's Caramel Loaf) and toffee bits (e.g. Heath Bits O' Brickle), then chop them micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the cooking surface.</p>
       <h5>Candy Crushing Protocol</h5>
       <p>Never attempt to chop or crush caramel or toffee at room temperature, as it will gum up your tools. Always freeze the candy solid first — <b>at least 60 minutes in the freezer, 24 hours to be safe</b> — to make it brittle. Place the frozen candy inside a <b>double-layered heavy-duty freezer bag</b> and strike it firmly with the flat side of a meat mallet or heavy rolling pin until broken into gravel-sized micro-bits. Sift through a mesh strainer to separate the uniform bits from the fine candy dust.</p>
+      <h5>Shield Application Mechanism</h5>
+      <p>The optimal mechanical tool for injecting a single or double Batter Shield is a dedicated <b>1-ounce Winco ladle</b> or a <b>spring-loaded 2-tablespoon cookie scoop</b>. Always use a small, separate reservoir of cold, plain batter for shielding. Drizzle the batter in a thin, concentric circle to fully mask the candy core from view, utilizing the back of a chilled spoon to smooth out the layer before executing an immediate flip.</p>
       <h5>Banana Nut experimentation</h5>
       <ul>
         <li><b>Traditional Bakery Profile:</b> Melted Ghee + Cinnamon + Fresh Nutmeg.</li>
@@ -419,7 +421,7 @@
     </div>
   </details>
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.10.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.11.0</div>
 </div>
 
 <script>
@@ -908,7 +910,7 @@ function renderOutput() {
 
   // Single Batter Shield (only when shield && not doubleShield)
   if (flavor.shield && !flavor.doubleShield) {
-    toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the cooking surface otherwise.</div>`;
+    toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a thin layer of plain batter over them with a <b>1-oz Winco ladle</b> or <b>spring-loaded 2-Tbsp cookie scoop</b> to seal before flipping. Candy will weld to the cooking surface otherwise.</div>`;
   }
 
   // Candy prep note (combined when both candies present)
@@ -930,7 +932,7 @@ function renderOutput() {
 
   // Double Batter Shield (Triple)
   if (flavor.doubleShield) {
-    toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the cooking surface otherwise.</div>`;
+    toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) with a <b>1-oz Winco ladle</b> or <b>spring-loaded 2-Tbsp cookie scoop</b> before flipping. Triple-Threat candies will weld to the cooking surface otherwise.</div>`;
   }
 
   const toppingsHtml = toppingsInner
@@ -982,9 +984,9 @@ function renderOutput() {
   }
 
   if (flavor.doubleShield) {
-    cookingSteps.push(`<li><b>Apply Double Batter Shield:</b> drizzle plain batter over the toppings <b>twice</b> (two layered coats) to fully cover them. Triple-Threat candies will weld to the cooking surface during the flip if you skip the second coat — it's non-negotiable for this combination.</li>`);
+    cookingSteps.push(`<li><b>Apply Double Batter Shield:</b> using a <b>1-oz Winco ladle</b> or a <b>spring-loaded 2-Tbsp cookie scoop</b>, drizzle plain batter from a small reservoir of cold, plain batter over the toppings in a thin concentric circle <b>twice</b> (two layered coats), smoothing each layer with the back of a chilled spoon to fully mask the candy core. Triple-Threat candies will weld to the cooking surface during the flip if you skip the second coat — it's non-negotiable for this combination.</li>`);
   } else if (flavor.shield) {
-    cookingSteps.push(`<li><b>Apply Batter Shield:</b> drizzle a small amount of plain batter over the toppings to fully cover them. This locks the sugars inside the dough so they melt smoothly during the flip instead of welding to the cooking surface.</li>`);
+    cookingSteps.push(`<li><b>Apply Batter Shield:</b> using a <b>1-oz Winco ladle</b> or a <b>spring-loaded 2-Tbsp cookie scoop</b>, drizzle plain batter from a small reservoir of cold, plain batter over the toppings in a thin concentric circle to fully mask the candy core, then smooth with the back of a chilled spoon. This locks the sugars inside the dough so they melt smoothly during the flip instead of welding to the cooking surface.</li>`);
   }
 
   cookingSteps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
