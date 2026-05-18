@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.10.2.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -74,6 +74,75 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v2.10.2 — Candy-combo recipe rescale (Option A: linear-with-mass) + chef-level area-scaling banana adjustments
+
+A second pass on the candy-combo TOPPINGS data after a multi-turn design review surfaced two related issues with the v2.9.0 / v2.10.1 values: the per-size scaling was inconsistent (toffee column doubled cleanly but caramel and chocolate did not), and the 4 oz candy combos ran significantly above the unshielded Max Combined Volume Limit cap.
+
+**The Option A scaling philosophy.** All three combo candies now follow clean per-size scaling rules tied to pancake mass:
+
+- **Toffee in any combo** = (size in oz) × 4 Drops = (size in oz) × 1/16 tsp. Across 0.5 → 4.0 oz: Smidgen (1/32) → Pinch (1/16) → Dash (⅛) → Scant Tad (3/16) → Tad (¼ tsp). Every value is a named vocab entry.
+- **Caramel in any combo** = (size in oz) × 1 tsp. Across 0.5 → 4.0 oz: Scant Tad (3/16 tsp at 0.5 oz, perceptual floor) → 1 tsp → 2 tsp → 1 Tbsp → 1 Tbsp + 1 tsp.
+- **Chocolate in any combo** = 2/3 of the single Chocolate max for that pancake size. Across 0.5 → 4.0 oz: 2 chips (or 4 mini) → 4–5 chips (or 8 mini) → 8–10 chips → 12–13 chips → 17–20 chips.
+
+This produces clean ratios between adjacent sizes that match the pancake-size doubling pattern itself (2×/2× from 0.5→1.0→2.0, then 1.5×/1.33× from 2.0→3.0→4.0).
+
+**Toffee unified across all combos.** In v2.9.0 the toffee values in the four combo recipes were different at the same pancake size (toffee in Triple was a Smidgen at 0.5 oz but a Hint at 2-candy combos). v2.10.2 unifies toffee at the same per-size value regardless of which combo it appears in — toffee column reads identically in C+T, T+Ch, and TCC. Same for caramel across C+T, C+Ch, TCC and chocolate across T+Ch, C+Ch, TCC.
+
+**Industry-ratio cross-check.** Web research into Turtles (caramel + chocolate, ~1:1 by weight), English Toffee (toffee + chocolate, 3–5:1 toffee-dominant when toffee is the structural base), and the Pillsbury Bake-Off "Chocolate Toffee Caramel Bars" (Chocolate:Caramel:Toffee ≈ 7:5:1 by weight) informed the per-candy proportions. For pancake mix-ins specifically — where all three are folded inclusions rather than structural layers — toffee runs at lower relative volume than caramel or chocolate because per-unit toffee flavor intensity is much higher. The v2.10.2 Triple TCC at 4 oz uses Tad toffee + 1 Tbsp + 1 tsp caramel + 17–20 chips — roughly 5:5:2 by weight, balancing caramel-and-chocolate body against toffee as an audible flavor accent.
+
+**0.5 oz perceptual-floor cells.** The 0.5 oz row's combo values sit on perceptual floors rather than linear extrapolations from the larger sizes. Toffee at 0.5 oz combos = Smidgen (1/32 tsp); caramel = Scant Tad (3/16 tsp); chocolate = 2 standard chips (or 4 mini). These are the smallest values that still feel like a real combo recipe on a 1.5-to-2-inch sample bite. Linear-with-mass extrapolation would produce values that exceed Single Batter Shield tolerance at that size, so the floor is held.
+
+**Banana-count corrections at 4.0 oz.** A surface-area audit during the design review found that banana slice counts at the 6.5-inch plate-size pancake were under-scaling relative to pancake area (1.29–1.33× from 3.0 oz vs. a 1.69× area increase). Three rows updated:
+
+- **bnut** at 4.0 oz: `'4–5 slices banana (¼")'` → `'5–6 slices banana (¼")'`
+- **bnut_choc** at 4.0 oz: `'4 slices banana (¼")'` → `'5–6 slices banana (¼")'`
+- **bnut_bacon** at 4.0 oz: `'4 slices banana'` → `'5–6 slices banana'`
+
+Pine nut counts and chocolate chip counts in those rows unchanged. The 1.29× banana scaling was a deliberate-looking pattern but produced visually under-loaded plate-size banana pancakes; bumping to ~1.6× recovers chef-level visual coverage.
+
+**Other rows audited but intentionally left as-is.** Bacon single column has a deliberate "diner-standard peak" density curve (peak at 2.0 oz, lighter at the extremes) reflecting how bacon is conventionally served — kept. Pine-nut over-scaling at the 1.0 → 2.0 oz transition in the bnut row is a deliberate "feature recipe" loading where Banana Nut as a single recipe gets more pine nuts than the two BN-combo recipes at the same size — kept. The Chocolate Chips single column scales mass-linearly which is correct for batter mix-ins — kept.
+
+**Caramel single 0.5 oz format conversion.** The 0.5 oz Caramel single recipe value, previously expressed as "2 micro-chopped bits" in both the picker TOPPINGS data and the recipe guide's Section 2 chart, is now expressed as the equivalent volume measurement **Scant Tad (3/16 tsp)** — matching the value already used for caramel in the 0.5 oz combos and bringing the cell into the named vocabulary system. No volume change (2 micro-bits and Scant Tad are equivalent volumes per the picker's standard-bit math); strictly a unit-of-measure conversion.
+
+**Caramel single 1.0–4.0 oz format conversion.** Following the same logic as the 0.5 oz cell, the remaining four Caramel single cells were converted from bit-count format (`'4–5 chopped caramel bits'`, etc.) to volume measurements that match the Max Combined Volume Limit at each size: **1½ tsp (½ Tbsp)** at 1.0 oz, **1 Tbsp (3 tsp)** at 2.0 oz, **1½ Tbsp (4½ tsp)** at 3.0 oz, **2 Tbsp (6 tsp)** at 4.0 oz. The full Caramel single column now uses consistent volume notation across all five sizes.
+
+**Toffee in combos bumped to 2/3 of single max.** The v2.10.2 initial release used toffee at 12.5% of single Toffee max in all combos (1/16 of a single, the linear-with-mass Option A rule). After internal-consistency review, toffee in combos is now bumped to **2/3 of single Toffee max** — matching the proportional reduction already applied to caramel and chocolate. The new combo toffee values at 1.0–4.0 oz: **⅓ tsp / ⅔ tsp / 1 tsp / 1⅓ tsp**. The 0.5 oz cell stays at Smidgen (perceptual floor; 2/3 of Smidgen would fall below the 1/64 tsp anchor). This converts toffee in combos from "background flavor accent" to "audible peer of caramel and chocolate." The trade-off vs. the Pillsbury-Bake-Off ratio (7:5:1 chocolate:caramel:toffee) is acknowledged — the new values prioritize internal coherence across the candy column over industry-benchmark replication, on the rationale that pro chefs working with these specific brand candies (Peter's Caramel Loaf + Heath Bits O' Brickle) calibrate by tasting against the recipe rather than against external benchmarks.
+
+**Caramel 0.5 oz in combos lowered to Dash.** Caramel in the three Caramel-containing combos at 0.5 oz drops from Scant Tad (3/16 tsp) to **Dash (⅛ tsp)** — restoring the "combos use less than singles" principle at the smallest size (the v2.10.2 initial release had combo caramel equal to single caramel at 0.5 oz, an inversion).
+
+**Chocolate 4.0 oz combo upper-bound raised.** Chocolate in the three Chocolate-containing combos at 4.0 oz raised from "up to 17–20 chips" to **"up to 17–22 chips"** — chef-level adjustment for visual coverage on the 6.5-inch plate-size pancake.
+
+**Bacon single 0.5 oz and 1.0 oz bumps.** Bacon at 0.5 oz raised from Pinch (1/16 tsp) to **Dash (⅛ tsp)**; bacon at 1.0 oz raised from 1 tsp to **1¼ tsp**. Maintains the Bacon : Bacon+Banana_Nut ratio of 2:1 at both sizes (combo bacon at 0.5 oz is Dash, matching single bacon at 0.5 oz; combo bacon at 1.0 oz is ⅝ tsp = ½ of 1¼ tsp).
+
+**Banana counts at 0.5 oz and 1.0 oz reformatted to "quartered slice".** Previous format: "1 half-slice banana (⅛")" at 0.5 oz and "1 disc banana (⅛–¼")" at 1.0 oz. New format reflects how the banana is actually prepared for small-pancake use — quartered for distribution: at 0.5 oz **"¾ to 1 slice banana, quartered (⅛"–3⁄16")"**, at 1.0 oz **"1½ to 2 slices banana, quartered (⅛"–¼")"**. Applied to all three banana flavors: Banana Nut, Banana Nut + Chocolate, Bacon + Banana Nut. The 3⁄16 fraction uses the typographic fraction slash (U+2044) for proper diagonal rendering.
+
+**Bacon thickness ¼" specification added to Bacon + Banana Nut cells.** At all five sizes, the bacon component of Bacon + Banana Nut now explicitly states "(¼" thick)" — bringing the row into alignment with the other rows that already specify slice thicknesses (banana ⅛"–¼", bacon ¼" matching the 4 oz Bacon single strip thickness).
+
+**Final-pass single-recipe and banana-combo refinements.** Six additional changes apply chef-level tuning to the smallest pancake sizes:
+
+- **Bacon single 0.5 oz** bumped from Dash (⅛ tsp) → **Tad (¼ tsp)** with explicit ¼" thickness spec for the crumbles, bringing the smallest bacon pancake to a fuller bacon presence (now sits at 100% of unshielded MCVL — the smallest pancake tastes decidedly *of* bacon).
+- **Toffee single 0.5 oz** bumped from Smidgen (1/32 tsp) → **Scant Tad (3/16 tsp)**, a 6× increase to make the smallest toffee pancake taste audibly of toffee rather than carrying a trace amount. Sits at 75% of unshielded MCVL, well within Single Batter Shield tolerance (50% of shielded cap).
+- **Banana Nut + Chocolate 0.5 oz and 1.0 oz banana** cells reduced from ranges to fixed values: `¾ to 1 slice` → **¾ slice** at 0.5 oz; `1½ to 2 slices` → **1½ slices** at 1.0 oz.
+- **Bacon + Banana Nut 0.5 oz and 1.0 oz banana** cells reduced identically to match Banana Nut + Chocolate: `¾ to 1 slice` → **¾ slice** at 0.5 oz; `1½ to 2 slices` → **1½ slices** at 1.0 oz.
+
+The two banana single cells (Banana Nut) keep their ranges (`¾ to 1 slice` at 0.5 oz, `1½ to 2 slices` at 1.0 oz) — single recipes get a slightly larger banana allocation than combo recipes, matching the broader pattern of singles being more generous with their featured ingredient than combos.
+
+**Companion manual:** the recipe guide's Section 2 (Add-ins Sizing & Maximum Limit Chart) is updated in the same release with a new comprehensive table that adds: (a) the four candy-combo recipes as new ingredient rows, (b) a stacked Max Combined Volume Limit row showing the unshielded baseline alongside the Single Batter Shield (~150% of unshielded MCVL) and Double Batter Shield (~165% of unshielded MCVL) ceilings, and (c) a Shield Type column identifying which recipes require batter shielding. All recipe value updates above are reflected in the same chart.
+
+**Ladle oil-application technique guidance added.** The Part 2 "Ladle Prep and Use" instruction previously read "wipe the inside with a tiny drop of avocado oil" without specifying the wiping technique. Expanded to describe three valid methods: (1) the folded paper-towel method (recommended — pour ~¼ tsp oil onto a quarter-folded paper towel, press the inside of the ladle bowl down against it and rotate), (2) the fingertip-rub method (single drop of oil swirled around the inside surface with a clean fingertip), and (3) the dip-and-shake method (briefly dip the cooled ladle into a small ramekin of oil, tip sideways to drain excess). The first method is recommended because it pairs naturally with the ice-bath rhythm — fold the towel so one section stays dry for the water-tap step and another section stays oiled for the ladle-prep step. The picker surfaces this guidance via a new universal `🥄 Ladle prep:` callout (see "Picker prep callouts expanded" below).
+
+**Banana Prep Protocol added (brief chill, not solid freeze).** New bullet in Part 3 Section 10 (Advanced Cooking Tips & Ingredient Nuances), placed between "How to Prep Pine Nuts for Maximum Flavor" and "Banana Nut Half-Batch vs. Quarter-Batch Experiments". Recommends chilling whole unpeeled bananas in the freezer for 15–30 minutes (or fridge for 1–2 hours) before slicing — firm enough for clean ⅛"–3⁄16"-to-¼" cuts, cold enough to delay water-sugar release on contact with heat (mitigating the existing Structural Conflict Rule), peel-on storage prevents oxidation. Explicitly warns against (a) solid freezing (ruptures cell walls, releases *more* water on the griddle, won't hold disc shape) and (b) long-term refrigeration (peel turns black within 12 hours; cold-inhibited enzymes dull flavor). Parallels the Candy Crushing Protocol's freezer-firm-up logic but uses brief chill rather than solid freeze — different ingredient, different optimum. The picker's `🍌 Banana prep:` callout (previously `🍌 Slice bananas`) was extended to surface the chill-then-slice protocol inline (see "Picker prep callouts expanded" below).
+
+**Section 2 chart orientation flipped to sizes-as-columns.** The Add-ins Sizing & Maximum Limit Chart was rebuilt with pancake sizes as the top header row and ingredients/recipes as left-column row labels (previously: ingredients as columns, sizes as rows). The Max Combined Volume Limit row uses `rowspan=3` to span its three sub-rows (Unshielded / Single Batter Shield / Double Batter Shield) under a single merged label cell. The Shield Type column was added between the ingredient name and the size cells. All recipe values are identical to the prior orientation — only the structural layout changed. Picker is unaffected.
+
+**Picker prep callouts expanded to surface manual guidance at cook time.** Three additions to the picker's `prepCalloutsFor` (Flight mode) and `singlePrepNotes` (Single mode) functions so the cook-time UI shows the same prep guidance carried in the companion manual:
+
+- **Universal ladle-prep callout** (new) — `🥄 Ladle prep:` callout, appears on every recipe regardless of flavor since every recipe uses a ladle. Describes the three oil-application methods (folded paper-towel, fingertip-rub, dip-and-shake) with the folded paper-towel method recommended. Pairs with the existing ice-water-bath ladle instruction.
+- **Banana callout extended** — the existing `🍌 Slice bananas…` callout was reworded as `🍌 Banana prep:` and expanded to cover the 15–30 min freezer chill (peel on) → slice protocol, plus the explicit warning against solid freezing. The slice-thickness guidance (⅛–¼", ideally 3⁄16") is preserved.
+- **Candy callouts extended** — the `🧊 Candy prep:`, `🧊 Caramel prep:`, and `🧊 Toffee prep:` callouts now mention the recommended products (Peter's Caramel Loaf, Heath Bits O' Brickle) inline, note that Peter's softness at room temp is correct rather than a defect, and describe the full freeze-smash-sift protocol from Part 3 of the manual. The flash-frozen vs deep-frozen distinction continues to be driven by the picker's `state.caramelPrep` and `state.toffeePrep` toggles as before.
+
+No state-shape or function-signature changes; both functions take the same inputs and return the same callout-array shape (callouts have new text but the same DOM structure). Existing tests for the prep-callout pipeline should pass unchanged.
 
 ### v2.10.1 — Switcher alignment fix + tightened row gap
 
