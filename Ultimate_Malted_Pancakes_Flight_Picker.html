@@ -1298,7 +1298,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.8.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.9.0</div>
 </div>
 
 <script>
@@ -1609,7 +1609,8 @@ const FLAVORS = [
   },
   { id: 'caramel_choc', cookGroup: 'candy', label: 'Caramel + Chocolate',
     strategy: 'BATTER SHIELD required. Encase candy completely inside.',
-    spices: [ { name: 'Cinnamon', amounts: SPICE.nutmeg } ],
+    // v2.9.0: Cinnamon-as-accent uses a finer scale than standalone cinnamon. Clean doubling 1/128→1/64→1/32→1/16.
+    spices: [ { name: 'Cinnamon', amounts: ['Hint (1/128 tsp)', 'Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Pinch (1/16 tsp)'] } ],
     fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong', shield: true, hasCaramel: true,
     tiers: {
@@ -1621,7 +1622,8 @@ const FLAVORS = [
   },
   { id: 'toffee_caramel', cookGroup: 'candy', label: 'Caramel + Toffee',
     strategy: 'BATTER SHIELD required.',
-    spices: [ { name: 'Nutmeg', amounts: SPICE.nutmeg } ],
+    // v2.9.0: Nutmeg-as-accent uses a finer scale than standalone nutmeg. 'Trace Dusting' = 1/256 tsp = 1/2 × Hint, project-internal vocab.
+    spices: [ { name: 'Nutmeg', amounts: ['Trace Dusting (1/256 tsp — a few microscopic specks tapped off a fingertip)', 'Hint (1/128 tsp)', 'Drop (1/64 tsp)', 'Smidgen (1/32 tsp)'] } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong', shield: true, hasCaramel: true, hasToffee: true,
     tiers: {
@@ -1633,7 +1635,8 @@ const FLAVORS = [
   },
   { id: 'toffee_choc', cookGroup: 'candy', label: 'Toffee + Chocolate',
     strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
-    spices: [ { name: 'Vanilla Bean Paste', amounts: SPICE.vanillaPaste } ],
+    // v2.9.0: vanilla paste uses half-strength scale here. Clean +⅛ tsp increment per batch step.
+    spices: [ { name: 'Vanilla Bean Paste', amounts: ['Dash (⅛ tsp)', '¼ tsp', '⅜ tsp', '½ tsp'] } ],
     fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong', shield: true, hasToffee: true,
     tiers: {
@@ -1645,9 +1648,12 @@ const FLAVORS = [
   },
   { id: 'triple', cookGroup: 'candy', label: 'Toffee + Caramel + Chocolate',
     strategy: 'DOUBLE SHIELD required.',
+    // v2.9.0: Espresso 2× higher than standalone toffee/triple (anchoring three competing notes).
+    // Espresso pattern: 1× Smidgen at Quarter, doubling/multiplying clean: 1/32 → 1/16 → 3/32 → 1/8.
+    // Sea Salt unchanged scale-wise; just reworded 3/4 batch as '3 Drops' to expose the multiplicative pattern.
     spices: [
-      { name: 'Espresso Powder', amounts: SPICE.espresso },
-      { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt },
+      { name: 'Espresso Powder', amounts: ['Smidgen (1/32 tsp)', 'Pinch (1/16 tsp)', '3 Smidgens (3/32 tsp)', 'Dash (⅛ tsp)'] },
+      { name: 'Sea Salt Flakes', amounts: ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', '3 Drops (3/64 tsp)', 'Pinch (1/16 tsp)'] },
     ],
     fat: 'Avocado Oil (in batter)', panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong', shield: true, doubleShield: true, hasCaramel: true, hasToffee: true,
@@ -1712,32 +1718,32 @@ const TOPPINGS = {
     ['16–18 chopped caramel bits'],
   ],
   toffee_caramel: [
-    ['Toffee: up to ~Smidgen (1/32 tsp)', 'Caramel: up to ~2 chopped bits'],
-    ['Toffee: up to ~½ tsp', 'Caramel: up to ~5 chopped bits'],
-    ['Toffee: up to ~1 tsp', 'Caramel: up to ~10 chopped bits'],
-    ['Toffee: up to ~1½ tsp', 'Caramel: up to ~14 chopped bits'],
-    ['Toffee: up to ~2 tsp', 'Caramel: up to ~18 chopped bits'],
+    ['Toffee: Hint (1/128 tsp) — 1 tiny pinpoint dip', 'Caramel: 1 micro-chopped speck (¼ of a standard bit)'],
+    ['Toffee: Drop (1/64 tsp) — 1 level micro-spoon', 'Caramel: 2 chopped bits (half of a standard bit)'],
+    ['Toffee: up to ¼ tsp', 'Caramel: up to 4 standard-sized bits'],
+    ['Toffee: up to ½ tsp', 'Caramel: up to 8 standard-sized bits'],
+    ['Toffee: up to ¾ tsp', 'Caramel: up to 12 standard-sized bits'],
   ],
   toffee_choc: [
-    ['Toffee: up to ~Smidgen (1/32 tsp)', 'Chocolate: up to ~4 chips'],
-    ['Toffee: up to ~½ tsp', 'Chocolate: up to ~8 chips'],
-    ['Toffee: up to ~1 tsp', 'Chocolate: up to ~15 chips'],
-    ['Toffee: up to ~1½ tsp', 'Chocolate: up to ~20 chips'],
-    ['Toffee: up to ~2 tsp', 'Chocolate: up to ~30 chips'],
+    ['Toffee: Hint (1/128 tsp) — 1 tiny pinpoint dip', 'Chocolate: 2 mini chips (or 1 standard chip)'],
+    ['Toffee: Drop (1/64 tsp) — 1 level micro-spoon', 'Chocolate: 2 standard chips (or 4 mini chips)'],
+    ['Toffee: up to ¼ tsp', 'Chocolate: up to 6 standard chips'],
+    ['Toffee: up to ½ tsp', 'Chocolate: up to 10 standard chips'],
+    ['Toffee: up to ¾ tsp', 'Chocolate: up to 15 standard chips'],
   ],
   caramel_choc: [
-    ['Caramel: up to ~2 chopped bits', 'Chocolate: up to ~4 chips'],
-    ['Caramel: up to ~5 chopped bits', 'Chocolate: up to ~8 chips'],
-    ['Caramel: up to ~10 chopped bits', 'Chocolate: up to ~15 chips'],
-    ['Caramel: up to ~14 chopped bits', 'Chocolate: up to ~20 chips'],
-    ['Caramel: up to ~18 chopped bits', 'Chocolate: up to ~30 chips'],
+    ['Caramel: 1 micro-chopped speck (¼ of a standard bit)', 'Chocolate: 2 mini chips (or 1 standard chip)'],
+    ['Caramel: 2 chopped bits (half of a standard bit)', 'Chocolate: 2 standard chips (or 4 mini chips)'],
+    ['Caramel: up to 5 bits', 'Chocolate: up to 8 standard chips'],
+    ['Caramel: up to 10 bits', 'Chocolate: up to 15 standard chips'],
+    ['Caramel: up to 14 bits', 'Chocolate: up to 20 standard chips'],
   ],
   triple: [
-    ['Toffee: ~Smidgen (1/32 tsp)', 'Caramel: 2 chopped bits', 'Chocolate: 2 chips'],
-    ['Toffee: 1 tiny pinch', 'Caramel: 2 chopped bits', 'Chocolate: 2 chips'],
-    ['Toffee: up to ~½ tsp', 'Caramel: up to ~5 chopped bits', 'Chocolate: up to ~8 chips'],
-    ['Toffee: up to ~1 tsp', 'Caramel: up to ~10 chopped bits', 'Chocolate: up to ~15 chips'],
-    ['Toffee: up to ~1½ tsp', 'Caramel: up to ~14 chopped bits', 'Chocolate: up to ~20 chips'],
+    ['Toffee: Hint (1/128 tsp) — 1 tiny pinpoint dip', 'Caramel: 1 micro-chopped speck (¼ of a standard bit)', 'Chocolate: 2 mini chips (or 1 standard chip)'],
+    ['Toffee: Drop (1/64 tsp) — 1 level micro-spoon', 'Caramel: 2 chopped bits (half of a standard bit)', 'Chocolate: 2 standard chips (or 4 mini chips)'],
+    ['Toffee: Smidgen (1/32 tsp)', 'Caramel: up to 5 bits', 'Chocolate: up to 8 standard chips'],
+    ['Toffee: Pinch (1/16 tsp)', 'Caramel: up to 10 bits', 'Chocolate: up to 15 standard chips'],
+    ['Toffee: Dash (⅛ tsp)', 'Caramel: up to 14 bits', 'Chocolate: up to 20 standard chips'],
   ],
 };
 
