@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -74,6 +74,22 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v2.8.0 — Direct-bind layouts, centered controls, relocated phase options
+
+Four user-requested changes shipped together:
+
+1. **Layout switchers other than cook-layout were unresponsive in some browsers.** The cook-layout switcher worked because v2.4.0 had added a direct `onclick` binding for it in `attachToggleHandlers` (as a backup for the delegated `#output` click listener). The tier/wet/spices/toppings switchers had no such backup — they relied on event delegation to bubble up to `#output`, which works in most browsers but can fail silently in some mobile webviews or when other listeners interfere with bubbling. **Fix**: added a shared `bindLayoutPills(attr, stateKey, storageKey)` helper in `attachToggleHandlers` and called it for all four (`data-tier-layout`, `data-wet-layout`, `data-spices-layout`, `data-toppings-layout`), mirroring the cook-layout pattern. The delegated handler stays in place as a second path; either route now sets state and re-renders.
+
+2. **Center the controls.** The first row of switchers (Mode, Layout, Theme, Card Size) used to left-align with Hide Options + Hide Controls pushed to the right. **Fix**: added `margin-left: auto` to `.mode-switcher`. Combined with the existing `margin-left: auto` on `.controls-actions`, the two auto-margins split the remaining horizontal space evenly and center the middle group as a block. When `data-controls-collapsed="1"` hides the switchers, the actions stay right-aligned via their own auto-margin (unchanged).
+
+3. **Move cook-phase options under the instructions card.** The order toggle and cook-layout switcher used to sit inside the cook `<div class="phase-header">` next to the "Cook phase" title. **Fix**: removed them from the header, inserted them as a new `<div class="phase-options">` band between `${sharedCookCard}` and `${cookGroupsHtml}`. Reads naturally as: read the shared instructions, then choose order + layout, then look at the per-flavor delta cards.
+
+4. **Move setup-phase options under the wet bowls card.** Same treatment for the setup phase — removed `${orderToggleSetupHtml}` from the setup `<div class="phase-header">`, inserted it as a new `<div class="phase-options">` band between `${dryWetPair}` and `${spicesBlock}`. Reads as: measure dry + wet bowls, then choose ordering, then continue with spices/toppings/grease.
+
+**New `.phase-options` class**: flex row, `border: 1px solid var(--line)`, `border-radius: 12px`, padded — visually distinct from the cards above and below so the user sees it as a controls band rather than another content card. Hidden background change for print (white).
+
+Issue 1 is technically a bug fix (Z-bump territory), but it ships bundled with three Y-bump UX changes (issues 2-4), so the higher bump wins per the project versioning rule: **v2.8.0** (Y bump).
 
 ### v2.7.1 — Stacked Batch must not be sticky (specificity bug fix)
 
@@ -211,12 +227,12 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html   # Windows
 ```
 
-That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3200 lines as of v2.7.0) with inline CSS and vanilla JS.
+That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3220 lines as of v2.8.0) with inline CSS and vanilla JS.
 
 The companion `.html` manual opens the same way in a browser. To import into Word: File → Open → select the manual HTML; Word preserves the tables, headers, and bullet hierarchy.
 
@@ -224,7 +240,7 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.7.1.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.8.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
@@ -383,7 +399,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.7.1** (CSS specificity bug fix: the v2.2.0 stacked-mode sticky-batch rule was overriding v2.7.0's intended static-Batch placement because both had specificity (0,4,1) and v2.2.0 came later in source order — removed the four v2.2.0 sticky-batch rules entirely since v2.7.0's whole-picker-region sticky achieves the same UX goal). **v2.7.0** introduced unconditional layouts and removed the compact-mode mechanism. **v2.6.0** had introduced compact-mode pancake-size relocation but broke side-by-side. **v2.5.0** bumped stacked .wrap to 1600px and centered h1/.sub. **v2.4.0** was the eight-item polish pass. **v2.3.0** was the 12-item refinement. **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.8.0**.
+`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a single release bundles both, the higher bump wins. Current: **v2.8.0** (direct-bind onclick for tier/wet/spices/toppings layout switchers so they work alongside cook-layout's existing direct binding; main controls-row switchers centered via margin-left:auto on .mode-switcher; cook-phase order + cook-layout options moved out of phase-header into a `.phase-options` band between sharedCookCard and cookGroupsHtml; setup-phase order toggle similarly relocated between dryWetPair and spicesBlock). **v2.7.1** fixed a specificity bug where v2.2.0's sticky-batch CSS rule was overriding v2.7.0's intended static-Batch placement. **v2.7.0** introduced unconditional layouts and removed the compact-mode mechanism. **v2.6.0** had introduced compact-mode pancake-size relocation but broke side-by-side. **v2.5.0** bumped stacked .wrap to 1600px and centered h1/.sub. **v2.4.0** was the eight-item polish pass. **v2.3.0** was the 12-item refinement. **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.9.0**.
 
 ## License
 
