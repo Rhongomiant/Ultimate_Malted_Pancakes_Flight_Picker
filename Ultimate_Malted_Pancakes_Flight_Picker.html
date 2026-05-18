@@ -42,10 +42,12 @@
   .out { background: #fff; border: 1px solid var(--line); border-radius: 14px;
     padding: 20px; margin-top: 8px; }
   .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
+  .out .yield { margin: 0 0 8px; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
   .out .desc { color: var(--muted); margin: 0 0 16px; font-size: 0.93rem; }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .col { display: flex; flex-direction: column; gap: 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 14px; height: 100%; }
+  .col > .block:last-child { flex-grow: 1; }
   .full-row { grid-column: 1 / -1; }
   .grid > .full-row.callout { margin-top: 0; }
   @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
@@ -66,7 +68,7 @@
   ul.list li .k { color: var(--muted); flex: 1 1 auto; min-width: 0;
     overflow-wrap: anywhere; }
 
-  .max-limit { background: #fff; border: 1px dashed var(--accent); color: var(--accent);
+  .max-limit { background: #fff; border: 1px solid var(--accent); color: var(--accent);
     padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 8px;
     text-align: center; font-weight: 600; }
   .callout { border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin-top: 10px; }
@@ -162,7 +164,7 @@
     <div id="caramel-inline" style="display:none;">
       <h3 class="sub-h">Caramel preparation</h3>
       <div class="opts" id="caramel-opts"></div>
-      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the griddle temperature. Hard-frozen caramel takes longer to melt and survives lower heat better; flash-frozen behaves more like room-temp candy.</p>
+      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the cooking-surface temperature. Hard-frozen caramel takes longer to melt and survives lower heat better; flash-frozen behaves more like room-temp candy.</p>
     </div>
   </div>
 
@@ -225,10 +227,10 @@
       </ul>
       <h5>Other terms</h5>
       <ul>
-        <li><b>Scant:</b> fill the measure just below the upper brim.</li>
-        <li><b>Batter Shield / Seal Method:</b> spoon a tiny drizzle of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the pan.</li>
+        <li><b>Scant:</b> fill the measure just below the upper brim. (e.g. <b>Scant Tad (3/16 tsp)</b> = a Tad spoon filled just below the brim.)</li>
+        <li><b>Batter Shield / Seal Method:</b> spoon a tiny drizzle of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the cooking surface.</li>
         <li><b>Ghee:</b> clarified butter (milk solids strained out). Deep, toasted, brown-butter note — pairs with malt powder.</li>
-        <li><b>Avocado Oil:</b> very high smoke point, flavorless. Best pan grease for sugar combos; used <i>inside</i> the batter for loud flavor combos (bacon, triple-threat).</li>
+        <li><b>Avocado Oil:</b> very high smoke point, flavorless. Best cooking-surface grease for sugar combos; used <i>inside</i> the batter for loud flavor combos (bacon, triple-threat).</li>
       </ul>
     </div>
   </details>
@@ -270,7 +272,7 @@
         <li><b>Microwave nuke-as-you-go:</b> right before each batch, cut cold fat into a small cup, microwave 10–15 sec until melted, sit 1 minute so it isn't boiling.</li>
       </ul>
       <h5>Vanilla bean paste vs. extract</h5>
-      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot pan. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Chocolate (anchors cocoa).</p>
+      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot cooking surface. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Chocolate (anchors cocoa).</p>
       <h5>Freshly grated vs. pre-ground nutmeg</h5>
       <p>Freshly grated = bright, sweet, intensely warm oils. Pre-ground = dusty/woody/medicinal. Fresh is mandatory to cut through heavy sugars cleanly.</p>
       <h5>Best nutmeg tool</h5>
@@ -278,9 +280,9 @@
       <h5>Toasting pine nuts</h5>
       <p>Raw pine nuts taste chalky. Dry skillet, medium-low, <b>no oil</b>, shake constantly. The exact second they turn light golden and smell intensely fragrant (~2–3 min) → pour into a cool bowl to stop the cook.</p>
       <h5>Banana thickness</h5>
-      <p>Slice ⅛"–¼" thick (ideally 3/16" — two stacked coins), sharp paring knife, right before cooking. Too thick = tears pancake on flip. Too thin = dissolves into mush, sticks to pan.</p>
+      <p>Slice ⅛"–¼" thick (ideally 3/16" — two stacked coins), sharp paring knife, right before cooking. Too thick = tears pancake on flip. Too thin = dissolves into mush, sticks to the cooking surface.</p>
       <h5>Caramel prep</h5>
-      <p>Buy baking caramel bits, chop micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the griddle.</p>
+      <p>Buy baking caramel bits, chop micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the cooking surface.</p>
       <h5>Banana Nut experimentation</h5>
       <ul>
         <li><b>Traditional Bakery Profile:</b> Melted Ghee + Cinnamon + Fresh Nutmeg.</li>
@@ -294,21 +296,66 @@
     <div class="body">
       <h5>Order: cleanest → stickiest</h5>
       <ol>
-        <li><b>First — Plain &amp; Chocolate Chips:</b> stay mostly contained; pan oil still clear.</li>
-        <li><b>Second — Bacon &amp; Banana Nut:</b> bacon = savory grease, bananas = fruit sugar. Wipe pan with dry paper towel after.</li>
+        <li><b>First — Plain &amp; Chocolate Chips:</b> stay mostly contained; cooking-surface oil still clear.</li>
+        <li><b>Second — Bacon &amp; Banana Nut:</b> bacon = savory grease, bananas = fruit sugar. Wipe the cooking surface with a dry paper towel after.</li>
         <li><b>Last — Toffee &amp; Caramel combos:</b> sticky sugar residue. Save them for the end so they don't contaminate other pancakes.</li>
       </ol>
       <h5>30-second between-batch cleanup</h5>
       <ol>
         <li><b>Scrape</b> — flat sharp edge of metal spatula → trash bowl.</li>
         <li><b>Ice Trick</b> — for hardened candy, drop one ice cube (or 1 Tbsp water) on the hot sticky spot. Steam blasts the sugar off.</li>
-        <li><b>Wipe</b> — thick-folded paper towel pressed with spatula across the surface.</li>
+        <li><b>Wipe</b> — thick-folded paper towel pressed with spatula across the cooking surface.</li>
         <li><b>Re-Oil</b> — fresh tsp avocado oil, wipe around to a micro-thin film, pour the next batch.</li>
       </ol>
-      <h5>Ladle prep (between every pour)</h5>
-      <p>Keep a container of ice water next to the cooking area. Before each scoop, dip ladle in ice water a few seconds → tap on towel to drop water beads → wipe inside with a tiny drop of avocado oil. Sticky batter releases cleanly.</p>
-      <h5>Pan grease amount</h5>
-      <p>You want a <b>micro-thin shimmering mirror</b> — not a puddle. If tilting the pan makes the oil pool to one side, you used too much. Drop a tsp of avocado oil, then immediately wipe across the surface with a folded paper towel to leave a thin glossy film.</p>
+      <h5>Cooking-surface grease amount</h5>
+      <p>You want a <b>micro-thin shimmering mirror</b> — not a puddle. If tilting the cooking surface makes the oil pool to one side, you used too much. Drop a tsp of avocado oil, then immediately wipe across the cooking surface with a folded paper towel to leave a thin glossy film.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🥄 Ladle / pancake size reference</summary>
+    <div class="body">
+      <h5>Sizes</h5>
+      <ul>
+        <li><b>0.5 oz (1 Tbsp scoop):</b> 1.5–2" sample bite. Drop toppings the second you pour — they cook fast. 8 of these = one normal stack.</li>
+        <li><b>1.0 oz (2 Tbsp scoop):</b> 2.5–3" silver dollar — the tasting-flight size. Single-serving (quarter) batch yields 4 of these.</li>
+        <li><b>2.0 oz (¼ cup):</b> 4" standard diner pancake. Easiest size for practicing flips.</li>
+        <li><b>3.0 oz (⅜ cup):</b> 5" thick-stack. Leave on the cooking surface slightly longer so the center cooks through.</li>
+        <li><b>4.0 oz (½ cup):</b> 6–7" plate-sized flapjack. Hardest to flip; best for laying down whole bacon strips.</li>
+      </ul>
+      <h5>Ladle prep — every scoop</h5>
+      <p>Sticky pancake batter likes to cling to the inside of warm ladles. To get a clean release every time:</p>
+      <ul>
+        <li><b>Ice-water container:</b> keep one within arm's reach of the cooking surface and rest your ladle(s) in it between scoops.</li>
+        <li><b>Chill:</b> before each scoop, dunk the ladle in the ice water for <b>at least a few seconds</b>.</li>
+        <li><b>Tap dry:</b> one quick tap on a clean towel to shake off loose water drops (you don't want them in your batter).</li>
+        <li><b>Oil the inside:</b> before your <b>first</b> scoop, wipe the inside with a tiny drop of avocado oil — sticky batter releases cleanly.</li>
+        <li><b>Quick scoop, quick pour:</b> swirl gently into the bowl to scoop (never beat), then pour straight onto the heated cooking-surface grease.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🍳 Liquid troubleshooting (thick / thin batter)</summary>
+    <div class="body">
+      <p>Check after the 10-minute rest.</p>
+      <ul>
+        <li><b>Too THICK</b> (paste / heavy scoopable dough) — common with 2% Lactaid, whole milk, heavy nut milks. <b>Fix:</b> whisk in <b>1 Tbsp water at a time</b> until it falls off the spoon in a slow ribbon.</li>
+        <li><b>Too THIN</b> (watery / runs across the cooking surface) — common with skim, oat, soy milks. <b>Fix:</b> whisk in <b>1 Tbsp All-Purpose flour at a time</b> until pourable-milkshake consistency.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>🔁 Flipping technique</summary>
+    <div class="body">
+      <h5>When to flip</h5>
+      <ul>
+        <li>Bubbles form on the surface and pop, leaving small holes that <b>stay open</b> (don't refill).</li>
+        <li>The wet sheen on top starts to look <b>matte and dry around the edges</b>.</li>
+      </ul>
+      <h5>The motion</h5>
+      <p>Slide the spatula completely under the center. Lift it 1–2 inches off the cooking surface. Flip with a quick gentle turn of your wrist. <b>Don't toss high</b> — wet batter splashes.</p>
     </div>
   </details>
 
@@ -325,43 +372,6 @@
       <p>As the flavor profile gets heavier (fats, roasted nuts, complex candies), syrup must scale Amber → Dark → Very Dark. A delicate Amber syrup on a candy/bacon stack washes out into flat sweetness instead of true maple.</p>
       <h5>The Structural Conflict Rule</h5>
       <p>Ripe banana discs release water-sugar compounds when seared. Combining bananas with pure melting candies (toffee/caramel) is locked in the "Bad" tier — it liquefies the pancake interior, causing tear-on-flip and burning.</p>
-    </div>
-  </details>
-
-  <details>
-    <summary>🥄 Ladle / pancake size reference</summary>
-    <div class="body">
-      <ul>
-        <li><b>0.5 oz (1 Tbsp scoop):</b> 1.5–2" sample bite. Drop toppings the second you pour — they cook fast. 8 of these = one normal stack.</li>
-        <li><b>1.0 oz (2 Tbsp scoop):</b> 2.5–3" silver dollar — the tasting-flight size. Single-serving batch yields 4 of these.</li>
-        <li><b>2.0 oz (¼ cup):</b> 4" standard diner pancake. Easiest size for practicing flips.</li>
-        <li><b>3.0 oz (⅜ cup):</b> 5" thick-stack. Leave on griddle slightly longer so the center cooks through.</li>
-        <li><b>4.0 oz (½ cup):</b> 6–7" plate-sized flapjack. Hardest to flip; best for laying down whole bacon strips.</li>
-      </ul>
-    </div>
-  </details>
-
-  <details>
-    <summary>🍳 Liquid troubleshooting (thick / thin batter)</summary>
-    <div class="body">
-      <p>Check after the 10-minute rest.</p>
-      <ul>
-        <li><b>Too THICK</b> (paste / heavy scoopable dough) — common with 2% Lactaid, whole milk, heavy nut milks. <b>Fix:</b> whisk in <b>1 Tbsp water at a time</b> until it falls off the spoon in a slow ribbon.</li>
-        <li><b>Too THIN</b> (watery / runs across the pan) — common with skim, oat, soy milks. <b>Fix:</b> whisk in <b>1 Tbsp All-Purpose flour at a time</b> until pourable-milkshake consistency.</li>
-      </ul>
-    </div>
-  </details>
-
-  <details>
-    <summary>🔁 Flipping technique</summary>
-    <div class="body">
-      <h5>When to flip</h5>
-      <ul>
-        <li>Bubbles form on the surface and pop, leaving small holes that <b>stay open</b> (don't refill).</li>
-        <li>The wet sheen on top starts to look <b>matte and dry around the edges</b>.</li>
-      </ul>
-      <h5>The motion</h5>
-      <p>Slide the spatula completely under the center. Lift it 1–2 inches off the griddle. Flip with a quick gentle turn of your wrist. <b>Don't toss high</b> — wet batter splashes.</p>
     </div>
   </details>
 
@@ -388,7 +398,7 @@
           <tr><td>Buttermilk</td><td>Saco Pantry Cultured Buttermilk Blend Powder</td><td>Generic plain-milk-powder shortcuts</td></tr>
           <tr><td>Espresso</td><td>King Arthur Baking Espresso Powder</td><td>Ground coffee beans (grit), supermarket instant (acidic)</td></tr>
           <tr><td>Pine nuts</td><td>Nuts.com Mediterranean Pine Nuts (Pignolias) — Spain/Italy/Portugal</td><td>Generic bulk-bin Chinese pine nuts (<i>Pinus armandii</i>) → "pine mouth" metallic aftertaste</td></tr>
-          <tr><td>Vanilla</td><td>Nielsen-Massey Madagascar Bourbon Vanilla Bean Paste</td><td>Imitation vanilla, cheap alcohol extracts (burn off on the griddle)</td></tr>
+          <tr><td>Vanilla</td><td>Nielsen-Massey Madagascar Bourbon Vanilla Bean Paste</td><td>Imitation vanilla, cheap alcohol extracts (burn off on the cooking surface)</td></tr>
           <tr><td>Corn flour</td><td>Bob's Red Mill Organic Yellow Corn Flour <i>or</i> Maseca Corn Masa Flour</td><td>Yellow cornmeal (too coarse — makes pancakes gritty)</td></tr>
           <tr><td>Maple syrup</td><td>Runamok "Sugarmaker's Cut", Crown Maple, Butternut Mountain Farm</td><td>Any HFCS-based table syrup</td></tr>
         </tbody>
@@ -396,23 +406,23 @@
     </div>
   </details>
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.5.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.6.0</div>
 </div>
 
 <script>
 const BATCHES = [
-  { id: 'quarter', label: 'Quarter', desc: '1 portion' },
-  { id: 'half',    label: 'Half',    desc: '2 portions' },
-  { id: 'three',   label: 'Three-Quarter', desc: '3 portions' },
-  { id: 'full',    label: 'Full',    desc: '4 portions' },
+  { id: 'quarter', label: 'Quarter', desc: '1 portion', oz: 4 },
+  { id: 'half',    label: 'Half',    desc: '2 portions', oz: 8 },
+  { id: 'three',   label: 'Three-Quarter', desc: '3 portions', oz: 12 },
+  { id: 'full',    label: 'Full',    desc: '4 portions', oz: 16 },
 ];
 
 const SIZES = [
-  { id: 's05', label: '0.5 oz (mini bite)',     detail: '1 Tbsp scoop · 1.5–2"',           maxCombined: '¼ tsp total' },
-  { id: 's10', label: '1.0 oz (silver dollar)', detail: '2 Tbsp scoop · 2.5–3" tasting flight', maxCombined: '½ Tbsp total' },
-  { id: 's20', label: '2.0 oz (diner)',         detail: '¼ cup · 4"',                       maxCombined: '1 Tbsp total' },
-  { id: 's30', label: '3.0 oz (thick stack)',   detail: '⅜ cup · 5"',                       maxCombined: '1½ Tbsp total' },
-  { id: 's40', label: '4.0 oz (plate)',         detail: '½ cup · 6–7"',                     maxCombined: '2 Tbsp total' },
+  { id: 's05', label: '0.5 oz (mini bite)',     detail: '1 Tbsp scoop · 1.5–2"',           maxCombined: 'Tad (¼ tsp) total', oz: 0.5 },
+  { id: 's10', label: '1.0 oz (silver dollar)', detail: '2 Tbsp scoop · 2.5–3" tasting flight', maxCombined: '½ Tbsp total', oz: 1.0 },
+  { id: 's20', label: '2.0 oz (diner)',         detail: '¼ cup · 4"',                       maxCombined: '1 Tbsp total', oz: 2.0 },
+  { id: 's30', label: '3.0 oz (thick stack)',   detail: '⅜ cup · 5"',                       maxCombined: '1½ Tbsp total', oz: 3.0 },
+  { id: 's40', label: '4.0 oz (plate)',         detail: '½ cup · 6–7"',                     maxCombined: '2 Tbsp total', oz: 4.0 },
 ];
 
 const DRY = {
@@ -436,12 +446,12 @@ const BULK_SCOOP = ['½ cup', '1 cup', '1½ cups', '2 cups'];
 const FAT = ['1½ tsp', '1 Tbsp', '1½ Tbsp', '2 Tbsp'];
 
 const SPICE = {
-  cinnamon:    ['Pinch (1/16 tsp)',  'Dash (⅛ tsp)',       'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
+  cinnamon:    ['Pinch (1/16 tsp)',  'Dash (⅛ tsp)',       'Scant Tad (3/16 tsp)',   'Tad (¼ tsp)'],
   nutmeg:      ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
   cardamom:    ['Hint (1/128 tsp)',  'Drop (1/64 tsp)',    'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
-  vanilla:     ['¼ tsp',             '½ tsp',              '¾ tsp',                  '1 tsp'],
-  vanillaPaste:['¼ tsp',             '½ tsp',              '¾ tsp',                  '1 tsp'],
-  salt:        ['Pinch (1/16 tsp)',  'Dash (⅛ tsp)',       'Scant ¼ tsp (3/16 tsp)', '¼ tsp'],
+  vanilla:     ['Tad (¼ tsp)',       '½ tsp',              '¾ tsp',                  '1 tsp'],
+  vanillaPaste:['Tad (¼ tsp)',       '½ tsp',              '¾ tsp',                  '1 tsp'],
+  salt:        ['Pinch (1/16 tsp)',  'Dash (⅛ tsp)',       'Scant Tad (3/16 tsp)',   'Tad (¼ tsp)'],
   blackPepper: ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
   cayenne:     ['Hint (1/128 tsp)',  'Drop (1/64 tsp)',    'Smidgen (1/32 tsp)',     'Pinch (1/16 tsp)'],
   espresso:    ['Drop (1/64 tsp)',   'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
@@ -574,7 +584,7 @@ const FLAVORS = [
       best: ['Grade A Very Dark Strong', 'Micro-candy + Fresh Nutmeg'],
       good: ['Grade A Dark Robust', 'Standard candy + Jar Nutmeg'],
       ok:   ['Grade A Amber Rich', 'Standard candy + No Nutmeg'],
-      bad:  ['Imitation Maple / Corn Syrup', 'Griddle surface heat above 325°F'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Cooking-surface heat above 325°F'],
     },
   },
   { id: 'toffee_choc', label: 'Toffee + Chocolate',
@@ -692,7 +702,7 @@ const TOPPINGS = {
   ],
   triple: [
     ['• ~Smidgen toffee + 2 caramel bits + 2 chocolate chips'],
-    ['📐 PDF Formula: 2 chocolate chips + 2 chopped caramel bits + 1 tiny pinch of toffee bits'],
+    ['📐 Formula: 2 chocolate chips + 2 chopped caramel bits + 1 tiny pinch of toffee bits'],
     ['• up to ~½ tsp toffee + ~5 caramel bits + ~8 chips'],
     ['• up to ~1 tsp toffee + ~10 caramel bits + ~15 chips'],
     ['• up to ~1½ tsp toffee + ~14 caramel bits + ~20 chips'],
@@ -739,6 +749,12 @@ function renderOutput() {
   const flavor = FLAVORS.find(f => f.id === state.flavor);
   const sizeIdx = state.size;
   const sizeInfo = SIZES[sizeIdx];
+  const batchInfo = BATCHES[b];
+  const isBacon = flavor.id === 'bacon' || flavor.id === 'bnut_bacon';
+
+  // Pancake yield (approximate)
+  const yieldCount = Math.max(1, Math.round(batchInfo.oz / sizeInfo.oz));
+  const yieldText = `Yields ~${yieldCount} pancake${yieldCount === 1 ? '' : 's'}`;
 
   // Dry block
   let dryHtml = state.bulk
@@ -784,25 +800,25 @@ function renderOutput() {
     }
   }
 
-  // Heat / griddle logic
+  // Heat / cooking-surface logic
   let heatLine;
   let lowHeatCalloutHtml = '';
   if (flavor.id === 'triple') {
     if (state.caramelPrep === 'deep') {
       heatLine = '300°F (low — deep-frozen Triple)';
-      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the griddle to 300°F</b> — Triple-Threat with rock-hard, deep-frozen caramel. Heat above this welds the candies to the pan.</div>`;
+      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 300°F</b> — Triple-Threat with rock-hard, deep-frozen caramel. Heat above this welds the candies to the cooking surface.</div>`;
     } else {
       heatLine = '325°F (low — flash-frozen Triple)';
-      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the griddle to 325°F</b> — Triple-Threat with 10-minute flash-frozen caramel. Triple requires low heat in both prep states.</div>`;
+      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — Triple-Threat with 10-minute flash-frozen caramel. Triple requires low heat in both prep states.</div>`;
     }
   } else if (flavor.hasCaramel && state.caramelPrep === 'deep') {
     heatLine = '325°F (low — deep-frozen caramel)';
-    lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the griddle to 325°F</b> — deep-frozen caramel takes longer to melt and burns at the normal 375°F.</div>`;
+    lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — deep-frozen caramel takes longer to melt and burns at the normal 375°F.</div>`;
   } else {
     heatLine = '375°F (Med-Low / Med on most stoves)';
   }
 
-  // Toppings block — includes batter shield + caramel prep + double shield notes
+  // Toppings block
   const toppingsList = TOPPINGS[flavor.id];
   let toppingsInner = '';
   if (toppingsList) {
@@ -813,41 +829,42 @@ function renderOutput() {
     toppingsInner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
   }
 
-  // 1st: single Batter Shield note (only when shield && not doubleShield)
+  // Single Batter Shield (only when shield && not doubleShield)
   if (flavor.shield && !flavor.doubleShield) {
-    toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the pan otherwise.</div>`;
+    toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the cooking surface otherwise.</div>`;
   }
-  // 2nd: Caramel prep note (if applicable)
+  // Caramel prep
   if (flavor.hasCaramel) {
     const prepText = state.caramelPrep === 'flash'
       ? `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
       : `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
     toppingsInner += `<div class="topping-note info">${prepText}</div>`;
   }
-  // 3rd: Double Batter Shield (if applicable)
+  // Double Batter Shield
   if (flavor.doubleShield) {
-    toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the pan otherwise.</div>`;
+    toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the cooking surface otherwise.</div>`;
   }
 
   const toppingsHtml = toppingsInner
     ? `<div class="block full-row"><h4>Toppings per pancake</h4>${toppingsInner}</div>`
     : '';
 
-  // Mixing card content — varies slightly when bacon is in the flavor
-  const baconNote = (flavor.id === 'bacon' || flavor.id === 'bnut_bacon')
-    ? ` <b>Cook the bacon during this rest.</b>`
-    : '';
+  // Combining & timing card — three short labeled lines
+  const restLine = isBacon
+    ? `<b>Rest:</b> <b>10 minutes undisturbed</b>. Cook the bacon during this rest. At the <b>7-min mark</b>, start preparing the cooking surface to cook pancakes in the bacon grease.`
+    : `<b>Rest:</b> <b>10 minutes undisturbed</b>. At the <b>7-min mark</b>, heat the cooking surface and apply the grease.`;
 
   const mixingCardHtml = `<div class="block full-row mixing-card">
     <h4>Combining &amp; timing</h4>
     <p><b>Mix:</b> pour wet into dry. Frother on lowest, <b>5–7 sec max</b>. Leave it lumpy — small dry streaks are fine. <b>Don't over-mix</b> or pancakes turn rubbery.</p>
-    <p><b>Rest:</b> <b>10 minutes undisturbed</b>.${baconNote} At the <b>7-min mark</b>, heat the pan and add the pan grease.</p>
+    <p>${restLine}</p>
+    <p><b>Ladle prep:</b> keep an ice-water container next to the cooking surface. Before each scoop: chill the ladle a few seconds in the ice water → tap on a towel to drop loose water → wipe the inside with a tiny dot of avocado oil. Scoop quickly and pour straight onto the heated grease.</p>
   </div>`;
 
-  // Other callouts (heat normal-info, butter, banana, pine nuts) — these stay BELOW the grid
+  // Other callouts below the grid
   const callouts = [];
   if (flavor.hasCaramel && state.caramelPrep === 'flash' && flavor.id !== 'triple') {
-    callouts.push(`<div class="callout info">🌡 Normal griddle temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
+    callouts.push(`<div class="callout info">🌡 Normal cooking-surface temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
   }
   if (flavor.fat.toLowerCase().includes('butter')) {
     callouts.push(`<div class="callout info">🧈 Use <b>unsalted</b> butter. The dry base is already salt-balanced.</div>`);
@@ -867,16 +884,17 @@ function renderOutput() {
   </div>`;
 
   // Cooking steps
-  const bakeBaconStep = (flavor.id === 'bacon' || flavor.id === 'bnut_bacon')
-    ? 'Cook bacon now (during the rest).'
-    : 'At the 7-min mark, heat the pan and add the pan grease.';
+  const bakeBaconStep = isBacon
+    ? 'Cook bacon now (during the rest). At the 7-min mark, prep the cooking surface to cook in the bacon grease.'
+    : 'At the 7-min mark, heat the cooking surface and apply the grease.';
   const shieldStep = flavor.doubleShield ? ' Apply <b>double</b> Batter Shield (two layers of plain batter over toppings).' :
                      flavor.shield ? ' Apply Batter Shield (drizzle plain batter over toppings).' : '';
 
   const out = document.getElementById('output');
   out.innerHTML = `
-    <h3>${flavor.label} · ${BATCHES[b].label} batch · ${sizeInfo.label}</h3>
-    <p class="desc">${flavor.strategy} · Griddle: <b>${heatLine}</b>.</p>
+    <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
+    <p class="yield">${yieldText}</p>
+    <p class="desc">${flavor.strategy} · Cooking surface: <b>${heatLine}</b>.</p>
 
     <div class="grid">
       <div class="col">
@@ -895,7 +913,7 @@ function renderOutput() {
           ${spicesHtml}
         </div>
         <div class="block">
-          <h4>Pan Grease</h4>
+          <h4>Cooking Surface Grease</h4>
           <ul class="list"><li><span class="k">Use</span><span class="v">${flavor.panGrease}</span></li></ul>
           <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Apply 1 tsp, then wipe across with paper towel to a micro-thin shimmering film. No puddles.</p>
         </div>
@@ -918,7 +936,7 @@ function renderOutput() {
       <li>Measure dry ingredients into one bowl. Mix wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()} into a second bowl. Use a handheld frother on lowest setting to emulsify the wet mix only.</li>
       <li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix.</b></li>
       <li>Rest the batter <b>10 minutes, undisturbed</b>. ${bakeBaconStep} Set up your ladle ice bath.</li>
-      <li>Pour ${sizeInfo.detail.split('·')[0].trim()} portions onto the hot greased pan. Drop toppings tightly in the center.${shieldStep}</li>
+      <li>Pour ${sizeInfo.detail.split('·')[0].trim()} portions onto the hot greased cooking surface. Drop toppings tightly in the center.${shieldStep}</li>
       <li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>
       <li>Between every pancake: scrape → ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>
     </ol>
