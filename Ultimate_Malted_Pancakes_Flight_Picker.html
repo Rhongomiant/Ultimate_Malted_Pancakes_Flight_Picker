@@ -159,7 +159,7 @@
     body[data-layout="side"] .layout-switcher { grid-column: 1 / -1; }
     body[data-layout="side"] .picker-pane { position: sticky; top: 14px;
       max-height: calc(100vh - 28px); overflow-y: auto;
-      padding: 2px 8px 2px 2px; }
+      padding: 2px 8px 50vh 2px; /* big bottom pad lets card 3 scroll up toward center */ }
     body[data-layout="side"] .picker-pane .card { margin-bottom: 14px; }
     body[data-layout="side"] .output-pane { min-width: 0; }
     body[data-layout="side"] .output-pane .card { margin-bottom: 14px; }
@@ -186,8 +186,8 @@
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
   <div class="layout-switcher" id="layout-switcher">
     <span class="ls-label">Layout</span>
-    <button type="button" data-mode="stacked" class="ls-btn active">Stacked</button>
-    <button type="button" data-mode="side" class="ls-btn">Side-by-side</button>
+    <button type="button" data-mode="side" class="ls-btn active">Side-by-side</button>
+    <button type="button" data-mode="stacked" class="ls-btn">Stacked</button>
   </div>
 
   <div class="picker-pane">
@@ -324,7 +324,7 @@
         <li><b>Microwave nuke-as-you-go:</b> right before each batch, cut cold fat into a small cup, microwave 10–15 sec until melted, sit 1 minute so it isn't boiling.</li>
       </ul>
       <h5>Vanilla bean paste vs. extract</h5>
-      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot cooking surface. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Chocolate (anchors cocoa).</p>
+      <p>Paste contains real vanilla pod seeds — heavy anchor that survives the hot cooking surface. Pure extract is alcohol-based and burns off quickly. Paste is mandatory for Toffee + Choc (anchors cocoa).</p>
       <h5>Freshly grated vs. pre-ground nutmeg</h5>
       <p>Freshly grated = bright, sweet, intensely warm oils. Pre-ground = dusty/woody/medicinal. Fresh is mandatory to cut through heavy sugars cleanly.</p>
       <h5>Best nutmeg tool</h5>
@@ -463,9 +463,9 @@
     <div class="body">
       <p>Use <b>100% Pure Grade A Maple Syrup</b>. Never commercial table syrups (Aunt Jemima, Log Cabin = HFCS + artificial flavor).</p>
       <ul>
-        <li><b>Grade A Amber Rich:</b> balanced &amp; classic — Plain, Chocolate Chips Only, Plain Banana Nut. Won't mask subtle dough flavor.</li>
-        <li><b>Grade A Dark Robust:</b> heavy &amp; caramelized — Bacon Only, Banana Nut + Chocolate Chips. Reliable for most candy combos.</li>
-        <li><b>Grade A Very Dark Strong:</b> intense, concentrated, complex — Banana Nut + Bacon, Toffee Only, Caramel Only, all complex candy combos including the Triple Threat.</li>
+        <li><b>Grade A Amber Rich:</b> balanced &amp; classic — Plain, Chocolate, Banana Nut. Won't mask subtle dough flavor.</li>
+        <li><b>Grade A Dark Robust:</b> heavy &amp; caramelized — Bacon, Banana + Choc. Reliable for most candy combos.</li>
+        <li><b>Grade A Very Dark Strong:</b> intense, concentrated, complex — Bacon + Banana, Toffee, Caramel, all complex candy combos including the Triple Threat.</li>
       </ul>
       <h5>The Syrup Scaling Law</h5>
       <p>As the flavor profile gets heavier (fats, roasted nuts, complex candies), syrup must scale Amber → Dark → Very Dark. A delicate Amber syrup on a candy/bacon stack washes out into flat sweetness instead of true maple.</p>
@@ -509,17 +509,17 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.13.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.14.0</div>
 </div>
 
 <script>
 
 // === Layout switcher (Stacked <-> Side-by-side, persisted) ===
 (function() {
-  const KEY = 'pancakeFlightLayout';
+  const KEY = 'pancakeFlightLayout_v2';
   const sw = document.getElementById('layout-switcher');
-  let saved = 'stacked';
-  try { saved = localStorage.getItem(KEY) || 'stacked'; } catch (_) {}
+  let saved = 'side';
+  try { saved = localStorage.getItem(KEY) || 'side'; } catch (_) {}
   setLayout(saved);
   sw.addEventListener('click', function(e) {
     const btn = e.target.closest('[data-mode]');
@@ -610,7 +610,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Savory fats mixed in plain dough'],
     },
   },
-  { id: 'choc', label: 'Chocolate Chips Only',
+  { id: 'choc', label: 'Chocolate',
     strategy: 'Scatter chips onto the wet pancake top. Flip when bubbles pop.',
     spices: [
       { name: 'Vanilla Extract', amounts: SPICE.vanilla },
@@ -625,7 +625,22 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Cheap waxy baking morsels'],
     },
   },
-  { id: 'bnut', label: 'Banana Nut Only',
+  { id: 'bacon', label: 'Bacon',
+    strategy: 'Cook bacon crisp during the 10-min rest. Press crumbles into the wet pancake top.',
+    spices: [
+      { name: 'Black Pepper', amounts: SPICE.blackPepper },
+      { name: 'Cayenne',      amounts: SPICE.cayenne },
+    ],
+    fat: 'Rendered Bacon Grease', panGrease: 'Rendered Bacon Grease',
+    syrup: 'Grade A Very Dark Strong',
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Crisp Bacon seared in Bacon Fat'],
+      good: ['Grade A Dark Robust', 'Standard Crisp Bacon crumbles'],
+      ok:   ['Grade A Amber Rich', 'Thick-cut chewy bacon chunks'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Raw or under-cooked bacon strips'],
+    },
+  },
+  { id: 'bnut', label: 'Banana Nut',
     strategy: 'Sprinkle pine nuts onto the wet pancake top first, then lay thin banana discs on top of the nuts.',
     spices: [ { name: 'Cinnamon', amounts: SPICE.cinnamon } ],
     pickOneSpices: {
@@ -644,38 +659,7 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Over-ripe, mushy mashed banana'],
     },
   },
-  { id: 'bnut_choc', label: 'Banana Nut + Chocolate Chips',
-    strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first; drop chocolate chips into the open spaces.',
-    spices: [
-      { name: 'Cinnamon',        amounts: SPICE.cinnamon },
-      { name: 'Nutmeg',          amounts: SPICE.nutmeg },
-      { name: 'Vanilla Extract', amounts: SPICE.vanilla },
-    ],
-    fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Dark Robust',
-    tiers: {
-      best: ['Grade A Dark Robust', 'Toasted Pine Nuts + Dark Chips'],
-      good: ['Grade A Very Dark Strong', 'Chopped Walnuts + Semi-Sweet'],
-      ok:   ['Grade A Amber Rich', 'Raw Tree Nuts + Milk Chips'],
-      bad:  ['Imitation Maple / Corn Syrup', 'Large un-chopped walnut chunks'],
-    },
-  },
-  { id: 'bacon', label: 'Bacon Only',
-    strategy: 'Cook bacon crisp during the 10-min rest. Press crumbles into the wet pancake top.',
-    spices: [
-      { name: 'Black Pepper', amounts: SPICE.blackPepper },
-      { name: 'Cayenne',      amounts: SPICE.cayenne },
-    ],
-    fat: 'Rendered Bacon Grease', panGrease: 'Rendered Bacon Grease',
-    syrup: 'Grade A Very Dark Strong',
-    tiers: {
-      best: ['Grade A Very Dark Strong', 'Crisp Bacon seared in Bacon Fat'],
-      good: ['Grade A Dark Robust', 'Standard Crisp Bacon crumbles'],
-      ok:   ['Grade A Amber Rich', 'Thick-cut chewy bacon chunks'],
-      bad:  ['Imitation Maple / Corn Syrup', 'Raw or under-cooked bacon strips'],
-    },
-  },
-  { id: 'bnut_bacon', label: 'Banana Nut + Bacon',
+  { id: 'bnut_bacon', label: 'Bacon + Banana',
     strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first, then press bacon crumbles into the wet top.',
     spices: [
       { name: 'Cinnamon',     amounts: SPICE.cinnamon },
@@ -691,19 +675,23 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Adding caramel/toffee to this row'],
     },
   },
-  { id: 'toffee', label: 'Toffee Only',
-    strategy: 'BATTER SHIELD required. Espresso anchors the toffee flavor.',
-    spices: [ { name: 'Espresso Powder', amounts: SPICE.espresso } ],
+  { id: 'bnut_choc', label: 'Banana + Choc',
+    strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first; drop chocolate chips into the open spaces.',
+    spices: [
+      { name: 'Cinnamon',        amounts: SPICE.cinnamon },
+      { name: 'Nutmeg',          amounts: SPICE.nutmeg },
+      { name: 'Vanilla Extract', amounts: SPICE.vanilla },
+    ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Very Dark Strong', shield: true, hasToffee: true,
+    syrup: 'Grade A Dark Robust',
     tiers: {
-      best: ['Grade A Very Dark Strong', 'Plain Heath Bits \'O Brickle'],
-      good: ['Grade A Dark Robust', 'Standard store-brand toffee pieces'],
-      ok:   ['Grade A Amber Rich', 'Chocolate-coated toffee pieces'],
-      bad:  ['Imitation Maple / Corn Syrup', 'Skipping the Batter Shield step'],
+      best: ['Grade A Dark Robust', 'Toasted Pine Nuts + Dark Chips'],
+      good: ['Grade A Very Dark Strong', 'Chopped Walnuts + Semi-Sweet'],
+      ok:   ['Grade A Amber Rich', 'Raw Tree Nuts + Milk Chips'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Large un-chopped walnut chunks'],
     },
   },
-  { id: 'caramel', label: 'Caramel Only',
+  { id: 'caramel', label: 'Caramel',
     strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
     spices: [ { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
@@ -715,31 +703,19 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Liquid caramel sauce in wet mix'],
     },
   },
-  { id: 'toffee_caramel', label: 'Toffee + Caramel',
-    strategy: 'BATTER SHIELD required.',
-    spices: [ { name: 'Nutmeg', amounts: SPICE.nutmeg } ],
+  { id: 'toffee', label: 'Toffee',
+    strategy: 'BATTER SHIELD required. Espresso anchors the toffee flavor.',
+    spices: [ { name: 'Espresso Powder', amounts: SPICE.espresso } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Very Dark Strong', shield: true, hasCaramel: true, hasToffee: true,
-    tiers: {
-      best: ['Grade A Very Dark Strong', 'Micro-candy + Fresh Nutmeg'],
-      good: ['Grade A Dark Robust', 'Standard candy + Jar Nutmeg'],
-      ok:   ['Grade A Amber Rich', 'Standard candy + No Nutmeg'],
-      bad:  ['Imitation Maple / Corn Syrup', 'Cooking-surface heat above 325°F'],
-    },
-  },
-  { id: 'toffee_choc', label: 'Toffee + Chocolate',
-    strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
-    spices: [ { name: 'Vanilla Bean Paste', amounts: SPICE.vanillaPaste } ],
-    fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
     syrup: 'Grade A Very Dark Strong', shield: true, hasToffee: true,
     tiers: {
-      best: ['Grade A Very Dark Strong', 'Plain Toffee + Dark Chips'],
-      good: ['Grade A Dark Robust', 'Store Toffee + Semi-Sweet Chips'],
-      ok:   ['Grade A Amber Rich', 'Choc-Toffee bits + Milk Chips'],
-      bad:  ['Imitation Maple / Corn Syrup', 'Mixing candy into dry mix bowl'],
+      best: ['Grade A Very Dark Strong', 'Plain Heath Bits \'O Brickle'],
+      good: ['Grade A Dark Robust', 'Standard store-brand toffee pieces'],
+      ok:   ['Grade A Amber Rich', 'Chocolate-coated toffee pieces'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Skipping the Batter Shield step'],
     },
   },
-  { id: 'caramel_choc', label: 'Caramel + Chocolate',
+  { id: 'caramel_choc', label: 'Caramel + Choc',
     strategy: 'BATTER SHIELD required. Encase candy completely inside.',
     spices: [ { name: 'Cinnamon', amounts: SPICE.nutmeg } ],
     fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
@@ -751,7 +727,31 @@ const FLAVORS = [
       bad:  ['Imitation Maple / Corn Syrup', 'Skipping the 10-min candy freeze'],
     },
   },
-  { id: 'triple', label: 'Toffee + Caramel + Chocolate',
+  { id: 'toffee_caramel', label: 'Caramel + Toffee',
+    strategy: 'BATTER SHIELD required.',
+    spices: [ { name: 'Nutmeg', amounts: SPICE.nutmeg } ],
+    fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong', shield: true, hasCaramel: true, hasToffee: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Micro-candy + Fresh Nutmeg'],
+      good: ['Grade A Dark Robust', 'Standard candy + Jar Nutmeg'],
+      ok:   ['Grade A Amber Rich', 'Standard candy + No Nutmeg'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Cooking-surface heat above 325°F'],
+    },
+  },
+  { id: 'toffee_choc', label: 'Toffee + Choc',
+    strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
+    spices: [ { name: 'Vanilla Bean Paste', amounts: SPICE.vanillaPaste } ],
+    fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong', shield: true, hasToffee: true,
+    tiers: {
+      best: ['Grade A Very Dark Strong', 'Plain Toffee + Dark Chips'],
+      good: ['Grade A Dark Robust', 'Store Toffee + Semi-Sweet Chips'],
+      ok:   ['Grade A Amber Rich', 'Choc-Toffee bits + Milk Chips'],
+      bad:  ['Imitation Maple / Corn Syrup', 'Mixing candy into dry mix bowl'],
+    },
+  },
+  { id: 'triple', label: 'Toffee + Caramel + Choc',
     strategy: 'DOUBLE SHIELD required.',
     spices: [
       { name: 'Espresso Powder', amounts: SPICE.espresso },
