@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pancake Flight Picker</title>
+<style>
+  :root {
+    --bg: #fdf8ef;
+    --card: #fff;
+    --line: #e7d9bd;
+    --ink: #2a221a;
+    --muted: #6b5b46;
+    --accent: #b45309;
+    --accent-soft: #fde9c8;
+    --good: #166534;
+    --warn: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 18px 96px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h1 .em { color: var(--accent); }
+  .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px 18px 14px; margin-bottom: 18px; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
+  .card h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opt { border: 1.5px solid var(--line); background: #fff; padding: 10px 14px;
+    border-radius: 999px; cursor: pointer; font-size: 0.92rem; color: var(--ink);
+    transition: all .12s; user-select: none; }
+  .opt:hover { border-color: var(--accent); }
+  .opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toggle { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.95rem; }
+  .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .out { background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px; margin-top: 8px; }
+  .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
+  .out .desc { color: var(--muted); margin: 0 0 16px; font-size: 0.93rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  .block { background: #fbf6ec; border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .block h4 { margin: 0 0 8px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent); font-weight: 700; }
+  ul.list { margin: 0; padding: 0; list-style: none; }
+  ul.list li { padding: 4px 0; border-bottom: 1px dashed #ecdfc6; font-size: 0.94rem;
+    display: flex; justify-content: space-between; gap: 10px; }
+  ul.list li:last-child { border-bottom: 0; }
+  ul.list li .v { color: var(--ink); font-weight: 600; text-align: right; }
+  ul.list li .k { color: var(--muted); }
+  .callout { border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin-top: 12px; }
+  .callout.warn { background: #fef2f2; border: 1px solid #fecaca; color: var(--warn); }
+  .callout.info { background: var(--accent-soft); border: 1px solid #f5d9a8; color: #7c3a00; }
+  .callout.good { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--good); }
+  .steps { margin: 14px 0 0; padding: 0 0 0 22px; font-size: 0.94rem; line-height: 1.5; }
+  .steps li { padding: 3px 0; }
+  .syrup { display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
+    background: #fff8e6; border: 1px solid #f3dca4; padding: 10px 12px; border-radius: 10px;
+    margin-top: 12px; }
+  .syrup .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+  .footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+  @media print {
+    body { background: #fff; }
+    .card:not(.out-card) { display: none; }
+    .footer, .toggle { display: none; }
+  }
+  .print-btn { background: var(--accent); color: #fff; border: 0; padding: 10px 16px;
+    border-radius: 8px; cursor: pointer; font-size: 0.92rem; margin-top: 8px; }
+  .print-btn:hover { background: #92400e; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🥞 Pancake <span class="em">Flight</span> Picker</h1>
+  <p class="sub">Pick your options. The recipe below updates as you choose.</p>
+
+  <div class="card">
+    <h2>1. Batch size</h2>
+    <div class="opts" id="batch-opts"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Flavor combination</h2>
+    <div class="opts" id="flavor-opts"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Pancake size (ladle)</h2>
+    <div class="opts" id="size-opts"></div>
+  </div>
+
+  <div class="card">
+    <h2>4. Starting from</h2>
+    <label class="toggle">
+      <input type="checkbox" id="bulk-toggle">
+      <span>I'm using the bulk dry pantry mix from the jar (instead of measuring each dry ingredient)</span>
+    </label>
+  </div>
+
+  <div class="card out-card">
+    <div class="out" id="output"></div>
+    <button class="print-btn" onclick="window.print()">🖨 Print this recipe</button>
+  </div>
+
+  <div class="footer">Based on The Master Pancake Flight Manual</div>
+</div>
+
+<script>
+const BATCHES = [
+  { id: 'quarter', label: 'Quarter', desc: '1 small portion' },
+  { id: 'half',    label: 'Half',    desc: '2 portions' },
+  { id: 'three',   label: 'Three-Quarter', desc: '3 portions' },
+  { id: 'full',    label: 'Full',    desc: '4 portions' },
+];
+
+const SIZES = [
+  { id: 's05', label: '0.5 oz (mini bite)', detail: '1 Tbsp scoop · 1.5–2"' },
+  { id: 's10', label: '1.0 oz (silver dollar)', detail: '2 Tbsp scoop · 2.5–3" — tasting flight size' },
+  { id: 's20', label: '2.0 oz (diner)', detail: '¼ cup · 4" — easiest to flip' },
+  { id: 's30', label: '3.0 oz (thick stack)', detail: '⅜ cup · 5"' },
+  { id: 's40', label: '4.0 oz (plate-sized)', detail: '½ cup · 6–7"' },
+];
+
+// idx 0=quarter, 1=half, 2=three, 3=full
+const DRY = {
+  flour:       ['⅜ cup (¼ cup + 2 Tbsp)', '¾ cup', '1⅛ cups (1 cup + 2 Tbsp)', '1½ cups'],
+  cornFlour:   ['½ Tbsp (1½ tsp)', '1 Tbsp', '1½ Tbsp', '2 Tbsp'],
+  malt:        ['½ Tbsp (1½ tsp)', '1 Tbsp', '1½ Tbsp', '2 Tbsp'],
+  buttermilk:  ['1 Tbsp', '2 Tbsp', '3 Tbsp', '¼ cup (4 Tbsp)'],
+  sugar:       ['⅜ tsp (~a fat ¼ tsp)', '¾ tsp', '1⅛ tsp', '1½ tsp'],
+  bakingPwd:   ['½ tsp', '1 tsp', '1½ tsp', '2 tsp'],
+  bakingSoda:  ['⅛ tsp', '¼ tsp', '⅜ tsp', '½ tsp'],
+  salt:        ['⅛ tsp', '¼ tsp', '⅜ tsp', '½ tsp'],
+};
+
+const WET = {
+  milk: ['¼ cup', '½ cup', '¾ cup', '1 cup'],
+  egg:  ['2 tsp whisked egg', '1½ Tbsp whisked egg', '2 Tbsp + ¾ tsp whisked egg', '1 whole large egg'],
+};
+
+const BULK_SCOOP = ['½ cup', '1 cup', '1½ cups', '2 cups'];
+
+// Wet fat ladder by batch size (used by most flavors)
+const FAT = ['1½ tsp', '1 Tbsp', '1½ Tbsp', '2 Tbsp'];
+
+const FLAVORS = [
+  {
+    id: 'plain',
+    label: 'Plain',
+    strategy: 'Standard. Brush with butter after cooking.',
+    spices: ['No additional spices'],
+    fat: 'Melted Unsalted Butter',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Amber Rich',
+    notes: [],
+  },
+  {
+    id: 'choc',
+    label: 'Chocolate Chips Only',
+    strategy: 'Scatter chips onto wet top. Flip when bubbles pop.',
+    spices: [
+      ['Vanilla Extract', ['¼ tsp', '½ tsp', '¾ tsp', '1 tsp']],
+      ['Salt', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
+    ],
+    fat: 'Melted Unsalted Butter',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Dark Robust',
+    notes: ['Best with dark chocolate chips.'],
+  },
+  {
+    id: 'bnut',
+    label: 'Banana Nut Only',
+    strategy: 'Sprinkle pine nuts first, then lay thin banana discs.',
+    spices: [
+      ['Cinnamon', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
+      ['Nutmeg',   ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      ['OR Cardamom', ['Trace dusting', 'Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Melted Ghee',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Dark Robust',
+    notes: ['Bananas: slice 1/8" to 1/4" thick (about 3/16"). Cut right before cooking.'],
+  },
+  {
+    id: 'bnut_choc',
+    label: 'Banana Nut + Chocolate Chips',
+    strategy: 'Pine nuts & bananas first. Chips in open spaces.',
+    spices: [
+      ['Cinnamon', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
+      ['Nutmeg',   ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      ['Vanilla Extract', ['¼ tsp', '½ tsp', '¾ tsp', '1 tsp']],
+    ],
+    fat: 'Melted Ghee',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Dark Robust',
+    notes: [],
+  },
+  {
+    id: 'bacon',
+    label: 'Bacon Only',
+    strategy: 'Cook bacon crisp first (during the 10-min rest). Press crumbles into wet top.',
+    spices: [
+      ['Black Pepper', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      ['Cayenne',      ['Trace Dusting', 'Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Rendered Bacon Grease',
+    panGrease: 'Rendered Bacon Grease',
+    syrup: 'Grade A Very Dark Strong',
+    notes: ['Wet fat = bacon grease (not butter).'],
+  },
+  {
+    id: 'bnut_bacon',
+    label: 'Banana Nut + Bacon',
+    strategy: 'Pine nuts & bananas first. Press bacon into wet top.',
+    spices: [
+      ['Cinnamon', ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant ¼ tsp (3/16 tsp)', '¼ tsp']],
+      ['Nutmeg',   ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      ['Black Pepper', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Avocado Oil (in batter)',
+    panGrease: 'Rendered Bacon Grease',
+    syrup: 'Grade A Very Dark Strong',
+    notes: [],
+  },
+  {
+    id: 'toffee',
+    label: 'Toffee Only',
+    strategy: 'BATTER SHIELD required. Espresso anchors the toffee flavor.',
+    spices: [
+      ['Espresso Powder', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Melted Ghee',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong',
+    notes: ['Use the Batter Shield — drizzle plain batter over toppings before flipping.'],
+    shield: true,
+  },
+  {
+    id: 'caramel',
+    label: 'Caramel Only',
+    strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
+    spices: [
+      ['Sea Salt Flakes', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Melted Ghee',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong',
+    notes: ['Use frozen / 10-min flash-frozen baking caramel bits. Batter Shield required.'],
+    shield: true,
+  },
+  {
+    id: 'toffee_caramel',
+    label: 'Toffee + Caramel',
+    strategy: 'BATTER SHIELD required. Lower griddle temp to 325°F.',
+    spices: [
+      ['Nutmeg', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Melted Ghee',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong',
+    notes: ['Drop griddle to 325°F (lower than the usual 375°F).'],
+    shield: true,
+    lowHeat: true,
+  },
+  {
+    id: 'toffee_choc',
+    label: 'Toffee + Chocolate',
+    strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
+    spices: [
+      ['Vanilla Bean Paste', ['¼ tsp', '½ tsp', '¾ tsp', '1 tsp']],
+    ],
+    fat: 'Melted Unsalted Butter',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong',
+    notes: [],
+    shield: true,
+  },
+  {
+    id: 'caramel_choc',
+    label: 'Caramel + Chocolate',
+    strategy: 'BATTER SHIELD required. Encase candy completely inside.',
+    spices: [
+      ['Cinnamon', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Melted Unsalted Butter',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong',
+    notes: [],
+    shield: true,
+  },
+  {
+    id: 'triple',
+    label: 'Toffee + Caramel + Chocolate',
+    strategy: 'DOUBLE SHIELD required. Heat low: 300–325°F.',
+    spices: [
+      ['Espresso Powder', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+      ['Sea Salt Flakes', ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)']],
+    ],
+    fat: 'Avocado Oil (in batter)',
+    panGrease: 'Pure Avocado Oil',
+    syrup: 'Grade A Very Dark Strong',
+    notes: ['The Triple Threat — keep griddle at 300–325°F, double shield.'],
+    shield: true,
+    lowHeat: true,
+  },
+];
+
+// Topping limits per pancake size index (0–4)
+// Each flavor that has toppings provides a per-size topping list (array of strings).
+const TOPPINGS = {
+  choc: [
+    ['3–4 standard chips (or 6 mini)'],
+    ['6–8 standard chips (or 12 mini)'],
+    ['12–15 standard chips'],
+    ['18–20 standard chips'],
+    ['25–30 standard chips'],
+  ],
+  bnut: [
+    ['1 half-slice banana (⅛")', '3–4 toasted pine nuts'],
+    ['1 disc banana (⅛–¼")', '6–8 toasted pine nuts'],
+    ['2–3 slices banana (¼")', '1 Tbsp toasted pine nuts'],
+    ['3–4 slices banana (¼")', '1½ Tbsp toasted pine nuts'],
+    ['4–5 slices banana (¼")', '2 Tbsp toasted pine nuts'],
+  ],
+  bnut_choc: [
+    ['1 half-slice banana', '2 toasted pine nuts', '2 chocolate chips'],
+    ['1 disc banana', '4–5 toasted pine nuts', '4 chocolate chips'],
+    ['2 slices banana', '2 tsp toasted pine nuts', '6–8 chocolate chips'],
+    ['3 slices banana', '1 Tbsp toasted pine nuts', '10–12 chocolate chips'],
+    ['4 slices banana', '1½ Tbsp toasted pine nuts', '15–20 chocolate chips'],
+  ],
+  bacon: [
+    ['Pinch (1/16 tsp) bacon (~2–3 flakes)'],
+    ['1 tsp crumbled bacon'],
+    ['1 Tbsp crumbled bacon'],
+    ['1½ Tbsp crumbled bacon'],
+    ['2 Tbsp crumbled bacon (or 2 whole strips flat)'],
+  ],
+  bnut_bacon: [
+    ['1 half-slice banana', '2 toasted pine nuts', '1 tiny pinch bacon'],
+    ['1 disc banana', '4–5 toasted pine nuts', '½ tsp bacon crumbles'],
+    ['2 slices banana', '2 tsp toasted pine nuts', '2 tsp bacon crumbles'],
+    ['3 slices banana', '1 Tbsp toasted pine nuts', '1 Tbsp bacon crumbles'],
+    ['4 slices banana', '1½ Tbsp toasted pine nuts', '1½ Tbsp bacon crumbles'],
+  ],
+  toffee: [
+    ['Smidgen (1/32 tsp) finely chopped toffee (4–5 specks)'],
+    ['½ tsp toffee bits'],
+    ['1 tsp toffee bits'],
+    ['1½ tsp toffee bits'],
+    ['2 tsp toffee bits'],
+  ],
+  caramel: [
+    ['2 micro-chopped caramel bits'],
+    ['4–5 chopped caramel bits'],
+    ['8–10 chopped caramel bits'],
+    ['12–14 chopped caramel bits'],
+    ['16–18 chopped caramel bits'],
+  ],
+  toffee_caramel: [
+    ['1 pinch toffee + 1 caramel speck'],
+    ['1 pinch toffee + 2 caramel bits'],
+    ['½ tsp toffee + 4 caramel bits'],
+    ['¾ tsp toffee + 6 caramel bits'],
+    ['1 tsp toffee + 8 caramel bits'],
+  ],
+  toffee_choc: [
+    ['Smidgen toffee + 2 chocolate chips'],
+    ['¼ tsp toffee + 4 chocolate chips'],
+    ['½ tsp toffee + 6–8 chips'],
+    ['¾ tsp toffee + 10–12 chips'],
+    ['1 tsp toffee + 15–20 chips'],
+  ],
+  caramel_choc: [
+    ['2 caramel bits + 2 chocolate chips'],
+    ['4 caramel bits + 4 chocolate chips'],
+    ['6 caramel bits + 6–8 chips'],
+    ['10 caramel bits + 10–12 chips'],
+    ['14 caramel bits + 15–20 chips'],
+  ],
+  triple: [
+    ['2 chips + 2 caramel bits + 1 pinch toffee'],
+    ['4 chips + 2 caramel + 1 pinch toffee (≤ ½ Tbsp total)'],
+    ['6 chips + 4 caramel + ½ tsp toffee (≤ 1 Tbsp total)'],
+    ['10 chips + 6 caramel + 1 tsp toffee (≤ 1½ Tbsp total)'],
+    ['15 chips + 10 caramel + 1½ tsp toffee (≤ 2 Tbsp total)'],
+  ],
+};
+
+const state = { batch: 1, flavor: 'plain', size: 1, bulk: false };
+
+function render() {
+  // Render option chips
+  const batchEl = document.getElementById('batch-opts');
+  batchEl.innerHTML = BATCHES.map((b, i) =>
+    `<div class="opt ${state.batch === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
+  ).join('');
+
+  const flavorEl = document.getElementById('flavor-opts');
+  flavorEl.innerHTML = FLAVORS.map(f =>
+    `<div class="opt ${state.flavor === f.id ? 'active' : ''}" data-flavor="${f.id}">${f.label}</div>`
+  ).join('');
+
+  const sizeEl = document.getElementById('size-opts');
+  sizeEl.innerHTML = SIZES.map((s, i) =>
+    `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
+  ).join('');
+
+  document.getElementById('bulk-toggle').checked = state.bulk;
+
+  renderOutput();
+}
+
+function renderOutput() {
+  const b = state.batch;
+  const flavor = FLAVORS.find(f => f.id === state.flavor);
+  const sizeIdx = state.size;
+  const sizeInfo = SIZES[sizeIdx];
+
+  // Dry section
+  let dryHtml;
+  if (state.bulk) {
+    dryHtml = `<ul class="list">
+      <li><span class="k">Bulk dry mix from jar</span><span class="v">${BULK_SCOOP[b]}</span></li>
+    </ul>`;
+  } else {
+    dryHtml = `<ul class="list">
+      <li><span class="k">All-Purpose Flour</span><span class="v">${DRY.flour[b]}</span></li>
+      <li><span class="k">Yellow Corn Flour</span><span class="v">${DRY.cornFlour[b]}</span></li>
+      <li><span class="k">Non-Diastatic Malt Powder</span><span class="v">${DRY.malt[b]}</span></li>
+      <li><span class="k">Cultured Buttermilk Powder</span><span class="v">${DRY.buttermilk[b]}</span></li>
+      <li><span class="k">Sugar</span><span class="v">${DRY.sugar[b]}</span></li>
+      <li><span class="k">Baking Powder</span><span class="v">${DRY.bakingPwd[b]}</span></li>
+      <li><span class="k">Baking Soda</span><span class="v">${DRY.bakingSoda[b]}</span></li>
+      <li><span class="k">Salt</span><span class="v">${DRY.salt[b]}</span></li>
+    </ul>`;
+  }
+
+  // Wet section
+  const wetHtml = `<ul class="list">
+    <li><span class="k">2% Lactaid Milk</span><span class="v">${WET.milk[b]}</span></li>
+    <li><span class="k">Egg</span><span class="v">${WET.egg[b]}</span></li>
+    <li><span class="k">${flavor.fat}</span><span class="v">${FAT[b]}</span></li>
+  </ul>`;
+
+  // Spices
+  let spicesHtml;
+  if (flavor.spices.length === 1 && flavor.spices[0] === 'No additional spices') {
+    spicesHtml = `<p style="margin:4px 0;color:var(--muted);font-size:.92rem">No additional spices for plain.</p>`;
+  } else {
+    spicesHtml = `<ul class="list">` + flavor.spices.map(s => {
+      if (Array.isArray(s)) {
+        return `<li><span class="k">${s[0]}</span><span class="v">${s[1][b]}</span></li>`;
+      }
+      return `<li><span class="k">${s}</span><span class="v">—</span></li>`;
+    }).join('') + `</ul>`;
+  }
+
+  // Toppings
+  const toppingsList = TOPPINGS[flavor.id];
+  let toppingsHtml = '';
+  if (toppingsList) {
+    toppingsHtml = `<div class="block">
+      <h4>Toppings per pancake (${sizeInfo.label})</h4>
+      <ul class="list">${toppingsList[sizeIdx].map(t => `<li><span class="k">•</span><span class="v">${t}</span></li>`).join('')}</ul>
+    </div>`;
+  }
+
+  // Cooking notes
+  const callouts = [];
+  if (flavor.shield) {
+    callouts.push(`<div class="callout warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Otherwise the candy welds to the pan.</div>`);
+  }
+  if (flavor.lowHeat) {
+    callouts.push(`<div class="callout warn">🌡 <b>Lower the griddle:</b> 300–325°F (not the usual 375°F).</div>`);
+  }
+  if (flavor.id === 'bacon' || flavor.id === 'bnut_bacon') {
+    callouts.push(`<div class="callout info">🥓 Cook the bacon during the 10-minute batter rest.</div>`);
+  }
+  if (flavor.notes.length) {
+    callouts.push(`<div class="callout info">💡 ${flavor.notes.join(' ')}</div>`);
+  }
+
+  const out = document.getElementById('output');
+  out.innerHTML = `
+    <h3>${flavor.label} · ${BATCHES[b].label} batch · ${sizeInfo.label}</h3>
+    <p class="desc">${flavor.strategy} · Griddle ${flavor.lowHeat ? '300–325°F' : '375°F (Med-Low / Med)'}.</p>
+
+    <div class="grid">
+      <div class="block">
+        <h4>Dry Bowl</h4>
+        ${dryHtml}
+      </div>
+      <div class="block">
+        <h4>Wet Bowl</h4>
+        ${wetHtml}
+      </div>
+      <div class="block">
+        <h4>Spices (into wet bowl)</h4>
+        ${spicesHtml}
+      </div>
+      <div class="block">
+        <h4>Pan Grease</h4>
+        <ul class="list"><li><span class="k">Use</span><span class="v">${flavor.panGrease}</span></li></ul>
+      </div>
+      ${toppingsHtml}
+    </div>
+
+    ${callouts.join('')}
+
+    <div class="syrup"><span class="dot"></span><b>Recommended syrup:</b> ${flavor.syrup}</div>
+
+    <ol class="steps">
+      <li>Mix dry ingredients in one bowl. Mix wet ingredients + spices + fat in a second bowl (whisk on low).</li>
+      <li>Pour wet into dry. Blend on lowest speed <b>5–7 seconds</b> only. Leave it lumpy — a few dry streaks are fine.</li>
+      <li>Rest the batter <b>10 minutes, undisturbed</b>. ${flavor.id === 'bacon' || flavor.id === 'bnut_bacon' ? 'Cook bacon during this rest.' : 'At the 7-min mark heat the pan and add grease.'}</li>
+      <li>Cook within 40 minutes. Pour ${sizeInfo.detail.split('·')[0].trim()} portions. Add toppings to wet top.${flavor.shield ? ' Drizzle plain batter over candy toppings (Batter Shield).' : ''}</li>
+      <li>Flip when surface bubbles stay open and edges look matte. Cook ~1 min on second side.</li>
+    </ol>
+  `;
+}
+
+// Event delegation
+document.getElementById('batch-opts').addEventListener('click', e => {
+  const opt = e.target.closest('[data-batch]');
+  if (!opt) return;
+  state.batch = +opt.dataset.batch;
+  render();
+});
+document.getElementById('flavor-opts').addEventListener('click', e => {
+  const opt = e.target.closest('[data-flavor]');
+  if (!opt) return;
+  state.flavor = opt.dataset.flavor;
+  render();
+});
+document.getElementById('size-opts').addEventListener('click', e => {
+  const opt = e.target.closest('[data-size]');
+  if (!opt) return;
+  state.size = +opt.dataset.size;
+  render();
+});
+document.getElementById('bulk-toggle').addEventListener('change', e => {
+  state.bulk = e.target.checked;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
