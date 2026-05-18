@@ -571,6 +571,109 @@
     .controls-row, .controls-toggle { display: none !important; }
   }
 
+  /* === v3.0.0-beta: batch tabs + per-batch controls === */
+  .batch-tabs-strip {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .batch-tab {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 9px; border: 1px solid var(--line);
+    background: var(--card); border-radius: 8px;
+    cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--ink); line-height: 1.2;
+    transition: background .15s, border-color .15s;
+  }
+  .batch-tab:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .batch-tab.active {
+    background: var(--accent); color: var(--on-accent);
+    border-color: var(--accent);
+  }
+  .batch-tab .bt-sub {
+    font-size: 10px; font-weight: 400; opacity: 0.8;
+  }
+  .batch-tab .bt-close {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(0,0,0,0.08); color: inherit;
+    font-size: 13px; line-height: 1; cursor: pointer;
+    margin-left: 2px; padding: 0;
+    border: 0; font-family: inherit;
+  }
+  .batch-tab.active .bt-close { background: rgba(255,255,255,0.28); }
+  .batch-tab .bt-close:hover { background: rgba(0,0,0,0.18); }
+  .batch-tab.active .bt-close:hover { background: rgba(255,255,255,0.45); }
+  .add-batch-btn {
+    padding: 5px 10px; border: 1px dashed var(--line);
+    background: transparent; border-radius: 8px;
+    cursor: pointer; font-size: 12px; color: var(--muted);
+    line-height: 1.2; font-family: inherit;
+  }
+  .add-batch-btn:hover {
+    background: var(--accent-soft); color: var(--ink);
+    border-color: var(--accent);
+  }
+  .batch-active-label {
+    font-size: 10px; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 0 0 6px;
+  }
+  .batch-count-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 10px; padding: 6px 10px;
+    background: var(--accent-soft); border-radius: 6px;
+  }
+  .batch-count-row .bc-label {
+    font-size: 12px; color: var(--ink); font-weight: 500;
+  }
+  .batch-count-stepper {
+    display: inline-flex; align-items: center; gap: 2px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 6px; padding: 2px;
+  }
+  .batch-count-stepper button {
+    width: 22px; height: 22px; border: 0; background: transparent;
+    font-size: 15px; line-height: 1; color: var(--ink); cursor: pointer;
+    border-radius: 4px; padding: 0; font-family: inherit;
+  }
+  .batch-count-stepper button:hover:not(:disabled) { background: var(--accent-soft); }
+  .batch-count-stepper button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .batch-count-stepper .bc-val {
+    min-width: 20px; text-align: center; font-weight: 600; font-size: 12px;
+  }
+  .multi-batch-toggle-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px; padding: 6px 10px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    font-size: 11px; color: var(--muted);
+  }
+  .multi-batch-toggle-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--card);
+    cursor: pointer; font-size: 11px; font-weight: 500;
+    color: var(--ink); font-family: inherit;
+  }
+  .multi-batch-toggle-pill.active {
+    background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+  }
+  .flavor-block-msg {
+    margin-top: 8px; padding: 6px 10px;
+    background: var(--warn-bg); border-left: 3px solid var(--warn);
+    border-radius: 4px;
+    font-size: 12px; color: var(--ink);
+    animation: flavor-block-fadein 0.2s ease-out;
+  }
+  @keyframes flavor-block-fadein {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media print {
+    .batch-tabs-strip, .batch-active-label, .batch-count-row,
+    .multi-batch-toggle-row, .flavor-block-msg { display: none !important; }
+  }
+
   /* === v2.7.0: sticky output header — lives OUTSIDE .out-card (which has `zoom`
      that breaks sticky descendants). Sticky-top differs by layout:
      - Side-by-side: pancake-size-bar is sticky at top of col 2 (its own rule), so
@@ -953,7 +1056,10 @@
       </button>
     </div>
     <div class="card-body">
+      <div class="batch-tabs-strip" id="batch-tabs-strip" hidden></div>
+      <p class="batch-active-label" id="batch-active-label" hidden>Active batch · size &amp; count</p>
       <div class="opts" id="batch-opts"></div>
+      <div class="batch-count-row" id="batch-count-row" hidden></div>
       <h3 class="sub-h">Dry mix source</h3>
       <div class="opts" id="bulk-opts"></div>
     </div>
@@ -975,6 +1081,8 @@
       </div>
       <div class="opts" id="flavor-opts"></div>
       <p class="picker-hint" id="flavor-hint" hidden></p>
+      <div class="flavor-block-msg" id="flavor-block-msg" hidden></div>
+      <div class="multi-batch-toggle-row" id="multi-batch-toggle-row" hidden></div>
       <div class="candy-row">
         <div id="caramel-inline" class="candy-cell" style="display:none;">
           <h3 class="sub-h">Caramel preparation</h3>
@@ -1305,7 +1413,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-alpha.2</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-beta</div>
 </div>
 
 <script>
@@ -2056,6 +2164,41 @@ function flavorById(id) { return FLAVORS.find(f => f.id === id); }
 function cookGroupOf(flavor) { return flavor.cookGroup; }
 
 // =========================================================================
+// v3.0.0-beta: persist the batches model + related state to localStorage.
+// Called from syncActiveBatchToLegacyState so every render writes through.
+// Cheap: only fires when state.mode === 'flight'.
+function persistBatchesState() {
+  try {
+    localStorage.setItem('pancakeFlightBatches', JSON.stringify(state.batches));
+    localStorage.setItem('pancakeFlightActiveBatchIdx', String(state.activeBatchIdx));
+    localStorage.setItem('pancakeFlightActiveCategories', state.activeCategories.join(','));
+    localStorage.setItem('pancakeFlightShoppingListExpanded', state.shoppingListExpanded ? '1' : '0');
+  } catch (_) {}
+}
+
+// v3.0.0-beta: bridge new batches model to the v2.10.1 render path.
+// In Flight mode, the active batch's batch-size + flavors get mirrored to
+// state.batch + state.selectedFlavors so the existing renderFlightOutput()
+// shows the active batch's recipe. v3.0.0-rc removes this bridge and rewrites
+// the render path to consume state.batches[] directly (per-batch columns).
+// =========================================================================
+function syncActiveBatchToLegacyState() {
+  if (state.mode !== 'flight') return;
+  // Auto-create one empty batch when entering Flight mode with no batches.
+  if (state.batches.length === 0) {
+    addBatch();
+  }
+  const ab = getActiveBatch();
+  if (!ab) return;
+  // Active batch's batch size: null is allowed (empty/new batch). When null,
+  // fall back to Half (1) for the render path which can't handle null.
+  state.batch = (ab.batch !== null && ab.batch !== undefined) ? ab.batch : 1;
+  state.selectedFlavors = (ab.flavors || []).slice();
+  // Persist after every Flight-mode sync.
+  persistBatchesState();
+}
+
+// =========================================================================
 // v3.0.0-alpha.2: batches-as-first-class helpers + prepScope hook.
 //
 // These are pure functions over state. render() does NOT call them yet —
@@ -2599,16 +2742,83 @@ function sharedCookingFlowHtml(flavors, sizeIdx) {
 // render() — top-level controller
 // =========================================================================
 
+// v3.0.0-beta: transient inline message shown when flavor-uniqueness blocks
+// a click. Cleared on the next render unless re-set. Lets the message persist
+// for one render cycle after which the user's next interaction wipes it.
+let _flavorBlockMsg = null;
+function setFlavorBlockMsg(text) {
+  _flavorBlockMsg = { text, displayed: false };
+}
+
 function render() {
+  // v3.0.0-beta: bridge active batch into legacy state fields before render.
+  syncActiveBatchToLegacyState();
   // --- Card 1 (visual): Pancake size ---
   document.getElementById('size-opts').innerHTML = SIZES.map((s, i) =>
     `<div class="opt ${state.size === i ? 'active' : ''}" data-size="${i}">${s.label}</div>`
   ).join('');
 
+  // --- v3.0.0-beta: batch tabs strip + active-batch label (Flight mode only) ---
+  const batchTabsStrip = document.getElementById('batch-tabs-strip');
+  const batchActiveLabel = document.getElementById('batch-active-label');
+  const batchCountRow = document.getElementById('batch-count-row');
+  if (state.mode === 'flight') {
+    // Build tabs.
+    const tabHtml = state.batches.map((b, idx) => {
+      const isActive = idx === state.activeBatchIdx;
+      const sizeLabel = (b.batch !== null && b.batch !== undefined)
+        ? BATCHES[b.batch].label : 'empty';
+      const flavorCount = (b.flavors || []).length;
+      const flavorPart = flavorCount > 0
+        ? ` · ${flavorCount} flavor${flavorCount === 1 ? '' : 's'}`
+        : '';
+      const countPart = (b.count && b.count > 1) ? ` · ×${b.count}` : '';
+      const subParts = sizeLabel + flavorPart + countPart;
+      const closeBtn = state.batches.length > 1
+        ? `<button type="button" class="bt-close" data-bt-close="${idx}" aria-label="Remove Batch ${idx + 1}">×</button>`
+        : '';
+      return `<button type="button" class="batch-tab ${isActive ? 'active' : ''}" data-bt-idx="${idx}">` +
+             `Batch ${idx + 1} <span class="bt-sub">${subParts}</span>` +
+             closeBtn +
+             `</button>`;
+    }).join('');
+    batchTabsStrip.innerHTML = tabHtml +
+      `<button type="button" class="add-batch-btn" id="add-batch-btn">+ Add batch</button>`;
+    batchTabsStrip.hidden = false;
+    batchActiveLabel.hidden = false;
+    batchActiveLabel.textContent = `Active: Batch ${state.activeBatchIdx + 1} · size & count`;
+  } else {
+    batchTabsStrip.hidden = true;
+    batchTabsStrip.innerHTML = '';
+    batchActiveLabel.hidden = true;
+  }
+
   // --- Card 2 (visual): Batch & dry mix ---
+  // In Flight mode, "active" is the active batch's batch (null → none active).
+  const renderedBatchIdx = (state.mode === 'flight')
+    ? (getActiveBatch() && getActiveBatch().batch)
+    : state.batch;
   document.getElementById('batch-opts').innerHTML = BATCHES.map((b, i) =>
-    `<div class="opt ${state.batch === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
+    `<div class="opt ${renderedBatchIdx === i ? 'active' : ''}" data-batch="${i}">${b.label} <span style="opacity:.6;font-size:.85em">· ${b.desc}</span></div>`
   ).join('');
+
+  // --- v3.0.0-beta: count stepper for active batch (Flight mode only) ---
+  if (state.mode === 'flight') {
+    const ab = getActiveBatch();
+    const cnt = ab ? (ab.count || 1) : 1;
+    batchCountRow.innerHTML =
+      `<span class="bc-label">Make this batch</span>` +
+      `<span class="batch-count-stepper">` +
+        `<button type="button" data-bc-step="-1" ${cnt <= 1 ? 'disabled' : ''} aria-label="Decrease count">−</button>` +
+        `<span class="bc-val">${cnt}</span>` +
+        `<button type="button" data-bc-step="1" ${cnt >= 99 ? 'disabled' : ''} aria-label="Increase count">+</button>` +
+      `</span>` +
+      `<span style="font-size:11px;color:var(--muted);">×${cnt > 1 ? ' (each at the size above)' : ''}</span>`;
+    batchCountRow.hidden = false;
+  } else {
+    batchCountRow.hidden = true;
+    batchCountRow.innerHTML = '';
+  }
 
   document.getElementById('bulk-opts').innerHTML = BULK_OPTS.map(o =>
     `<div class="opt ${state.bulk === o.bulk ? 'active' : ''}" data-bulk="${o.bulk}">${o.label}</div>`
@@ -2634,14 +2844,46 @@ function render() {
     const n = state.selectedFlavors.length;
     statusEl.hidden = false;
     statusText.textContent = n === 0
-      ? 'Select one or more flavors below'
-      : (n === 1 ? 'Selected: 1 flavor' : `Selected: ${n} flavors`);
+      ? 'Select one or more flavors for this batch'
+      : (n === 1 ? 'Selected: 1 flavor in this batch' : `Selected: ${n} flavors in this batch`);
     clearBtn.hidden = (n === 0);
     hint.hidden = false;
-    hint.textContent = 'Each selected flavor is its own complete batch at the chosen batch size. Tap pills to include/exclude.';
+    hint.textContent = 'Tap pills to include/exclude flavors in the active batch.';
   } else {
     statusEl.hidden = true;
     hint.hidden = true;
+  }
+
+  // --- v3.0.0-beta: flavor-block message (after a uniqueness block) ---
+  const blockMsgEl = document.getElementById('flavor-block-msg');
+  if (_flavorBlockMsg) {
+    if (_flavorBlockMsg.displayed) {
+      // Already shown on previous render — clear now.
+      _flavorBlockMsg = null;
+      blockMsgEl.hidden = true;
+      blockMsgEl.textContent = '';
+    } else {
+      blockMsgEl.textContent = _flavorBlockMsg.text;
+      blockMsgEl.hidden = false;
+      _flavorBlockMsg.displayed = true;
+    }
+  } else {
+    blockMsgEl.hidden = true;
+    blockMsgEl.textContent = '';
+  }
+
+  // --- v3.0.0-beta: "Allow same flavor in multiple batches" toggle (Flight) ---
+  const multiToggleRow = document.getElementById('multi-batch-toggle-row');
+  if (state.mode === 'flight') {
+    multiToggleRow.innerHTML =
+      `<span style="flex:1;">Allow the same flavor in multiple batches</span>` +
+      `<button type="button" class="multi-batch-toggle-pill ${state.allowMultiBatchFlavor ? 'active' : ''}" id="multi-batch-toggle-pill">` +
+        (state.allowMultiBatchFlavor ? 'On' : 'Off') +
+      `</button>`;
+    multiToggleRow.hidden = false;
+  } else {
+    multiToggleRow.hidden = true;
+    multiToggleRow.innerHTML = '';
   }
 
   // Candy prep sub-pickers
@@ -3124,6 +3366,12 @@ document.getElementById('mode-switcher').addEventListener('click', e => {
   const m = btn.dataset.modePick;
   if (m !== 'single' && m !== 'flight') return;
   state.mode = m;
+  // v3.0.0-beta: auto-create one empty batch when entering Flight mode.
+  // syncActiveBatchToLegacyState (called by render) also does this, but doing
+  // it here ensures consistent active-tab state before the first render.
+  if (m === 'flight' && state.batches.length === 0) {
+    addBatch();
+  }
   document.getElementById('mode-switcher').querySelectorAll('[data-mode-pick]').forEach(b =>
     b.classList.toggle('active', b.dataset.modePick === m));
   try { localStorage.setItem('pancakeFlightMode', m); } catch (_) {}
@@ -3133,7 +3381,13 @@ document.getElementById('mode-switcher').addEventListener('click', e => {
 document.getElementById('batch-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-batch]');
   if (!opt) return;
-  state.batch = +opt.dataset.batch;
+  const newBatch = +opt.dataset.batch;
+  if (state.mode === 'flight') {
+    const ab = getActiveBatch();
+    if (ab) ab.batch = newBatch;
+  } else {
+    state.batch = newBatch;
+  }
   render();
 });
 document.getElementById('bulk-opts').addEventListener('click', e => {
@@ -3149,14 +3403,90 @@ document.getElementById('flavor-opts').addEventListener('click', e => {
   if (state.mode === 'single') {
     state.flavor = id;
   } else {
-    const i = state.selectedFlavors.indexOf(id);
-    if (i >= 0) state.selectedFlavors.splice(i, 1);
-    else        state.selectedFlavors.push(id);
+    const ab = getActiveBatch();
+    if (!ab) return;
+    const idx = ab.flavors.indexOf(id);
+    if (idx >= 0) {
+      // De-select.
+      ab.flavors.splice(idx, 1);
+    } else {
+      // Uniqueness check: flavor in another batch?
+      if (!state.allowMultiBatchFlavor) {
+        const otherIdx = findFlavorInBatches(id);
+        if (otherIdx >= 0 && otherIdx !== state.activeBatchIdx) {
+          const flavorLabel = (flavorById(id) || { label: id }).label;
+          setFlavorBlockMsg(
+            `${flavorLabel} is already in Batch ${otherIdx + 1}. Remove it there first, or enable "Allow the same flavor in multiple batches" below.`
+          );
+          render();
+          return;
+        }
+      }
+      ab.flavors.push(id);
+    }
   }
   render();
 });
 document.getElementById('flavor-clear').addEventListener('click', e => {
-  state.selectedFlavors = [];
+  if (state.mode === 'flight') {
+    const ab = getActiveBatch();
+    if (ab) ab.flavors = [];
+  } else {
+    state.selectedFlavors = [];
+  }
+  render();
+});
+
+// v3.0.0-beta: batch-tabs-strip click handlers — tabs, close buttons, add-batch.
+document.getElementById('batch-tabs-strip').addEventListener('click', e => {
+  // Add-batch button has priority.
+  const addBtn = e.target.closest('#add-batch-btn');
+  if (addBtn) {
+    addBatch();
+    render();
+    return;
+  }
+  // Close button on a tab.
+  const closeBtn = e.target.closest('[data-bt-close]');
+  if (closeBtn) {
+    e.stopPropagation();
+    const idx = +closeBtn.dataset.btClose;
+    removeBatch(idx);
+    render();
+    return;
+  }
+  // Tab click → switch active batch.
+  const tab = e.target.closest('[data-bt-idx]');
+  if (tab) {
+    const idx = +tab.dataset.btIdx;
+    if (idx >= 0 && idx < state.batches.length) {
+      state.activeBatchIdx = idx;
+      render();
+    }
+  }
+});
+
+// v3.0.0-beta: count-stepper handlers (Flight mode only).
+document.getElementById('batch-count-row').addEventListener('click', e => {
+  const btn = e.target.closest('[data-bc-step]');
+  if (!btn) return;
+  if (state.mode !== 'flight') return;
+  const ab = getActiveBatch();
+  if (!ab) return;
+  const step = +btn.dataset.bcStep;
+  const newCount = (ab.count || 1) + step;
+  if (newCount < 1 || newCount > 99) return;
+  ab.count = newCount;
+  render();
+});
+
+// v3.0.0-beta: multi-batch toggle handler.
+document.getElementById('multi-batch-toggle-row').addEventListener('click', e => {
+  if (!e.target.closest('#multi-batch-toggle-pill')) return;
+  state.allowMultiBatchFlavor = !state.allowMultiBatchFlavor;
+  try {
+    localStorage.setItem('pancakeFlightAllowMultiBatchFlavor', state.allowMultiBatchFlavor ? '1' : '0');
+  } catch (_) {}
   render();
 });
 document.getElementById('size-opts').addEventListener('click', e => {
