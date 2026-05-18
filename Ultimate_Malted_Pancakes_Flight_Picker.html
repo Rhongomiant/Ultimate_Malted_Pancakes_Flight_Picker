@@ -639,8 +639,28 @@
      flavor cards, tier flavor cards. */
   .category-section .cs-setup,
   .category-section .cs-cook,
-  .category-section .cs-tier {
+  .category-section .cs-tier,
+  .category-section .cook-shared {
     margin-top: 12px;
+  }
+  /* rc.7: compact shared-cooking card inside a category section. */
+  .category-section .cook-shared {
+    background: var(--bg); border: 1px dashed var(--line);
+    border-radius: 6px; padding: 10px 12px;
+  }
+  .category-section .cook-shared h4 {
+    font-size: 11px; margin: 0 0 6px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); font-weight: 600;
+  }
+  .category-section .cook-shared .shared-sub {
+    display: none; /* the compact heading speaks for itself */
+  }
+  .category-section .cook-shared ol.steps {
+    margin: 4px 0 0; padding-left: 18px; font-size: 0.82rem;
+  }
+  .category-section .cook-shared ol.steps li {
+    margin-bottom: 2px;
   }
   .category-section .cs-setup:first-child { margin-top: 8px; }
   .category-section .cs-cook,
@@ -735,11 +755,8 @@
   .output-grouping-row button.active {
     background: var(--accent); color: var(--on-accent);
   }
-  /* rc.6: scoped-header annotation in Mode B's shared cooking instructions. */
-  .cook-shared .shared-scope {
-    font-size: 0.7rem; color: var(--muted); font-weight: 400;
-    font-style: italic; margin-left: 4px;
-  }
+  /* rc.7: scope annotation removed since shared cooking instructions now
+     live inside each category section (no longer "applies to all categories"). */
 
   /* Reset button in controls row. */
   .reset-btn {
@@ -769,11 +786,12 @@
   }
   .batches-row::-webkit-scrollbar-thumb:hover { background: var(--accent); }
   .batches-row > .batch-column {
-    flex: 0 0 auto; min-width: 320px;
-    /* rc.6: removed max-width hard cap from rc.5. The ballooning that
-       prompted the cap was actually sub-card overflow inside F&S/Toppings
-       grids — see .subcard min-width:0 rule below. Now columns can grow
-       to use available space without overflowing. */
+    /* rc.7 hybrid sizing: flex-basis 320px, can grow to share leftover
+       space when columns fit, can shrink slightly. Once total natural
+       width exceeds the .batches-row, the row overflows and scrolls.
+       max-width prevents a lone column on a wide viewport from becoming
+       absurdly wide (which would also push sub-cards apart unhelpfully). */
+    flex: 1 1 320px; min-width: 320px; max-width: 560px;
     overflow: hidden;
   }
   .scroll-hint {
@@ -1832,7 +1850,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.6</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc.7</div>
 </div>
 
 <script>
@@ -3943,20 +3961,18 @@ function renderFlightOutput() {
           <div class="batches-row" data-batches-row="cat-${cat}" data-batch-layout="${state.batchLayout}">${columnsHtml}</div>
           ${scrollHintHtml}
         </div>
+        ${sharedCookCardHtml}
         ${catCookHtml}
         ${catTierHtml}
       </div>`;
     }).join('');
-    // rc.6: shared cooking instructions sit ABOVE the .groups-row as a
-    // preamble, with a header that clarifies the scope (one instruction set
-    // applies across all categories below).
-    const modeBSharedCookHtml = sharedCookCardHtml
-      ? sharedCookCardHtml.replace(
-          'Shared Cooking Instructions',
-          'Shared Cooking Instructions <span class="shared-scope">(applies to all categories below)</span>'
-        )
-      : '';
-    setupBodyHtml = `${modeBSharedCookHtml}<div class="groups-row" data-group-layout="${state.groupLayout}" data-groups-row="all">${sectionsHtml}</div>`;
+    // rc.7: sharedCookCardHtml now lives INSIDE each .category-section between
+    // .cs-setup and .cs-cook (above). Each category is a self-contained
+    // workflow unit — prep → shared cooking instructions → cook → tier.
+    // The instructions are intentionally repeated per category since the
+    // user works one category at a time. Mode B no longer emits anything
+    // above the .groups-row.
+    setupBodyHtml = `<div class="groups-row" data-group-layout="${state.groupLayout}" data-groups-row="all">${sectionsHtml}</div>`;
   } else {
     // Mode A: single horizontal-scroll row honoring data-batch-layout.
     const columnsHtml = visibleBatchIdxs.map(idx => renderBatchColumnHtml(idx)).filter(h => h).join('');
