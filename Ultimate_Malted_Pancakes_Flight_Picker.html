@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pancake Flight Picker</title>
+<title>Ultimate Malted Pancakes Flight Picker</title>
 <style>
   :root {
     --bg: #fdf8ef;
@@ -43,7 +43,9 @@
     padding: 20px; margin-top: 8px; }
   .out h3 { font-size: 1.15rem; margin: 0 0 4px; }
   .out .yield { margin: 0 0 8px; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
-  .out .desc { color: var(--muted); margin: 0 0 16px; font-size: 0.93rem; }
+  .out .desc { color: var(--muted); margin: 6px 0 16px; font-size: 0.93rem; }
+  .prep-stack { display: flex; flex-direction: column; gap: 8px; margin: 0 0 12px; }
+  .prep-stack .callout { margin-top: 0; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
   .col { display: flex; flex-direction: column; gap: 14px; height: 100%; }
@@ -55,9 +57,6 @@
   .block { background: #fbf6ec; border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
   .block h4 { margin: 0 0 8px; font-size: 0.7rem; text-transform: uppercase;
     letter-spacing: 0.1em; color: var(--accent); font-weight: 700; }
-  .mixing-card p { margin: 6px 0; font-size: 0.92rem; }
-  .mixing-card p:first-of-type { margin-top: 0; }
-  .mixing-card p:last-child { margin-bottom: 0; }
 
   ul.list { margin: 0; padding: 0; list-style: none; }
   ul.list li { padding: 4px 0; border-bottom: 1px dashed #ecdfc6; font-size: 0.94rem;
@@ -68,7 +67,7 @@
   ul.list li .k { color: var(--muted); flex: 1 1 auto; min-width: 0;
     overflow-wrap: anywhere; }
 
-  .max-limit { background: #fff; border: 1px solid var(--accent); color: var(--accent);
+  .max-limit { background: var(--accent-soft); border: 1px solid #f5d9a8; color: #7c3a00;
     padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 8px;
     text-align: center; font-weight: 600; }
   .callout { border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin-top: 10px; }
@@ -81,7 +80,10 @@
   .topping-note.info { background: #fff; border: 1px solid #f5d9a8; color: #7c3a00; }
 
   .steps { margin: 14px 0 0; padding: 0 0 0 22px; font-size: 0.94rem; line-height: 1.55; }
-  .steps li { padding: 3px 0; }
+  .steps > li { padding: 3px 0; }
+  .steps .sub-steps { margin: 6px 0 4px; padding: 0 0 0 20px; list-style: disc; }
+  .steps .sub-steps li { padding: 2px 0; font-size: 0.92rem; color: #3a2f23; }
+
   .syrup { display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
     background: #fff8e6; border: 1px solid #f3dca4; padding: 10px 12px; border-radius: 10px;
     margin-top: 14px; }
@@ -145,7 +147,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🥞 Pancake <span class="em">Flight</span> Picker</h1>
+  <h1>🥞 Ultimate Malted Pancakes <span class="em">Flight</span> Picker</h1>
   <p class="sub">Pick your options. The recipe updates as you choose. Reference docs are at the bottom.</p>
 
   <div class="card">
@@ -225,9 +227,13 @@
         <li><b>Dash (⅛ tsp):</b> one full level scoop of a standard dash spoon (= exactly two level Pinches). <b>Finger method:</b> a massive three-finger pinch using the pads of thumb, index, and middle fingers together.</li>
         <li><b>Tad (¼ tsp):</b> one full level scoop of a standard quarter-teaspoon spoon (= exactly two level Dashes). <b>Finger method:</b> a massive four-finger pinch using the pads of thumb, index, middle, and ring fingers pressed tightly together.</li>
       </ul>
+      <h5>Modifiers (apply to any measure)</h5>
+      <ul>
+        <li><b>Scant:</b> fill the measure just below the upper brim — between this measure and the next smaller one. (e.g. <b>Scant Tad (3/16 tsp)</b> = halfway between a Dash and a Tad.)</li>
+        <li><b>Fat:</b> overfilled / heaped — between this measure and the next larger one. (e.g. <b>Fat Tad (⅜ tsp)</b> = halfway between a Tad and ½ tsp.)</li>
+      </ul>
       <h5>Other terms</h5>
       <ul>
-        <li><b>Scant:</b> fill the measure just below the upper brim. (e.g. <b>Scant Tad (3/16 tsp)</b> = a Tad spoon filled just below the brim.)</li>
         <li><b>Batter Shield / Seal Method:</b> spoon a tiny drizzle of plain batter over candy toppings before flipping — locks sugar inside so it can't weld to the cooking surface.</li>
         <li><b>Ghee:</b> clarified butter (milk solids strained out). Deep, toasted, brown-butter note — pairs with malt powder.</li>
         <li><b>Avocado Oil:</b> very high smoke point, flavorless. Best cooking-surface grease for sugar combos; used <i>inside</i> the batter for loud flavor combos (bacon, triple-threat).</li>
@@ -406,7 +412,7 @@
     </div>
   </details>
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.6.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.7.0</div>
 </div>
 
 <script>
@@ -430,10 +436,10 @@ const DRY = {
   cornFlour:   ['½ Tbsp (1½ tsp)',        '1 Tbsp', '1½ Tbsp',                  '2 Tbsp'],
   malt:        ['½ Tbsp (1½ tsp)',        '1 Tbsp', '1½ Tbsp',                  '2 Tbsp'],
   buttermilk:  ['1 Tbsp',                 '2 Tbsp', '3 Tbsp',                   '¼ cup (4 Tbsp)'],
-  sugar:       ['⅜ tsp (~a fat ¼ tsp)',   '¾ tsp',  '1⅛ tsp (~1 tsp + a pinch)','1½ tsp'],
+  sugar:       ['Fat Tad (⅜ tsp)',        '¾ tsp',  '1 tsp + Dash (1⅛ tsp)',    '1½ tsp'],
   bakingPwd:   ['½ tsp',                  '1 tsp',  '1½ tsp',                   '2 tsp'],
-  bakingSoda:  ['⅛ tsp',                  '¼ tsp',  '⅜ tsp (¼ tsp + ⅛ tsp)',    '½ tsp'],
-  salt:        ['⅛ tsp',                  '¼ tsp',  '⅜ tsp (¼ tsp + ⅛ tsp)',    '½ tsp'],
+  bakingSoda:  ['⅛ tsp',                  'Tad (¼ tsp)', 'Fat Tad (⅜ tsp)',     '½ tsp'],
+  salt:        ['⅛ tsp',                  'Tad (¼ tsp)', 'Fat Tad (⅜ tsp)',     '½ tsp'],
 };
 
 const WET = {
@@ -471,7 +477,7 @@ const FLAVORS = [
     },
   },
   { id: 'choc', label: 'Chocolate Chips Only',
-    strategy: 'Scatter chips onto wet top. Flip when bubbles pop.',
+    strategy: 'Scatter chips onto the wet pancake top. Flip when bubbles pop.',
     spices: [
       { name: 'Vanilla Extract', amounts: SPICE.vanilla },
       { name: 'Salt',            amounts: SPICE.salt },
@@ -486,7 +492,7 @@ const FLAVORS = [
     },
   },
   { id: 'bnut', label: 'Banana Nut Only',
-    strategy: 'Sprinkle pine nuts first, then lay thin banana discs.',
+    strategy: 'Sprinkle pine nuts onto the wet pancake top first, then lay thin banana discs on top of the nuts.',
     spices: [ { name: 'Cinnamon', amounts: SPICE.cinnamon } ],
     pickOneSpices: {
       label: 'Plus ONE of (your choice)',
@@ -505,7 +511,7 @@ const FLAVORS = [
     },
   },
   { id: 'bnut_choc', label: 'Banana Nut + Chocolate Chips',
-    strategy: 'Pine nuts &amp; bananas first. Chips in open spaces.',
+    strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first; drop chocolate chips into the open spaces.',
     spices: [
       { name: 'Cinnamon',        amounts: SPICE.cinnamon },
       { name: 'Nutmeg',          amounts: SPICE.nutmeg },
@@ -521,7 +527,7 @@ const FLAVORS = [
     },
   },
   { id: 'bacon', label: 'Bacon Only',
-    strategy: 'Cook bacon crisp during the 10-min rest. Press crumbles into wet top.',
+    strategy: 'Cook bacon crisp during the 10-min rest. Press crumbles into the wet pancake top.',
     spices: [
       { name: 'Black Pepper', amounts: SPICE.blackPepper },
       { name: 'Cayenne',      amounts: SPICE.cayenne },
@@ -536,7 +542,7 @@ const FLAVORS = [
     },
   },
   { id: 'bnut_bacon', label: 'Banana Nut + Bacon',
-    strategy: 'Pine nuts &amp; bananas first. Press bacon into wet top.',
+    strategy: 'Sprinkle pine nuts and lay banana discs onto the wet pancake top first, then press bacon crumbles into the wet top.',
     spices: [
       { name: 'Cinnamon',     amounts: SPICE.cinnamon },
       { name: 'Nutmeg',       amounts: SPICE.nutmeg },
@@ -751,10 +757,22 @@ function renderOutput() {
   const sizeInfo = SIZES[sizeIdx];
   const batchInfo = BATCHES[b];
   const isBacon = flavor.id === 'bacon' || flavor.id === 'bnut_bacon';
+  const hasBanana = flavor.id === 'bnut' || flavor.id === 'bnut_choc' || flavor.id === 'bnut_bacon';
 
   // Pancake yield (approximate)
   const yieldCount = Math.max(1, Math.round(batchInfo.oz / sizeInfo.oz));
   const yieldText = `Yields ~${yieldCount} pancake${yieldCount === 1 ? '' : 's'}`;
+
+  // Prep notes — anything that has to happen BEFORE the pancake hits the cooking surface.
+  // Goes directly under the Yields line.
+  const prepNotes = [];
+  if (hasBanana) {
+    prepNotes.push(`<div class="callout info">🌰 <b>Toast pine nuts</b> in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
+    prepNotes.push(`<div class="callout info">🍌 <b>Slice bananas</b> ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
+  }
+  const prepStackHtml = prepNotes.length
+    ? `<div class="prep-stack">${prepNotes.join('')}</div>`
+    : '';
 
   // Dry block
   let dryHtml = state.bulk
@@ -829,7 +847,7 @@ function renderOutput() {
     toppingsInner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
   }
 
-  // Single Batter Shield (only when shield && not doubleShield)
+  // Single Batter Shield
   if (flavor.shield && !flavor.doubleShield) {
     toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the cooking surface otherwise.</div>`;
   }
@@ -849,29 +867,14 @@ function renderOutput() {
     ? `<div class="block full-row"><h4>Toppings per pancake</h4>${toppingsInner}</div>`
     : '';
 
-  // Combining & timing card — three short labeled lines
-  const restLine = isBacon
-    ? `<b>Rest:</b> <b>10 minutes undisturbed</b>. Cook the bacon during this rest. At the <b>7-min mark</b>, start preparing the cooking surface to cook pancakes in the bacon grease.`
-    : `<b>Rest:</b> <b>10 minutes undisturbed</b>. At the <b>7-min mark</b>, heat the cooking surface and apply the grease.`;
-
-  const mixingCardHtml = `<div class="block full-row mixing-card">
-    <h4>Combining &amp; timing</h4>
-    <p><b>Mix:</b> pour wet into dry. Frother on lowest, <b>5–7 sec max</b>. Leave it lumpy — small dry streaks are fine. <b>Don't over-mix</b> or pancakes turn rubbery.</p>
-    <p>${restLine}</p>
-    <p><b>Ladle prep:</b> keep an ice-water container next to the cooking surface. Before each scoop: chill the ladle a few seconds in the ice water → tap on a towel to drop loose water → wipe the inside with a tiny dot of avocado oil. Scoop quickly and pour straight onto the heated grease.</p>
-  </div>`;
-
-  // Other callouts below the grid
+  // Below-grid callouts (only butter advice + normal-temp confirmation if applicable).
+  // Pine-nut and banana prep moved above; bacon timing moved into cooking steps.
   const callouts = [];
   if (flavor.hasCaramel && state.caramelPrep === 'flash' && flavor.id !== 'triple') {
     callouts.push(`<div class="callout info">🌡 Normal cooking-surface temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
   }
   if (flavor.fat.toLowerCase().includes('butter')) {
     callouts.push(`<div class="callout info">🧈 Use <b>unsalted</b> butter. The dry base is already salt-balanced.</div>`);
-  }
-  if (flavor.id === 'bnut' || flavor.id === 'bnut_choc' || flavor.id === 'bnut_bacon') {
-    callouts.push(`<div class="callout info">🍌 Slice bananas ⅛–¼" thick (ideally 3/16" — two stacked coins). Cut right before cooking with a sharp paring knife. Too thick tears the pancake; too thin dissolves into mush.</div>`);
-    callouts.push(`<div class="callout info">🌰 Toast pine nuts in a dry skillet (no oil) on medium-low ~2–3 min until light golden. Pour into a cool bowl the second they're done.</div>`);
   }
 
   // Quality Tier
@@ -883,10 +886,18 @@ function renderOutput() {
     <div class="tier tier-bad"><div class="tier-h">❌ Avoid</div><span class="syr">${t.bad[0]}</span><span class="ing">${t.bad[1]}</span></div>
   </div>`;
 
-  // Cooking steps
-  const bakeBaconStep = isBacon
-    ? 'Cook bacon now (during the rest). At the 7-min mark, prep the cooking surface to cook in the bacon grease.'
-    : 'At the 7-min mark, heat the cooking surface and apply the grease.';
+  // Cooking steps — "Rest" now expands into sub-bullets; ladle prep absorbed into the pour step.
+  const restSubSteps = [];
+  restSubSteps.push(`<li>Fill a bowl (or any container that fits your ladles) with ice and water. Submerge the ladle scoops in the bowl to keep them ice-cold.</li>`);
+  if (isBacon) {
+    restSubSteps.push(`<li>Cook the bacon crisp — its rendered grease becomes your cooking-surface grease.</li>`);
+  }
+  if (isBacon) {
+    restSubSteps.push(`<li>At the <b>7-min mark</b>, prep the cooking surface to cook pancakes in the bacon grease.</li>`);
+  } else {
+    restSubSteps.push(`<li>At the <b>7-min mark</b>, heat the cooking surface and apply the grease.</li>`);
+  }
+
   const shieldStep = flavor.doubleShield ? ' Apply <b>double</b> Batter Shield (two layers of plain batter over toppings).' :
                      flavor.shield ? ' Apply Batter Shield (drizzle plain batter over toppings).' : '';
 
@@ -894,6 +905,7 @@ function renderOutput() {
   out.innerHTML = `
     <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
     <p class="yield">${yieldText}</p>
+    ${prepStackHtml}
     <p class="desc">${flavor.strategy} · Cooking surface: <b>${heatLine}</b>.</p>
 
     <div class="grid">
@@ -919,7 +931,6 @@ function renderOutput() {
         </div>
       </div>
 
-      ${mixingCardHtml}
       ${lowHeatCalloutHtml}
       ${toppingsHtml}
     </div>
@@ -933,10 +944,12 @@ function renderOutput() {
 
     <h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Cooking Steps</h4>
     <ol class="steps">
-      <li>Measure dry ingredients into one bowl. Mix wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()} into a second bowl. Use a handheld frother on lowest setting to emulsify the wet mix only.</li>
-      <li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix.</b></li>
-      <li>Rest the batter <b>10 minutes, undisturbed</b>. ${bakeBaconStep} Set up your ladle ice bath.</li>
-      <li>Pour ${sizeInfo.detail.split('·')[0].trim()} portions onto the hot greased cooking surface. Drop toppings tightly in the center.${shieldStep}</li>
+      <li>Measure dry ingredients into one bowl. In a second bowl, combine the wet ingredients + spices + ${flavor.fat.split(' ').slice(-1)[0].toLowerCase()}. Frother on lowest to emulsify the wet mix only.</li>
+      <li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix</b> or pancakes turn rubbery.</li>
+      <li><b>Rest the batter 10 minutes, undisturbed.</b> During the rest:
+        <ul class="sub-steps">${restSubSteps.join('')}</ul>
+      </li>
+      <li><b>When ready to scoop:</b> pull a ladle from the ice bath, tap it once on a clean towel to drop loose water, wipe the inside with a tiny dot of avocado oil. Scoop the batter quickly and pour it straight onto the heated grease in ${sizeInfo.detail.split('·')[0].trim()} portions. Drop toppings tightly in the center.${shieldStep}</li>
       <li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>
       <li>Between every pancake: scrape → ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>
     </ol>
