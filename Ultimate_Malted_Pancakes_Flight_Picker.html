@@ -571,6 +571,157 @@
     .controls-row, .controls-toggle { display: none !important; }
   }
 
+  /* === v3.0.0-rc: per-batch column grid + active-category filter === */
+  .batches-row {
+    display: grid; gap: 14px; margin-bottom: 14px;
+    align-items: start;
+  }
+  .batches-row[data-batch-count="1"] { grid-template-columns: 1fr; }
+  .batches-row[data-batch-count="2"] { grid-template-columns: 1fr 1fr; }
+  .batches-row[data-batch-count="3"] { grid-template-columns: 1fr 1fr 1fr; }
+  .batches-row[data-batch-count="4"] { grid-template-columns: repeat(4, 1fr); }
+  .batches-row[data-batch-count="5"] { grid-template-columns: repeat(5, 1fr); }
+  .batches-row[data-batch-count="6"] { grid-template-columns: repeat(6, 1fr); }
+  @media (max-width: 1100px) {
+    .batches-row[data-batch-count="3"],
+    .batches-row[data-batch-count="4"],
+    .batches-row[data-batch-count="5"],
+    .batches-row[data-batch-count="6"] { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .batches-row { grid-template-columns: 1fr !important; }
+  }
+  .batch-column {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px;
+    page-break-inside: avoid;
+  }
+  .batch-column-header {
+    font-size: 13px; font-weight: 600;
+    padding-bottom: 8px; margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .batch-column-header .bc-sub {
+    font-weight: 400; color: var(--muted);
+    font-size: 12px; margin-left: 4px;
+  }
+  .batch-column .block { margin-bottom: 12px; }
+  .batch-column .block:last-child { margin-bottom: 0; }
+  .batch-column .block h4 {
+    font-size: 12px; margin: 0 0 6px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--muted); font-weight: 600;
+  }
+  .batch-column .block h5 {
+    font-size: 12px; margin: 0 0 4px;
+    font-weight: 600; color: var(--ink);
+  }
+  .batch-column .subcard {
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 6px; padding: 8px; margin-bottom: 6px;
+  }
+  .batch-column .subcard:last-child { margin-bottom: 0; }
+  .batch-column .setup-row-pair {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .batch-column .grease-lines {
+    background: var(--accent-soft); padding: 8px 10px;
+    border-radius: 6px;
+  }
+  .batch-column .grease-lines h4 { margin-bottom: 4px; }
+  .batch-column .grease-lines ul {
+    margin: 0; padding-left: 16px; font-size: 12px;
+  }
+  .batch-empty-state {
+    padding: 14px 10px; text-align: center;
+    color: var(--muted); font-size: 12px;
+    font-style: italic;
+    background: var(--bg); border: 1px dashed var(--line);
+    border-radius: 6px;
+  }
+  .active-category-pills-row {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; padding: 8px 12px;
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; margin: 0 0 12px;
+  }
+  .active-category-pills-row .acpr-label {
+    color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .active-category-pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 4px 10px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--card);
+    cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--ink); font-family: inherit;
+  }
+  .active-category-pill:hover { background: var(--accent-soft); }
+  .active-category-pill.active {
+    background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+  }
+  .active-category-pill .acp-check { font-size: 10px; opacity: 0.85; }
+  .active-category-pill .acp-count {
+    font-size: 10px; opacity: 0.7; font-weight: 400;
+  }
+  .active-category-pill.disabled {
+    opacity: 0.35; cursor: not-allowed; pointer-events: none;
+  }
+  .active-category-action {
+    padding: 4px 10px; border-radius: 12px;
+    border: 1px dashed var(--line); background: transparent;
+    cursor: pointer; font-size: 11px;
+    color: var(--muted); font-family: inherit;
+  }
+  .active-category-action:hover {
+    background: var(--card); color: var(--ink); border-style: solid;
+  }
+  .no-active-categories {
+    padding: 20px; text-align: center; color: var(--muted);
+    background: var(--card); border: 1px dashed var(--line);
+    border-radius: 8px; font-style: italic;
+  }
+  .cook-category-card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 8px; padding: 12px; margin-bottom: 10px;
+    page-break-inside: avoid;
+  }
+  .cook-category-card .ccc-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .cook-category-card .ccc-title {
+    font-weight: 600; font-size: 13px; color: var(--ink);
+  }
+  .cook-category-card .ccc-heat {
+    font-size: 12px; font-weight: 500;
+    color: var(--accent-strong);
+  }
+  .cook-category-card .ccc-blurb {
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 8px; font-style: italic;
+  }
+  .flavor-delta-card .fdc-batch-label {
+    font-weight: 400; opacity: 0.7; font-size: 11px;
+    margin-left: 4px;
+  }
+  .tier-section {
+    margin-top: 18px; padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+  .tier-section > h4 {
+    font-size: 13px; margin: 0 0 8px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); font-weight: 600;
+  }
+  @media print {
+    .active-category-pills-row { display: none !important; }
+    .batches-row { display: block; }
+    .batches-row > .batch-column { margin-bottom: 12px; }
+  }
+
   /* === v3.0.0-beta: batch tabs + per-batch controls === */
   .batch-tabs-strip {
     display: flex; flex-wrap: wrap; gap: 6px;
@@ -1413,7 +1564,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-beta</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v3.0.0-rc</div>
 </div>
 
 <script>
@@ -3063,252 +3214,9 @@ function renderSingleOutput() {
 // renderFlightOutput — v2.1.1: one section per concept w/ sub-cards + dedup
 // =========================================================================
 
-function renderFlightOutput() {
-  const out = document.getElementById('output');
-  const header = document.getElementById('out-header');
-  const ids = getRenderOrderedFlavors();
-  const n = ids.length;
-
-  if (n === 0) {
-    header.innerHTML = `<h3>Flight mode</h3>`;
-    out.innerHTML = `
-      <div class="empty-state">
-        <p style="margin:0 0 6px;font-size:1.05rem;color:var(--ink)">No flavors selected yet.</p>
-        <p style="margin:0">Pick one or more flavors above to build a flight. Each flavor becomes its own batch at the chosen batch size.</p>
-      </div>`;
-    return;
-  }
-
-  const b = state.batch;
-  const sizeIdx = state.size;
-  const sizeInfo = SIZES[sizeIdx];
-  const batchInfo = BATCHES[b];
-
-  const flavors = ids.map(flavorById);
-  const total = totalYield(b, sizeIdx, n);
-
-  const titleText = `Flight · ${n} flavor${n === 1 ? '' : 's'} · ${batchInfo.label} batch each · ${sizeInfo.label}`;
-  const yieldText = `Yields ~${total} pancake${total === 1 ? '' : 's'} total (${Math.round(total / n)} per flavor)`;
-
-  // Prep callouts (deduped)
-  const prepCallouts = prepCalloutsFor(ids);
-  const prepHtml = prepCallouts.length ? `<div class="prep-stack">${prepCallouts.join('')}</div>` : '';
-
-  // --- Dry block (one section, singular/plural label) ---
-  const dryHeading = n === 1 ? 'Dry Bowl' : `Dry Bowls (× ${n})`;
-  const dryNote = n === 1
-    ? 'Measure once into a single dry bowl.'
-    : `Either prepare <b>${n} separate ${batchInfo.label.toLowerCase()} dry bowls</b>, <b>or</b> measure <b>${n}× the recipe above</b> into one large bowl and split into ${n} equal portions before adding wet.`;
-  const dryBlock = `<div class="block">
-    <h4>${dryHeading}</h4>
-    ${dryBowlHtml(b, state.bulk)}
-    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">${dryNote}</p>
-  </div>`;
-
-  // --- Wet block — single shared block (milk + egg only; fat moves to FAT & Spices) ---
-  const wetHeading = n === 1 ? 'Wet Bowl' : `Wet Bowls (× ${n})`;
-  const wetNote = n === 1
-    ? 'Add the fat and spices below — separate sub-card per flavor.'
-    : `Same shared liquids in each of the ${n} bowls. Per-flavor fat + spices go in the next section.`;
-  const wetBlock = `<div class="block">
-    <h4>${wetHeading}</h4>
-    ${wetBowlSharedHtml(b)}
-    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">${wetNote}</p>
-  </div>`;
-
-  // v2.3.0: Dry + Wet side-by-side (#3)
-  const dryWetPair = `<div class="setup-row-pair">${dryBlock}${wetBlock}</div>`;
-
-  // --- FAT & Spices — per-flavor sub-cards w/layout switcher ---
-  const spicesHeading = n === 1 ? 'FAT & Spices (into wet bowl)' : 'FAT & Spices (into wet bowls)';
-  const spicesBlock = `<div class="block">
-    <div class="toggle-row">
-      <h4>${spicesHeading}</h4>
-      ${n > 1 ? layoutSwitcherHtml('spices', state.spicesLayout) : ''}
-    </div>
-    <div class="subcards-grid" data-subcard-layout="${state.spicesLayout}"${sideGridStyle(state.spicesLayout, n)}>
-      ${flavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${fatAndSpicesHtml(f, b)}</div>`).join('')}
-    </div>
-  </div>`;
-
-  // --- Toppings — per-flavor sub-cards w/layout switcher ---
-  const toppingsBlock = `<div class="block">
-    <div class="toggle-row">
-      <h4>Toppings per pancake</h4>
-      ${n > 1 ? layoutSwitcherHtml('toppings', state.toppingsLayout) : ''}
-    </div>
-    <div class="subcards-grid" data-subcard-layout="${state.toppingsLayout}"${sideGridStyle(state.toppingsLayout, n)}>
-      ${flavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${toppingsInnerHtml(f, sizeIdx, { includeCandyPrep: false })}</div>`).join('')}
-    </div>
-  </div>`;
-
-  // --- Grease (one block) ---
-  // v2.3.0: use menu order for grease grouping regardless of orderMode (presentation-only).
-  const grouped = groupSelectedByCooking(ids, 'menu');
-  const greases = distinctGreasesByGroup(grouped);
-  const greaseBlock = `<div class="grease-lines">
-    <h4>Cooking-Surface Grease (one line per distinct grease type)</h4>
-    <ul>
-      ${greases.map(g => `<li>
-        <span class="grease-group">${COOK_GROUP_LABEL[g.group]}</span> &middot;
-        <b>${g.grease}</b> &middot; <span style="color:var(--muted)">for ${g.flavorLabels.join(', ')}</span>
-      </li>`).join('')}
-    </ul>
-    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Apply 1 tsp, then wipe across with paper towel to a micro-thin shimmering film. No puddles.</p>
-  </div>`;
-
-  // Callouts (deduped)
-  const calloutSet = new Set();
-  flavors.forEach(f => flavorCallouts(f).forEach(c => calloutSet.add(c)));
-  const calloutsHtml = Array.from(calloutSet).join('');
-
-  // --- Quality Tiers (moved to AFTER Cook phase in v2.3.0; #5) ---
-  let tiersBlockHtml;
-  if (n === 1) {
-    tiersBlockHtml = `<h4 style="margin:18px 0 6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Quality Tier (Chef → Avoid) — ${flavors[0].label}</h4>
-      ${tierGridHtml(flavors[0])}`;
-  } else {
-    const cmp = compareTiers(flavors);
-    const sharedHtml = cmp.shared.length
-      ? `<div class="tiers-shared">
-          <h5>Shared across all ${n} flavors</h5>
-          <ul>
-            ${cmp.shared.map(s => `<li>
-              <span class="tier-badge ${s.tier}">${s.tierLabel}</span>
-              <span class="tier-slot">${s.slotLabel}</span>
-              <span class="tier-val">${s.value}</span>
-            </li>`).join('')}
-          </ul>
-        </div>`
-      : `<div class="tiers-shared"><h5>Shared across all ${n} flavors</h5><p class="tiers-shared-empty">Nothing in common across these flavors' quality tiers — see per-flavor blocks below.</p></div>`;
-
-    // v2.3.0 FIX #7: side-by-side uses inline minmax(260px, 1fr) so cards don't shrink past readability; horizontal scroll if overflow
-    const tierSideStyle = state.tierLayout === 'side'
-      ? ` style="grid-template-columns: repeat(${n}, minmax(260px, 1fr))"` : '';
-    const tierGridClass = state.tierLayout === 'side' ? 'tiers-per-flavor tier-side-grid' : 'tiers-per-flavor';
-    const perFlavorHtml = `<div class="${tierGridClass}" data-tier-layout="${state.tierLayout}"${tierSideStyle}>
-      ${flavors.map(f => {
-        const entries = cmp.perFlavor[f.id];
-        if (!entries.length) {
-          return `<div class="flavor-tiers-card"><h5>${f.label}</h5><div class="all-match">All quality tiers match the shared set above.</div></div>`;
-        }
-        return `<div class="flavor-tiers-card">
-          <h5>${f.label}</h5>
-          <div class="compact-tiers">
-            ${entries.map(e => `<div class="compact-tier-row">
-              <span class="tier-badge ${e.tier}">${e.tierLabel}</span>
-              <span class="ti-slot">${e.slotLabel}</span>
-              <span class="ti-val">${e.value}</span>
-            </div>`).join('')}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-
-    tiersBlockHtml = `<div class="toggle-row">
-      <h4>Quality Tier (Chef → Avoid) — shared + per flavor</h4>
-      <div class="inline-toggle" data-toggle-group="tier-layout">
-        <span class="label">Layout</span>
-        <button type="button" data-tier-layout="side"  class="${state.tierLayout === 'side'  ? 'active' : ''}">Side-by-side</button>
-        <button type="button" data-tier-layout="stack" class="${state.tierLayout === 'stack' ? 'active' : ''}">Stacked</button>
-        <button type="button" data-tier-layout="grid"  class="${state.tierLayout === 'grid'  ? 'active' : ''}">Grid</button>
-      </div>
-    </div>
-    ${sharedHtml}
-    ${perFlavorHtml}`;
-  }
-
-  // --- Cook phase ---
-  // v2.4.0 #9: syrups now appear in BOTH places, regardless of mode:
-  //   - deduped list in the shared cook card (always)
-  //   - per-flavor row in each delta card (always)
-  const syrupGroupings = getSyrupGroupings(flavors);
-
-  const sharedSyrupHtml = `<div class="cook-shared-syrups">
-    <h5>Recommended syrups (one line per distinct syrup)</h5>
-    <ul>
-      ${syrupGroupings.map(sg =>
-        `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
-      ).join('')}
-    </ul>
-  </div>`;
-
-  const sharedCookCard = `<div class="cook-shared">
-    <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
-    <ol class="steps">${sharedCookingFlowHtml(flavors, sizeIdx)}</ol>
-    ${sharedSyrupHtml}
-  </div>`;
-
-  // v2.4.0 #8: cook-layout attribute uses data-cook-layout-grid on the grid container
-  // (different from button's data-cook-layout) so closest() can't confuse them.
-  const cookGridAttr = `data-cook-layout="${state.cookLayout}"`;
-  const cookSideStyleN = m => state.cookLayout === 'side'
-    ? ` style="grid-template-columns: repeat(${m}, minmax(240px, 1fr))"` : '';
-
-  // Per-flavor delta-card HTML — ALWAYS appends a syrup row (item 9).
-  const deltaCardHtmlFor = (f, showHeat) => {
-    const inner = flavorDeltaCardHtml(f, sizeIdx, { showHeat });
-    const syrupRow = `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
-        <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
-      </ul>`;
-    return `<div class="flavor-delta-card"><h6>${f.label}</h6>${inner}${syrupRow}</div>`;
-  };
-
-  const isRecommended = state.orderMode === 'recommended';
-
-  let cookGroupsHtml;
-  if (isRecommended) {
-    const grpForCook = groupSelectedByCooking(ids, state.recommendedSubOrder);
-    const groupingOrder = COOK_GROUP_ORDER.filter(g => grpForCook[g].length);
-    cookGroupsHtml = groupingOrder.map((g, idx) => {
-      const groupIds = grpForCook[g];
-      const groupFlavors = groupIds.map(flavorById);
-      const heat = effectiveHeatForGroup(g, groupIds);
-      const isLast = idx === groupingOrder.length - 1;
-
-      const staggerNote = groupFlavors.length > 1
-        ? `<div class="cg-stagger">Stagger the rests: mix flavor 1's bowls, start its 10-min rest, then mix flavor 2's while flavor 1 is resting (flavor 2's rest finishes ~7 min after flavor 1's). Cook flavor 1 the moment its rest is up, then flavor 2.</div>`
-        : '';
-
-      const deltaCards = `<div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyleN(groupFlavors.length)}>
-        ${groupFlavors.map(f => deltaCardHtmlFor(f, false)).join('')}
-      </div>`;
-
-      const transition = isLast ? '' :
-        `<div class="transition">→ Wipe the cooking surface clean, re-apply grease for the <b>${COOK_GROUP_LABEL[groupingOrder[idx + 1]]}</b> group, then continue.</div>`;
-
-      return `<div class="cook-group">
-        <div class="cg-head">
-          <span class="cg-title">${COOK_GROUP_LABEL[g]} group</span>
-          <span class="cg-heat">${heat.temp} <span style="opacity:.7">(${heat.detail})</span></span>
-        </div>
-        <p class="cg-flavors"><b>Flavors:</b> ${groupFlavors.map(f => f.label).join(' · ')} &mdash; <span style="color:var(--muted)">${COOK_GROUP_BLURB[g]}</span></p>
-        ${staggerNote}
-        ${deltaCards}
-        ${transition}
-      </div>`;
-    }).join('');
-  } else {
-    // Menu or Selection — flat per-flavor cards using getRenderOrderedFlavors order
-    const flatFlavors = ids.map(flavorById);
-    cookGroupsHtml = `<div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyleN(flatFlavors.length)}>
-      ${flatFlavors.map(f => deltaCardHtmlFor(f, true)).join('')}
-    </div>`;
-  }
-
-  // Cook layout switcher (when n>1)
-  const cookLayoutSwitcher = n > 1
-    ? `<div class="inline-toggle" data-toggle-group="cook-layout" style="margin-left:8px">
-        <span class="label">Layout</span>
-        <button type="button" data-cook-layout="side"  class="${state.cookLayout === 'side'  ? 'active' : ''}">Side-by-side</button>
-        <button type="button" data-cook-layout="stack" class="${state.cookLayout === 'stack' ? 'active' : ''}">Stacked</button>
-        <button type="button" data-cook-layout="grid"  class="${state.cookLayout === 'grid'  ? 'active' : ''}">Grid</button>
-      </div>`
-    : '';
-
-  // v2.4.0 #4: 3-way order toggle + conditional sub-order, shown in BOTH Setup and Cook phase headers.
-  // The button-id suffix (`-setup` / `-cook`) keeps DOM ids unique even though the active state mirrors.
-  const buildOrderToggle = (suffix) => `<div class="inline-toggle order-toggle" data-toggle-group="order-mode-${suffix}">
+// v3.0.0-rc: hoisted out of renderFlightOutput so the v3 render path can call it.
+function buildOrderToggle(suffix) {
+  return `<div class="inline-toggle order-toggle" data-toggle-group="order-mode-${suffix}">
     <span class="label">Order</span>
     <button type="button" data-order-mode="recommended" class="${state.orderMode === 'recommended' ? 'active' : ''}">Recommended Order</button>
     <button type="button" data-order-mode="menu"        class="${state.orderMode === 'menu'        ? 'active' : ''}">Menu Order</button>
@@ -3319,40 +3227,447 @@ function renderFlightOutput() {
       <button type="button" data-rec-sub-order="selection" class="${state.recommendedSubOrder === 'selection' ? 'active' : ''}">Selection</button>
     </span>
   </div>`;
+}
+
+function renderFlightOutput() {
+  const out = document.getElementById('output');
+  const header = document.getElementById('out-header');
+  const sizeIdx = state.size;
+  const sizeInfo = SIZES[sizeIdx];
+
+  // v3.0.0-rc: iterate state.batches[] instead of a flat flavor list.
+  if (state.batches.length === 0) {
+    header.innerHTML = `<h3>Flight mode</h3>`;
+    out.innerHTML = `<div class="empty-state"><p>No batches yet. Use the picker above to add one.</p></div>`;
+    return;
+  }
+
+  const isRecommended = state.orderMode === 'recommended';
+  const activeCats = state.activeCategories;
+
+  // Helper: is a flavor in the active categories (only filters under recommended)?
+  function flavorIsActive(flavorId) {
+    if (!isRecommended) return true;
+    const f = flavorById(flavorId);
+    return f && activeCats.indexOf(f.cookGroup) >= 0;
+  }
+
+  // Helper: does this batch have any flavor in the active categories?
+  function batchHasActiveFlavor(b) {
+    if (!isRecommended) return true;
+    if (b.flavors.length === 0) return true;  // unconfigured/empty: keep visible for placeholder
+    return b.flavors.some(flavorIsActive);
+  }
+
+  // Helper: render a batch label for a delta card (e.g., " · B2").
+  function batchLabelFor(batchIdx) {
+    return `<span class="fdc-batch-label">· B${batchIdx + 1}</span>`;
+  }
+
+  // Per-category flavor count for the active-category pill badges.
+  const catCounts = { clean: 0, savory: 0, candy: 0 };
+  state.batches.forEach(b => {
+    if (b.batch === null) return;
+    b.flavors.forEach(fid => {
+      const f = flavorById(fid);
+      if (f) catCounts[f.cookGroup] = (catCounts[f.cookGroup] || 0) + 1;
+    });
+  });
+
+  // Build the active-category pills row (only under recommended order).
+  const activeCategoryPillsHtml = isRecommended
+    ? `<div class="active-category-pills-row">
+        <span class="acpr-label">Category</span>
+        ${COOK_GROUP_ORDER.map(g => {
+          const cnt = catCounts[g] || 0;
+          const disabled = cnt === 0;
+          const isOn = activeCats.indexOf(g) >= 0;
+          return `<button type="button" class="active-category-pill ${isOn ? 'active' : ''} ${disabled ? 'disabled' : ''}" data-acat-toggle="${g}"${disabled ? ' aria-disabled="true"' : ''}>` +
+                 (isOn ? `<span class="acp-check">✓</span> ` : '') +
+                 `${COOK_GROUP_LABEL[g]}` +
+                 (cnt > 0 ? ` <span class="acp-count">(${cnt})</span>` : '') +
+                 `</button>`;
+        }).join('')}
+        <button type="button" class="active-category-action" data-acat-action="all">All</button>
+        <button type="button" class="active-category-action" data-acat-action="clear">Clear</button>
+      </div>`
+    : '';
+
+  // Determine which batches are visible.
+  const visibleBatchIdxs = [];
+  state.batches.forEach((b, idx) => {
+    if (batchHasActiveFlavor(b)) visibleBatchIdxs.push(idx);
+  });
+
+  // Determine which flavor tuples are visible (across all batches, filtered).
+  const visibleTuples = [];
+  state.batches.forEach((b, idx) => {
+    if (b.batch === null) return;
+    b.flavors.forEach(fid => {
+      if (!flavorIsActive(fid)) return;
+      const f = flavorById(fid);
+      if (f) visibleTuples.push({ batchIdx: idx, batch: b, flavor: f });
+    });
+  });
+
+  const totalBatches = state.batches.length;
+  const visibleFlavorCount = visibleTuples.length;
+
+  // Title.
+  const titleText = `Flight · ${totalBatches} batch${totalBatches === 1 ? '' : 'es'} · ${sizeInfo.label}`;
+  let yieldText = '';
+  if (visibleFlavorCount > 0) {
+    let totalPancakes = 0;
+    state.batches.forEach(b => {
+      if (b.batch === null) return;
+      const ct = b.count || 1;
+      const perFlavor = totalYield(b.batch, sizeIdx, 1);
+      totalPancakes += perFlavor * b.flavors.length * ct;
+    });
+    yieldText = `Yields ~${totalPancakes} pancake${totalPancakes === 1 ? '' : 's'} total across all batches`;
+  }
+  header.innerHTML = `<h3>${titleText}</h3>${yieldText ? `<p class="yield">${yieldText}</p>` : ''}`;
+
+  // Empty filter state: under recommended with no active categories.
+  if (isRecommended && activeCats.length === 0) {
+    out.innerHTML = `<div class="phase-options">${buildOrderToggle('setup')}</div>
+      ${activeCategoryPillsHtml}
+      <div class="no-active-categories">All categories are hidden. Click <b>All</b> above to restore.</div>`;
+    return;
+  }
+
+  // Note: previously had an "all-empty" early-return here that preempted
+  // per-batch placeholder rendering. Removed in rc — empty/partial batches
+  // now render their own placeholder cards in the per-batch column loop.
+
+  // -------------------------------------------------------------------
+  // Setup phase — per-batch columns side by side.
+  // -------------------------------------------------------------------
+  const batchColumnsHtml = visibleBatchIdxs.map(idx => {
+    const b = state.batches[idx];
+    const sizeLabel = (b.batch !== null && b.batch !== undefined) ? BATCHES[b.batch].label : null;
+    const countLabel = (b.count > 1) ? ` × ${b.count}` : '';
+    const headerInner = `Batch ${idx + 1}` +
+      (sizeLabel ? ` · ${sizeLabel}${countLabel}` : '') +
+      (b.flavors.length > 0
+        ? `<span class="bc-sub">${b.flavors.map(fid => (flavorById(fid) || { label: fid }).label).join(', ')}</span>`
+        : '');
+    const colHeaderHtml = `<div class="batch-column-header">${headerInner}</div>`;
+
+    // Empty / partially configured?
+    if (b.batch === null || b.flavors.length === 0) {
+      let msg;
+      if (b.batch === null && b.flavors.length === 0) {
+        msg = 'Pick a batch size and at least one flavor to configure this batch.';
+      } else if (b.batch === null) {
+        msg = 'Pick a batch size for this batch.';
+      } else {
+        msg = 'Pick at least one flavor for this batch.';
+      }
+      return `<div class="batch-column">${colHeaderHtml}<div class="batch-empty-state">${msg}</div></div>`;
+    }
+
+    // Filter to visible flavors in this batch.
+    const flavorIds = b.flavors.filter(flavorIsActive);
+    if (flavorIds.length === 0) {
+      // Batch has flavors but none active — shouldn't happen because batchHasActiveFlavor
+      // returned true to include this batch. Defensive: skip the column.
+      return '';
+    }
+
+    // Order flavors within the batch column according to orderMode.
+    let orderedIds;
+    if (isRecommended) {
+      const grouped = groupSelectedByCooking(flavorIds, state.recommendedSubOrder);
+      orderedIds = COOK_GROUP_ORDER.reduce((acc, g) => acc.concat(grouped[g] || []), []);
+    } else if (state.orderMode === 'menu') {
+      orderedIds = flavorIds.slice().sort((x, y) => FLAVOR_INDEX[x] - FLAVOR_INDEX[y]);
+    } else {
+      orderedIds = flavorIds.slice(); // selection — preserves picker order
+    }
+    const orderedFlavors = orderedIds.map(flavorById);
+
+    // Dry + Wet pair (50/50).
+    const dryWetPair = `<div class="setup-row-pair">
+      <div class="block">
+        <h4>Dry Bowl${b.count > 1 ? ` × ${b.count}` : ''}</h4>
+        ${dryBowlHtml(b.batch, state.bulk)}
+      </div>
+      <div class="block">
+        <h4>Wet Bowls${b.count > 1 ? ` × ${b.count}` : ''}${flavorIds.length > 1 ? ` (per flavor)` : ''}</h4>
+        ${wetBowlSharedHtml(b.batch)}
+      </div>
+    </div>`;
+
+    // Fat & Spices (per flavor in the column).
+    const spicesBlock = `<div class="block">
+      <h4>FAT &amp; Spices${flavorIds.length > 1 ? ' (per flavor)' : ''}</h4>
+      ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${fatAndSpicesHtml(f, b.batch)}</div>`).join('')}
+    </div>`;
+
+    // Toppings (per flavor).
+    const toppingsBlock = `<div class="block">
+      <h4>Toppings per pancake</h4>
+      ${orderedFlavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${toppingsInnerHtml(f, sizeIdx, { includeCandyPrep: false })}</div>`).join('')}
+    </div>`;
+
+    // Grease for this batch only.
+    const groupedForGrease = groupSelectedByCooking(flavorIds, 'menu');
+    const greases = distinctGreasesByGroup(groupedForGrease);
+    const greaseBlock = `<div class="grease-lines">
+      <h4>Cooking-surface grease</h4>
+      <ul>
+        ${greases.map(g => `<li>
+          <b>${g.grease}</b> <span style="color:var(--muted);font-size:11px;">· ${COOK_GROUP_LABEL[g.group]} (${g.flavorLabels.join(', ')})</span>
+        </li>`).join('')}
+      </ul>
+    </div>`;
+
+    return `<div class="batch-column">
+      ${colHeaderHtml}
+      ${dryWetPair}
+      ${spicesBlock}
+      ${toppingsBlock}
+      ${greaseBlock}
+    </div>`;
+  }).filter(h => h).join('');
+
+  const renderedBatchCount = visibleBatchIdxs.filter(idx => {
+    const b = state.batches[idx];
+    return !(b.batch === null && b.flavors.length === 0) ? true : true;
+  }).length;
+
+  // -------------------------------------------------------------------
+  // Cook phase + Tier + Shopping list — only render when flavors exist.
+  // -------------------------------------------------------------------
+  let cookPhaseHtml = '';
+  let tierSectionHtml = '';
+  let masterShoppingListHtml = '';
+
+  if (visibleFlavorCount > 0) {
+    // Collect all candy flavor ids across visible tuples for heat computation.
+    const allVisibleFlavorIds = visibleTuples.map(t => t.flavor.id);
+    const allVisibleFlavors = visibleTuples.map(t => t.flavor);
+
+    // Build the per-flavor delta card HTML, with batch label.
+    const deltaCardHtmlForTuple = (tuple, showHeat) => {
+      const f = tuple.flavor;
+      const inner = flavorDeltaCardHtml(f, sizeIdx, { showHeat });
+      const syrupRow = `<ul class="flavor-deltas" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:6px">
+          <li><span class="k">Syrup</span><span class="v">${f.syrup}</span></li>
+        </ul>`;
+      return `<div class="flavor-delta-card"><h6>${f.label} ${batchLabelFor(tuple.batchIdx)}</h6>${inner}${syrupRow}</div>`;
+    };
+
+    // Combined syrup groupings across all visible flavors (deduped by syrup).
+    const syrupGroupings = getSyrupGroupings(allVisibleFlavors);
+    const sharedSyrupHtml = syrupGroupings.length > 0 ? `<div class="cook-shared-syrups">
+      <h5>Recommended syrups (one line per distinct syrup)</h5>
+      <ul>
+        ${syrupGroupings.map(sg =>
+          `<li><b>${sg.syrup}</b> <span style="color:var(--muted)">— for ${sg.flavors.join(', ')}</span></li>`
+        ).join('')}
+      </ul>
+    </div>` : '';
+
+    const sharedCookCard = `<div class="cook-shared">
+      <h4>Shared Cooking Instructions <span class="shared-sub">— follow in order; consult per-flavor delta cards below for specifics</span></h4>
+      <ol class="steps">${sharedCookingFlowHtml(allVisibleFlavors, sizeIdx)}</ol>
+      ${sharedSyrupHtml}
+    </div>`;
+
+    const cookGridAttr = `data-cook-layout="${state.cookLayout}"`;
+    const cookSideStyleN = m => state.cookLayout === 'side'
+      ? ` style="grid-template-columns: repeat(${m}, minmax(240px, 1fr))"` : '';
+
+    let cookGroupsHtml;
+    if (isRecommended) {
+      // Group all visible tuples by cookGroup.
+      const tuplesByGroup = { clean: [], savory: [], candy: [] };
+      visibleTuples.forEach(t => {
+        tuplesByGroup[t.flavor.cookGroup].push(t);
+      });
+      // Apply sub-ordering within each group.
+      const sortTuples = (arr) => {
+        const subOrder = state.recommendedSubOrder;
+        if (subOrder === 'menu') {
+          return arr.slice().sort((a, b) => FLAVOR_INDEX[a.flavor.id] - FLAVOR_INDEX[b.flavor.id]);
+        }
+        return arr.slice().sort((a, b) => {
+          if (a.batchIdx !== b.batchIdx) return a.batchIdx - b.batchIdx;
+          return a.batch.flavors.indexOf(a.flavor.id) - b.batch.flavors.indexOf(b.flavor.id);
+        });
+      };
+
+      const visibleGroupOrder = COOK_GROUP_ORDER.filter(g => tuplesByGroup[g].length > 0);
+      cookGroupsHtml = visibleGroupOrder.map((g, idx) => {
+        const groupTuples = sortTuples(tuplesByGroup[g]);
+        const groupFlavorIds = groupTuples.map(t => t.flavor.id);
+        const heat = effectiveHeatForGroup(g, groupFlavorIds);
+        const isLast = idx === visibleGroupOrder.length - 1;
+
+        const deltaCards = `<div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyleN(groupTuples.length)}>
+          ${groupTuples.map(t => deltaCardHtmlForTuple(t, false)).join('')}
+        </div>`;
+
+        const transition = isLast ? '' :
+          `<div class="transition">→ Wipe the cooking surface clean, re-apply grease for the <b>${COOK_GROUP_LABEL[visibleGroupOrder[idx + 1]]}</b> group, then continue.</div>`;
+
+        return `<div class="cook-category-card">
+          <div class="ccc-head">
+            <span class="ccc-title">${COOK_GROUP_LABEL[g]} · ${heat.temp}</span>
+            <span class="ccc-heat">${heat.detail}</span>
+          </div>
+          <div class="ccc-blurb">${COOK_GROUP_BLURB[g]}</div>
+          ${deltaCards}
+          ${transition}
+        </div>`;
+      }).join('');
+    } else {
+      let orderedTuples;
+      if (state.orderMode === 'menu') {
+        orderedTuples = visibleTuples.slice().sort((a, b) => FLAVOR_INDEX[a.flavor.id] - FLAVOR_INDEX[b.flavor.id]);
+      } else {
+        orderedTuples = visibleTuples.slice().sort((a, b) => {
+          if (a.batchIdx !== b.batchIdx) return a.batchIdx - b.batchIdx;
+          return a.batch.flavors.indexOf(a.flavor.id) - b.batch.flavors.indexOf(b.flavor.id);
+        });
+      }
+      cookGroupsHtml = `<div class="flavor-deltas-grid" ${cookGridAttr}${cookSideStyleN(orderedTuples.length)}>
+        ${orderedTuples.map(t => deltaCardHtmlForTuple(t, true)).join('')}
+      </div>`;
+    }
+
+    const cookLayoutSwitcher = visibleFlavorCount > 1
+      ? `<div class="inline-toggle" data-toggle-group="cook-layout" style="margin-left:8px">
+          <span class="label">Layout</span>
+          <button type="button" data-cook-layout="side"  class="${state.cookLayout === 'side'  ? 'active' : ''}">Side-by-side</button>
+          <button type="button" data-cook-layout="stack" class="${state.cookLayout === 'stack' ? 'active' : ''}">Stacked</button>
+          <button type="button" data-cook-layout="grid"  class="${state.cookLayout === 'grid'  ? 'active' : ''}">Grid</button>
+        </div>`
+      : '';
+
+    cookPhaseHtml = `<div class="phase-header">
+      <h3>Cook phase</h3>
+    </div>
+    <div class="phase-section">
+      ${sharedCookCard}
+      <div class="phase-options">${buildOrderToggle('cook')}${cookLayoutSwitcher}</div>
+      ${cookGroupsHtml}
+    </div>`;
+
+    // Tier section.
+    const byFlavor = {};
+    visibleTuples.forEach(t => {
+      const id = t.flavor.id;
+      if (!byFlavor[id]) byFlavor[id] = { flavor: t.flavor, batchIdxs: [] };
+      byFlavor[id].batchIdxs.push(t.batchIdx);
+    });
+    const uniqueFlavors = Object.values(byFlavor);
+
+    if (uniqueFlavors.length === 1) {
+      const u = uniqueFlavors[0];
+      const labelHtml = `${u.flavor.label} ${u.batchIdxs.map(i => batchLabelFor(i)).join(' ')}`;
+      tierSectionHtml = `<div class="tier-section">
+        <h4>Quality Tier (Chef → Avoid) — ${labelHtml}</h4>
+        ${tierGridHtml(u.flavor)}
+      </div>`;
+    } else {
+      const flavorsArr = uniqueFlavors.map(u => u.flavor);
+      const cmp = compareTiers(flavorsArr);
+      const sharedHtml = cmp.shared.length
+        ? `<div class="tiers-shared">
+            <h5>Shared across all ${uniqueFlavors.length} flavors</h5>
+            <ul>
+              ${cmp.shared.map(s => `<li>
+                <span class="tier-badge ${s.tier}">${s.tierLabel}</span>
+                <span class="tier-slot">${s.slotLabel}</span>
+                <span class="tier-val">${s.value}</span>
+              </li>`).join('')}
+            </ul>
+          </div>`
+        : `<div class="tiers-shared"><h5>Shared across all ${uniqueFlavors.length} flavors</h5><p class="tiers-shared-empty">Nothing in common across these flavors' quality tiers — see per-flavor blocks below.</p></div>`;
+
+      const tierSideStyle = state.tierLayout === 'side'
+        ? ` style="grid-template-columns: repeat(${uniqueFlavors.length}, minmax(260px, 1fr))"` : '';
+      const tierGridClass = state.tierLayout === 'side' ? 'tiers-per-flavor tier-side-grid' : 'tiers-per-flavor';
+      const perFlavorHtml = `<div class="${tierGridClass}" data-tier-layout="${state.tierLayout}"${tierSideStyle}>
+        ${uniqueFlavors.map(u => {
+          const entries = cmp.perFlavor[u.flavor.id];
+          const labelHtml = `${u.flavor.label} ${u.batchIdxs.map(i => batchLabelFor(i)).join(' ')}`;
+          if (!entries.length) {
+            return `<div class="flavor-tiers-card"><h5>${labelHtml}</h5><div class="all-match">All quality tiers match the shared set above.</div></div>`;
+          }
+          return `<div class="flavor-tiers-card">
+            <h5>${labelHtml}</h5>
+            <div class="compact-tiers">
+              ${entries.map(e => `<div class="compact-tier-row">
+                <span class="tier-badge ${e.tier}">${e.tierLabel}</span>
+                <span class="ti-slot">${e.slotLabel}</span>
+                <span class="ti-val">${e.value}</span>
+              </div>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+
+      tierSectionHtml = `<div class="tier-section">
+        <div class="toggle-row">
+          <h4>Quality Tier (Chef → Avoid) — shared + per flavor</h4>
+          <div class="inline-toggle" data-toggle-group="tier-layout">
+            <span class="label">Layout</span>
+            <button type="button" data-tier-layout="side"  class="${state.tierLayout === 'side'  ? 'active' : ''}">Side-by-side</button>
+            <button type="button" data-tier-layout="stack" class="${state.tierLayout === 'stack' ? 'active' : ''}">Stacked</button>
+            <button type="button" data-tier-layout="grid"  class="${state.tierLayout === 'grid'  ? 'active' : ''}">Grid</button>
+          </div>
+        </div>
+        ${sharedHtml}
+        ${perFlavorHtml}
+      </div>`;
+    }
+
+    // Master shopping list placeholder.
+    masterShoppingListHtml = `<div class="tier-section">
+      <h4>Master Shopping List</h4>
+      <p style="color:var(--muted); font-style:italic; font-size:12px;">Computed totals across all batches arrive in v3.0.0 final.</p>
+    </div>`;
+  }
+
+  // -------------------------------------------------------------------
+  // Prep callouts (deduped across all visible flavors).
+  // -------------------------------------------------------------------
+  const allVisibleIds = visibleTuples.map(t => t.flavor.id);
+  const prepCallouts = prepCalloutsFor(allVisibleIds);
+  const prepHtml = prepCallouts.length ? `<div class="prep-stack">${prepCallouts.join('')}</div>` : '';
+
+  // -------------------------------------------------------------------
+  // Order toggle for Setup.
+  // -------------------------------------------------------------------
   const orderToggleSetupHtml = buildOrderToggle('setup');
-  const orderToggleCookHtml  = buildOrderToggle('cook');
 
-  // --- Header (written to OUTSIDE-the-card element) ---
-  header.innerHTML = `<h3>${titleText}</h3><p class="yield">${yieldText}</p>`;
-
-  // --- Final body assembly (v2.8.0: phase options moved out of headers into in-section bands) ---
+  // -------------------------------------------------------------------
+  // Final assembly.
+  // -------------------------------------------------------------------
   out.innerHTML = `
     ${prepHtml}
 
     <div class="phase-header">
       <h3>Setup phase</h3>
-      <span class="phase-sub">Measure everything. No cooking yet.</span>
+      <span class="phase-sub">${renderedBatchCount} batch${renderedBatchCount === 1 ? '' : 'es'} visible</span>
     </div>
     <div class="phase-section">
-      ${dryWetPair}
       <div class="phase-options">${orderToggleSetupHtml}</div>
-      ${spicesBlock}
-      ${toppingsBlock}
-      ${greaseBlock}
+      ${activeCategoryPillsHtml}
+      <div class="batches-row" data-batch-count="${renderedBatchCount}">
+        ${batchColumnsHtml}
+      </div>
     </div>
 
-    ${calloutsHtml}
+    ${cookPhaseHtml}
 
-    <div class="phase-header">
-      <h3>Cook phase</h3>
-    </div>
-    <div class="phase-section">
-      ${sharedCookCard}
-      <div class="phase-options">${orderToggleCookHtml}${cookLayoutSwitcher}</div>
-      ${cookGroupsHtml}
-    </div>
+    ${tierSectionHtml}
 
-    ${tiersBlockHtml}
+    ${masterShoppingListHtml}
   `;
 }
 
@@ -3488,6 +3803,31 @@ document.getElementById('multi-batch-toggle-row').addEventListener('click', e =>
     localStorage.setItem('pancakeFlightAllowMultiBatchFlavor', state.allowMultiBatchFlavor ? '1' : '0');
   } catch (_) {}
   render();
+});
+
+// v3.0.0-rc: active-category pill handlers (delegated on #output).
+document.getElementById('output').addEventListener('click', e => {
+  // Category pill toggle.
+  const togglePill = e.target.closest('[data-acat-toggle]');
+  if (togglePill) {
+    if (togglePill.classList.contains('disabled')) return;
+    const cat = togglePill.dataset.acatToggle;
+    if (COOK_GROUP_ORDER.indexOf(cat) < 0) return;
+    const idx = state.activeCategories.indexOf(cat);
+    if (idx >= 0) state.activeCategories.splice(idx, 1);
+    else state.activeCategories.push(cat);
+    render();
+    return;
+  }
+  // Quick action (All / Clear).
+  const actionBtn = e.target.closest('[data-acat-action]');
+  if (actionBtn) {
+    const action = actionBtn.dataset.acatAction;
+    if (action === 'all') state.activeCategories = COOK_GROUP_ORDER.slice();
+    else if (action === 'clear') state.activeCategories = [];
+    render();
+    return;
+  }
 });
 document.getElementById('size-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-size]');
