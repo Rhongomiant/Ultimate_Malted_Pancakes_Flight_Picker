@@ -257,25 +257,29 @@
     font-weight: 600; }
 
   /* === Side-by-side layout (>= 1000px viewport only) === */
+  /* v2.2.0: pancake-size-bar lives at top of right column above .output-pane */
   @media (min-width: 1000px) {
-    body[data-layout="side"] .wrap { max-width: 1320px;
+    body[data-layout="side"] .wrap { max-width: 1600px;
       display: grid; grid-template-columns: 360px 1fr;
       column-gap: 28px; align-items: start; }
     body[data-layout="side"] h1,
     body[data-layout="side"] .sub,
     body[data-layout="side"] .controls-row { grid-column: 1 / -1; }
-    body[data-layout="side"] .picker-pane { grid-column: 1; }
-    body[data-layout="side"] .output-pane { grid-column: 2; }
-    body[data-layout="side"] .picker-pane { position: sticky; top: 14px;
-      max-height: calc(100vh - 28px); overflow-y: auto;
-      padding: 2px 8px 50vh 2px; /* big bottom pad lets card 3 scroll up toward center */ }
+    body[data-layout="side"] .pancake-size-bar { grid-column: 2; }
+    body[data-layout="side"] .picker-pane { grid-column: 1; grid-row: span 2;
+      position: sticky; top: calc(var(--controls-h, 60px) + 8px);
+      max-height: calc(100vh - var(--controls-h, 60px) - 16px); overflow-y: auto;
+      padding: 2px 8px 50vh 2px; }
+    body[data-layout="side"] .output-pane { grid-column: 2; min-width: 0; }
     body[data-layout="side"] .picker-pane .card { margin-bottom: 14px; }
-    body[data-layout="side"] .output-pane { min-width: 0; }
     body[data-layout="side"] .output-pane .card { margin-bottom: 14px; }
-    /* Slim scrollbar inside the sticky pane */
     body[data-layout="side"] .picker-pane::-webkit-scrollbar { width: 6px; }
     body[data-layout="side"] .picker-pane::-webkit-scrollbar-thumb {
       background: var(--scrollbar-thumb); border-radius: 3px; }
+    /* Options collapsed: picker hides, size bar + recipe expand */
+    body[data-layout="side"][data-options-collapsed="1"] .picker-pane { display: none; }
+    body[data-layout="side"][data-options-collapsed="1"] .pancake-size-bar,
+    body[data-layout="side"][data-options-collapsed="1"] .output-pane { grid-column: 1 / -1; }
   }
 
 
@@ -617,9 +621,117 @@
     word-wrap: break-word; overflow-wrap: anywhere; }
   ul.flavor-deltas li:last-child { border-bottom: 0; }
 
-  /* === v2.1.1: side-by-side picker pane — Pancake Size first (sticky inside pane) === */
-  body[data-layout="side"] .picker-pane .card:first-child {
-    position: sticky; top: 0; z-index: 5; background: var(--card); }
+  /* === v2.2.0: controls-row actions container (Hide Options + Hide Controls grouped right) === */
+  .controls-actions { margin-left: auto; display: inline-flex; gap: 8px; align-items: center; }
+  .options-toggle, .controls-toggle { border: 1px solid var(--line);
+    background: var(--card); border-radius: 999px; padding: 6px 14px;
+    font-size: 0.78rem; cursor: pointer; color: var(--muted);
+    font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+  .options-toggle:hover, .controls-toggle:hover { color: var(--ink); }
+  .controls-toggle { margin-left: 0; } /* override v2.1.1 auto-margin */
+  body[data-controls-collapsed="1"] .controls-row > :not(.controls-actions) { display: none; }
+  body[data-controls-collapsed="1"] .controls-actions { margin-left: auto; }
+  body:not([data-options-collapsed="1"]) .options-toggle .expand-label { display: none; }
+  body[data-options-collapsed="1"] .options-toggle .collapse-label { display: none; }
+
+  /* === v2.2.0: Pancake Size bar (sticky, collapsible) === */
+  .pancake-size-bar { background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;
+    position: sticky; top: var(--controls-h, 60px); z-index: 55; }
+  body[data-controls-collapsed="1"] .pancake-size-bar { top: var(--controls-collapsed-h, 38px); }
+  .pancake-size-bar .psb-head { display: flex; align-items: center; gap: 12px; }
+  .pancake-size-bar .psb-title { margin: 0; font-size: 1.0rem; color: var(--ink);
+    font-weight: 600; flex: 1; }
+  .pancake-size-bar .psb-toggle { background: none; border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 12px; font-size: 0.78rem;
+    color: var(--muted); cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .pancake-size-bar .psb-toggle:hover { color: var(--ink); }
+  .pancake-size-bar .psb-body { margin-top: 10px; }
+  .pancake-size-bar[data-collapsed="1"] .psb-body { display: none; }
+  .pancake-size-bar[data-collapsed="1"] .psb-title-expanded { display: none; }
+  .pancake-size-bar:not([data-collapsed="1"]) .psb-title-collapsed { display: none; }
+  .pancake-size-bar[data-collapsed="1"] { padding: 8px 16px; }
+  .pancake-size-bar .psb-toggle .expand-label { display: none; }
+  .pancake-size-bar[data-collapsed="1"] .psb-toggle .expand-label { display: inline; }
+  .pancake-size-bar[data-collapsed="1"] .psb-toggle .collapse-label { display: none; }
+  @media print {
+    .pancake-size-bar { position: static; }
+    .pancake-size-bar .psb-toggle { display: none; }
+    .pancake-size-bar[data-collapsed="1"] .psb-body { display: block; }
+    .pancake-size-bar[data-collapsed="1"] .psb-title-expanded { display: inline; }
+    .pancake-size-bar[data-collapsed="1"] .psb-title-collapsed { display: none; }
+  }
+
+  /* === v2.2.0: stacked-mode sticky Batch card (Pancake Size + Batch stay on screen) === */
+  body:not([data-layout="side"]) .picker-pane .card[data-card="batch"] {
+    position: sticky;
+    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 8px);
+    z-index: 50; background: var(--card); }
+  body:not([data-layout="side"])[data-controls-collapsed="1"] .picker-pane .card[data-card="batch"] {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 8px); }
+  body:not([data-layout="side"])[data-pancake-collapsed="1"] .picker-pane .card[data-card="batch"] {
+    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 8px); }
+  body:not([data-layout="side"])[data-controls-collapsed="1"][data-pancake-collapsed="1"] .picker-pane .card[data-card="batch"] {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 8px); }
+  body[data-options-collapsed="1"]:not([data-layout="side"]) .picker-pane { display: none; }
+
+  /* === v2.2.0: per-card collapse (Batch + Flavors picker cards) === */
+  .card .card-head { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+  .card .card-head h2 { flex: 1; margin: 0; }
+  .card .card-collapse { background: none; border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 12px; font-size: 0.78rem; color: var(--muted);
+    cursor: pointer; font-family: inherit; flex-shrink: 0; }
+  .card .card-collapse:hover { color: var(--ink); }
+  .card[data-collapsed="1"] .card-body { display: none; }
+  .card .card-collapse .expand-label { display: none; }
+  .card[data-collapsed="1"] .card-collapse .expand-label { display: inline; }
+  .card[data-collapsed="1"] .card-collapse .collapse-label { display: none; }
+  @media print {
+    .card .card-collapse { display: none; }
+    .card[data-collapsed="1"] .card-body { display: block; }
+  }
+
+  /* === v2.2.0: split sticky header — title scrolls away, yield stays === */
+  .out-title { margin: -8px -16px 0; padding: 10px 16px 4px;
+    background: var(--card); border-bottom: 1px dashed var(--line); }
+  .out-title h3 { margin: 0; }
+  .out-yield { position: sticky;
+    top: calc(var(--controls-h, 60px) + var(--psb-h, 60px) + 4px);
+    z-index: 25; background: var(--card);
+    margin: 0 -16px 14px; padding: 8px 16px;
+    border-bottom: 1px solid var(--line); }
+  body[data-controls-collapsed="1"] .out-yield {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-h, 60px) + 4px); }
+  body[data-pancake-collapsed="1"] .out-yield {
+    top: calc(var(--controls-h, 60px) + var(--psb-collapsed-h, 38px) + 4px); }
+  body[data-controls-collapsed="1"][data-pancake-collapsed="1"] .out-yield {
+    top: calc(var(--controls-collapsed-h, 38px) + var(--psb-collapsed-h, 38px) + 4px); }
+  .out-yield .yield { margin: 0; }
+  @media print {
+    .out-title, .out-yield { position: static; padding: 0; margin: 0 0 8px;
+      border-bottom: 0; background: transparent; }
+  }
+
+  /* === v2.2.0: sub-card list k/v stacking (item 6a — kills horizontal squish) === */
+  .subcards-grid .subcard ul.list li {
+    display: block; padding: 6px 0; }
+  .subcards-grid .subcard ul.list li .k {
+    display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+  .subcards-grid .subcard ul.list li .v {
+    display: block; text-align: left; color: var(--muted); font-weight: 400;
+    white-space: normal; padding-left: 14px; position: relative;
+    overflow-wrap: anywhere; word-break: break-word; }
+  .subcards-grid .subcard ul.list li .v::before {
+    content: "•"; position: absolute; left: 2px; color: var(--accent); }
+
+  /* === v2.2.0: sub-card grid horizontal scroll fallback (item 6b) === */
+  .subcards-grid[data-subcard-layout="side"] {
+    overflow-x: auto; padding-bottom: 6px; }
+  .subcards-grid[data-subcard-layout="side"]::-webkit-scrollbar { height: 6px; }
+  .subcards-grid[data-subcard-layout="side"]::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb); border-radius: 3px; }
+  .subcards-grid[data-subcard-layout="side"] .subcard { min-width: 200px; }
 
 </style>
 </head>
@@ -660,45 +772,82 @@
       <button type="button" data-step="5"  class="cs-btn active">5%</button>
       <button type="button" data-step="10" class="cs-btn">10%</button>
     </div>
-    <button type="button" class="controls-toggle" id="controls-toggle"
-            aria-label="Toggle controls visibility">
-      <span class="collapse-label">▲ Hide controls</span>
-      <span class="expand-label">▼ Show controls</span>
-    </button>
+    <div class="controls-actions" id="controls-actions">
+      <button type="button" class="options-toggle" id="options-toggle"
+              aria-label="Toggle picker options visibility">
+        <span class="collapse-label">◀ Hide options</span>
+        <span class="expand-label">▶ Show options</span>
+      </button>
+      <button type="button" class="controls-toggle" id="controls-toggle"
+              aria-label="Toggle controls visibility">
+        <span class="collapse-label">▲ Hide controls</span>
+        <span class="expand-label">▼ Show controls</span>
+      </button>
+    </div>
+  </div><!-- /controls-row -->
+
+  <div class="pancake-size-bar" id="pancake-size-bar" data-collapsed="0">
+    <div class="psb-head">
+      <h3 class="psb-title">
+        <span class="psb-title-expanded">Pancake Size (Ladle Size)</span>
+        <span class="psb-title-collapsed">Reveal Pancake Size (Ladle Size)</span>
+      </h3>
+      <button type="button" class="psb-toggle" id="psb-toggle"
+              aria-label="Toggle pancake size visibility">
+        <span class="collapse-label">▲ Hide</span>
+        <span class="expand-label">▼ Show</span>
+      </button>
+    </div>
+    <div class="psb-body">
+      <div class="opts" id="size-opts"></div>
+    </div>
   </div>
 
   <div class="picker-pane">
-  <div class="card">
-    <h2>1. Pancake size (ladle)</h2>
-    <div class="opts" id="size-opts"></div>
+  <div class="card" data-card="batch" data-collapsed="0">
+    <div class="card-head">
+      <h2>2. Batch size &amp; dry mix source</h2>
+      <button type="button" class="card-collapse" data-card-toggle="batch"
+              aria-label="Toggle Batch card">
+        <span class="collapse-label">▲ Hide</span>
+        <span class="expand-label">▼ Show</span>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="opts" id="batch-opts"></div>
+      <h3 class="sub-h">Dry mix source</h3>
+      <div class="opts" id="bulk-opts"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>2. Batch size &amp; dry mix source</h2>
-    <div class="opts" id="batch-opts"></div>
-    <h3 class="sub-h">Dry mix source</h3>
-    <div class="opts" id="bulk-opts"></div>
-  </div>
-
-  <div class="card">
-    <h2>3. Flavor combination</h2>
-    <div class="flavor-status" id="flavor-status" hidden>
-      <span id="flavor-status-text">Selected: 0 flavors</span>
-      <button type="button" class="clear-btn" id="flavor-clear" hidden>Clear all</button>
+  <div class="card" data-card="flavor" data-collapsed="0">
+    <div class="card-head">
+      <h2>3. Flavors &amp; Combinations</h2>
+      <button type="button" class="card-collapse" data-card-toggle="flavor"
+              aria-label="Toggle Flavors card">
+        <span class="collapse-label">▲ Hide</span>
+        <span class="expand-label">▼ Show</span>
+      </button>
     </div>
-    <div class="opts" id="flavor-opts"></div>
-    <p class="picker-hint" id="flavor-hint" hidden></p>
-    <div class="candy-row">
-      <div id="caramel-inline" class="candy-cell" style="display:none;">
-        <h3 class="sub-h">Caramel preparation</h3>
-        <div class="opts" id="caramel-opts"></div>
+    <div class="card-body">
+      <div class="flavor-status" id="flavor-status" hidden>
+        <span id="flavor-status-text">Selected: 0 flavors</span>
+        <button type="button" class="clear-btn" id="flavor-clear" hidden>Clear all</button>
       </div>
-      <div id="toffee-inline" class="candy-cell" style="display:none;">
-        <h3 class="sub-h">Toffee preparation</h3>
-        <div class="opts" id="toffee-opts"></div>
+      <div class="opts" id="flavor-opts"></div>
+      <p class="picker-hint" id="flavor-hint" hidden></p>
+      <div class="candy-row">
+        <div id="caramel-inline" class="candy-cell" style="display:none;">
+          <h3 class="sub-h">Caramel preparation</h3>
+          <div class="opts" id="caramel-opts"></div>
+        </div>
+        <div id="toffee-inline" class="candy-cell" style="display:none;">
+          <h3 class="sub-h">Toffee preparation</h3>
+          <div class="opts" id="toffee-opts"></div>
+        </div>
       </div>
+      <p id="candy-hint" style="display:none;margin:10px 0 0;color:var(--muted);font-size:.85rem"></p>
     </div>
-    <p id="candy-hint" style="display:none;margin:10px 0 0;color:var(--muted);font-size:.85rem"></p>
   </div>
   </div><!-- /picker-pane -->
 
@@ -991,7 +1140,7 @@
 
   </div><!-- /output-pane -->
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.1.1</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v2.2.0</div>
 </div>
 
 <script>
@@ -1448,12 +1597,16 @@ const state = {
   bulk: false,
   caramelPrep: 'flash',
   toffeePrep: 'flash',
-  groupByCookOrder: true,
+  groupByCookOrder: true,          // Recommended Order (true) vs Selection Order (false) — affects Setup + Cook
   tierLayout: 'side',
   wetLayout: 'grid',
   spicesLayout: 'grid',
   toppingsLayout: 'grid',
   controlsCollapsed: false,
+  pancakeSizeCollapsed: false,     // v2.2.0
+  batchCardCollapsed: false,       // v2.2.0
+  flavorCardCollapsed: false,      // v2.2.0
+  optionsCollapsed: false,         // v2.2.0
 };
 
 // Restore persisted UI prefs (mode/grouping/layouts/collapse) from localStorage
@@ -1473,6 +1626,10 @@ try {
   if (tpl === 'side' || tpl === 'stack' || tpl === 'grid') state.toppingsLayout = tpl;
   const cc = localStorage.getItem('pancakeFlightControlsCollapsed');
   if (cc === '1') state.controlsCollapsed = true;
+  if (localStorage.getItem('pancakeFlightPancakeSizeCollapsed') === '1') state.pancakeSizeCollapsed = true;
+  if (localStorage.getItem('pancakeFlightBatchCardCollapsed') === '1') state.batchCardCollapsed = true;
+  if (localStorage.getItem('pancakeFlightFlavorCardCollapsed') === '1') state.flavorCardCollapsed = true;
+  if (localStorage.getItem('pancakeFlightOptionsCollapsed') === '1') state.optionsCollapsed = true;
 } catch (_) {}
 
 // =========================================================================
@@ -1557,6 +1714,14 @@ function cookGroupOf(flavor) { return flavor.cookGroup; }
 // Return selected flavor ids sorted by their position in FLAVORS (menu order)
 function getSortedSelectedFlavors() {
   return state.selectedFlavors.slice().sort((a, b) => FLAVOR_INDEX[a] - FLAVOR_INDEX[b]);
+}
+
+// v2.2.0: return ids in the order the user wants displayed — menu order when
+// Recommended Order is active, raw pick order when Selection Order is active.
+function getRenderOrderedFlavors() {
+  return state.groupByCookOrder
+    ? getSortedSelectedFlavors()
+    : state.selectedFlavors.slice();
 }
 
 // Group selected ids by cook-group; within each group, sorted by menu order
@@ -1707,6 +1872,42 @@ function wetBowlHtml(flavor, batchIdx) {
     <li><span class="k">Egg</span><span class="v">${WET.egg[b]}</span></li>
     <li><span class="k">${flavor.fat}</span><span class="v">${FAT[b]}</span></li>
   </ul>`;
+}
+
+// v2.2.0: Wet Bowl shared section for Flight — only milk + egg (fat moves to
+// the per-flavor FAT & Spices block since fat differs by flavor).
+function wetBowlSharedHtml(batchIdx) {
+  const b = batchIdx;
+  return `<ul class="list">
+    <li><span class="k">2% Lactaid Milk</span><span class="v">${WET.milk[b]}</span></li>
+    <li><span class="k">Egg</span><span class="v">${WET.egg[b]}</span></li>
+  </ul>`;
+}
+
+// v2.2.0: combined FAT + Spices block per flavor (Flight mode)
+function fatAndSpicesHtml(flavor, batchIdx) {
+  const b = batchIdx;
+  let html = `<ul class="list">
+    <li><span class="k">${flavor.fat}</span><span class="v">${FAT[b]}</span></li>
+  </ul>`;
+  if (flavor.spices.length) {
+    html += `<ul class="list" style="margin-top:6px">` + flavor.spices.map(s =>
+      `<li><span class="k">${s.name}</span><span class="v">${s.amounts[b]}</span></li>`
+    ).join('') + `</ul>`;
+  }
+  if (flavor.pickOneSpices) {
+    const grp = flavor.pickOneSpices;
+    html += `
+        <p style="margin:10px 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700">${grp.label}</p>
+        <ul class="list">` + grp.options.map(o =>
+          `<li><span class="k">${o.name}</span><span class="v">${o.amounts[b]}</span></li>`
+        ).join('') + `</ul>
+        <p style="margin:6px 0 0;color:var(--muted);font-size:.82rem">Add <b>one</b> of these to the wet bowl — not both.</p>`;
+  }
+  if (!flavor.spices.length && !flavor.pickOneSpices) {
+    html += `<p style="margin:6px 0 0;color:var(--muted);font-size:.92rem">No additional spices for this flavor.</p>`;
+  }
+  return html;
 }
 
 function spicesHtml(flavor, batchIdx) {
@@ -2097,8 +2298,10 @@ function renderSingleOutput() {
 
   const out = document.getElementById('output');
   out.innerHTML = `
-    <div class="out-header">
+    <div class="out-title">
       <h3>${flavor.label} · ${batchInfo.label} batch · ${sizeInfo.label}</h3>
+    </div>
+    <div class="out-yield">
       <p class="yield">${yieldText}</p>
     </div>
     ${prepStackHtml}
@@ -2151,11 +2354,11 @@ function renderSingleOutput() {
 
 function renderFlightOutput() {
   const out = document.getElementById('output');
-  const ids = getSortedSelectedFlavors();   // <-- always menu order
+  const ids = getRenderOrderedFlavors();   // menu order or selection order based on toggle
   const n = ids.length;
 
   if (n === 0) {
-    out.innerHTML = `<div class="out-header"><h3>Flight mode</h3></div>
+    out.innerHTML = `<div class="out-title"><h3>Flight mode</h3></div>
       <div class="empty-state">
         <p style="margin:0 0 6px;font-size:1.05rem;color:var(--ink)">No flavors selected yet.</p>
         <p style="margin:0">Pick one or more flavors above to build a flight. Each flavor becomes its own batch at the chosen batch size.</p>
@@ -2189,27 +2392,26 @@ function renderFlightOutput() {
     <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">${dryNote}</p>
   </div>`;
 
-  // --- Wet block — per-flavor sub-cards w/layout switcher ---
-  const wetHeading = n === 1 ? 'Wet Bowl' : 'Wet Bowls';
+  // --- Wet block — single shared block (milk + egg only; fat moves to FAT & Spices) ---
+  const wetHeading = n === 1 ? 'Wet Bowl' : `Wet Bowls (× ${n})`;
+  const wetNote = n === 1
+    ? 'Add the fat and spices below — separate sub-card per flavor.'
+    : `Same shared liquids in each of the ${n} bowls. Per-flavor fat + spices go in the next section.`;
   const wetBlock = `<div class="block">
-    <div class="toggle-row">
-      <h4>${wetHeading}</h4>
-      ${n > 1 ? layoutSwitcherHtml('wet', state.wetLayout) : ''}
-    </div>
-    <div class="subcards-grid" data-subcard-layout="${state.wetLayout}"${sideGridStyle(state.wetLayout, n)}>
-      ${flavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${wetBowlHtml(f, b)}</div>`).join('')}
-    </div>
+    <h4>${wetHeading}</h4>
+    ${wetBowlSharedHtml(b)}
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">${wetNote}</p>
   </div>`;
 
-  // --- Spices — per-flavor sub-cards w/layout switcher ---
-  const spicesHeading = n === 1 ? 'Spices (into wet bowl)' : 'Spices (into wet bowls)';
+  // --- FAT & Spices — per-flavor sub-cards w/layout switcher ---
+  const spicesHeading = n === 1 ? 'FAT & Spices (into wet bowl)' : 'FAT & Spices (into wet bowls)';
   const spicesBlock = `<div class="block">
     <div class="toggle-row">
       <h4>${spicesHeading}</h4>
       ${n > 1 ? layoutSwitcherHtml('spices', state.spicesLayout) : ''}
     </div>
     <div class="subcards-grid" data-subcard-layout="${state.spicesLayout}"${sideGridStyle(state.spicesLayout, n)}>
-      ${flavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${spicesHtml(f, b)}</div>`).join('')}
+      ${flavors.map(f => `<div class="subcard"><h5>${f.label}</h5>${fatAndSpicesHtml(f, b)}</div>`).join('')}
     </div>
   </div>`;
 
@@ -2367,8 +2569,10 @@ function renderFlightOutput() {
 
   // --- Final assembly ---
   out.innerHTML = `
-    <div class="out-header">
+    <div class="out-title">
       <h3>${titleText}</h3>
+    </div>
+    <div class="out-yield">
       <p class="yield">${yieldText}</p>
     </div>
     ${prepHtml}
@@ -2394,9 +2598,9 @@ function renderFlightOutput() {
     <div class="phase-header">
       <h3>Cook phase</h3>
       <div class="inline-toggle" data-toggle-group="cook-group">
-        <span class="label">Group by</span>
-        <button type="button" data-cook-grouping="1" class="${state.groupByCookOrder ? 'active' : ''}">Cooking order</button>
-        <button type="button" data-cook-grouping="0" class="${state.groupByCookOrder ? '' : 'active'}">Selection order</button>
+        <span class="label">Order</span>
+        <button type="button" data-cook-grouping="1" class="${state.groupByCookOrder ? 'active' : ''}">Recommended Order</button>
+        <button type="button" data-cook-grouping="0" class="${state.groupByCookOrder ? '' : 'active'}">Selection Order</button>
       </div>
     </div>
     <div class="phase-section">
@@ -2521,34 +2725,95 @@ document.getElementById('output').addEventListener('click', e => {
   }
 });
 
+// v2.2.0: a single updateStickyHeights tracks all sticky bar heights
+function updateStickyHeights() {
+  const row = document.getElementById('controls-row');
+  const psb = document.getElementById('pancake-size-bar');
+  if (row) {
+    const h = row.offsetHeight;
+    if (state.controlsCollapsed) {
+      document.documentElement.style.setProperty('--controls-collapsed-h', h + 'px');
+    } else {
+      document.documentElement.style.setProperty('--controls-h', h + 'px');
+    }
+  }
+  if (psb) {
+    const h = psb.offsetHeight;
+    if (state.pancakeSizeCollapsed) {
+      document.documentElement.style.setProperty('--psb-collapsed-h', h + 'px');
+    } else {
+      document.documentElement.style.setProperty('--psb-h', h + 'px');
+    }
+  }
+}
+
+// Alias the old name so render() can still call it
+function updateControlsHeight() { updateStickyHeights(); }
+
+// v2.2.0: applyCollapseStates writes all body data-attrs from state
+function applyCollapseStates() {
+  const body = document.body;
+  body.dataset.controlsCollapsed = state.controlsCollapsed ? '1' : '0';
+  body.dataset.optionsCollapsed = state.optionsCollapsed ? '1' : '0';
+  body.dataset.pancakeCollapsed = state.pancakeSizeCollapsed ? '1' : '0';
+
+  const psb = document.getElementById('pancake-size-bar');
+  if (psb) psb.dataset.collapsed = state.pancakeSizeCollapsed ? '1' : '0';
+
+  const batchCard = document.querySelector('.card[data-card="batch"]');
+  if (batchCard) batchCard.dataset.collapsed = state.batchCardCollapsed ? '1' : '0';
+
+  const flavorCard = document.querySelector('.card[data-card="flavor"]');
+  if (flavorCard) flavorCard.dataset.collapsed = state.flavorCardCollapsed ? '1' : '0';
+}
+
 // Controls collapse toggle
 document.getElementById('controls-toggle').addEventListener('click', () => {
   state.controlsCollapsed = !state.controlsCollapsed;
-  document.body.dataset.controlsCollapsed = state.controlsCollapsed ? '1' : '0';
   try { localStorage.setItem('pancakeFlightControlsCollapsed', state.controlsCollapsed ? '1' : '0'); } catch (_) {}
-  // Allow CSS transition before measuring
-  setTimeout(updateControlsHeight, 30);
+  applyCollapseStates();
+  setTimeout(updateStickyHeights, 30);
 });
 
-// Keep --controls-h CSS variable in sync with the actual row height
-function updateControlsHeight() {
-  const row = document.getElementById('controls-row');
-  if (!row) return;
-  const h = row.offsetHeight;
-  if (state.controlsCollapsed) {
-    document.documentElement.style.setProperty('--controls-collapsed-h', h + 'px');
-  } else {
-    document.documentElement.style.setProperty('--controls-h', h + 'px');
-  }
-}
-window.addEventListener('resize', updateControlsHeight);
+// Options collapse toggle (hides picker pane)
+document.getElementById('options-toggle').addEventListener('click', () => {
+  state.optionsCollapsed = !state.optionsCollapsed;
+  try { localStorage.setItem('pancakeFlightOptionsCollapsed', state.optionsCollapsed ? '1' : '0'); } catch (_) {}
+  applyCollapseStates();
+  setTimeout(updateStickyHeights, 30);
+});
+
+// Pancake-size bar collapse toggle
+document.getElementById('psb-toggle').addEventListener('click', () => {
+  state.pancakeSizeCollapsed = !state.pancakeSizeCollapsed;
+  try { localStorage.setItem('pancakeFlightPancakeSizeCollapsed', state.pancakeSizeCollapsed ? '1' : '0'); } catch (_) {}
+  applyCollapseStates();
+  setTimeout(updateStickyHeights, 30);
+});
+
+// Per-card collapse toggles (Batch + Flavors)
+document.querySelectorAll('[data-card-toggle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const which = btn.dataset.cardToggle;
+    const key = which === 'batch' ? 'batchCardCollapsed' : 'flavorCardCollapsed';
+    const storageKey = which === 'batch'
+      ? 'pancakeFlightBatchCardCollapsed'
+      : 'pancakeFlightFlavorCardCollapsed';
+    state[key] = !state[key];
+    try { localStorage.setItem(storageKey, state[key] ? '1' : '0'); } catch (_) {}
+    applyCollapseStates();
+    setTimeout(updateStickyHeights, 30);
+  });
+});
+
+window.addEventListener('resize', updateStickyHeights);
 
 // Initial mode-switcher active state (apply persisted)
 document.getElementById('mode-switcher').querySelectorAll('[data-mode-pick]').forEach(b =>
   b.classList.toggle('active', b.dataset.modePick === state.mode));
 
-// Apply initial collapsed state to body data-attr
-document.body.dataset.controlsCollapsed = state.controlsCollapsed ? '1' : '0';
+// Apply all initial collapsed states
+applyCollapseStates();
 
 // Parse URL state before initial render
 parseUrlState();
