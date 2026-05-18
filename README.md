@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v2.4.0.html` — the picker app
+- `Ultimate_Malted_Pancakes_Flight_Picker_v2.5.0.html` — the picker app
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -74,6 +74,15 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v2.5.0 — Stacked width parity + centered header
+
+Two tiny polish items on v2.4.0:
+
+1. **Stacked width matches side-by-side**: v2.4.0 bumped the default `.wrap` from 920px to 1200px, but side-by-side was still wider at 1600px — so switching to stacked mode (or hiding options in side-by-side) felt like the page suddenly got narrower. Stacked now uses the same 1600px max-width as side-by-side, so visually the chrome and content occupy the same horizontal real estate regardless of layout. In stacked-mode compact-pair, this gives Batch + Flavors a much wider sticky band, which in turn means the band can be flatter (less vertical space lost) since each card has more room to lay out its options horizontally.
+2. **Centered title + subtitle**: `h1` and `.sub` both got `text-align: center`. In side-by-side they were already spanning the full grid via `grid-column: 1 / -1`, but the text inside was left-aligned. They now sit visually centered at the top of the page in both layouts.
+
+No state/localStorage/URL changes; no JS changes. Pure CSS.
 
 ### v2.4.0 — Eight feedback items on v2.3.0
 
@@ -152,12 +161,12 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.4.0.html   # macOS
-xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.4.0.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.4.0.html   # Windows
+open  Ultimate_Malted_Pancakes_Flight_Picker_v2.5.0.html   # macOS
+xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.5.0.html # Linux
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.5.0.html   # Windows
 ```
 
-That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3200 lines as of v2.4.0) with inline CSS and vanilla JS.
+That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3200 lines as of v2.5.0) with inline CSS and vanilla JS.
 
 The companion `.html` manual opens the same way in a browser. To import into Word: File → Open → select the manual HTML; Word preserves the tables, headers, and bullet hierarchy.
 
@@ -165,7 +174,7 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.4.0.html   # the app
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.5.0.html   # the app
 ├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
 └── README.md                                            # this file
 ```
@@ -324,7 +333,7 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 ## Versioning
 
-`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.4.0** (six-item polish pass on v2.3.0: sticky-title gap bump + ResizeObserver, Setup-phase order toggle UX addition, sub-order + cook-layout direct-binding click fix, sub-card grid minmax fix, syrups-everywhere restructure, stacked-width bump + compact-pair refinement). **v2.3.0** was the 12-item refinement (sticky title reliability, Show/Hide capitalize + visibility fix, Dry+Wet side-by-side, 3-way order toggle, Quality Tier moved to end, picker-card prefix strip, side-by-side overlap, Cook-phase layout switcher, syrups in Cook phase, Stacked-mode compact pair animation, Pancake Size under Flavors, print-time grid fallback with alert). **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.5.0**.
+`X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. Current: **v2.5.0** (stacked .wrap max-width bumped 1200 → 1600 to match side-by-side; h1 + .sub centered). **v2.4.0** was the eight-item polish pass on v2.3.0 (sticky-title gap + ResizeObserver, Setup-phase order toggle, direct-binding click fix for sub-order and cook-layout, sub-card grid minmax fix, syrups-everywhere restructure, stacked width + compact-pair refinement). **v2.3.0** was the 12-item refinement. **v2.2.0** was the 10-item layout overhaul. **v2.1.1** added URL state encoding, sticky chrome, picker card reorder, setup restructure, tier-side-by-side fix, topping wrapping fix, menu-order rendering. v2.1.0 introduced Flight mode; v2.0.0 added the recipe card-size switcher. The v2 roadmap is in `v2_HANDOFF.md`; the next phase (mixed batch sizes per flavor + master shopping list) will be **v2.6.0**.
 
 ## License
 
