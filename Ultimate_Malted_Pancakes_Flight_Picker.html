@@ -161,7 +161,12 @@
     <div id="caramel-inline" style="display:none;">
       <h3 class="sub-h">Caramel preparation</h3>
       <div class="opts" id="caramel-opts"></div>
-      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the cooking-surface temperature. Hard-frozen caramel takes longer to melt and survives lower heat better; flash-frozen behaves more like room-temp candy.</p>
+      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Caramel prep state drives the cooking-surface temperature: deep-frozen takes longer to melt and needs lower heat; flash-frozen behaves more like room-temp candy.</p>
+    </div>
+    <div id="toffee-inline" style="display:none;">
+      <h3 class="sub-h">Toffee preparation</h3>
+      <div class="opts" id="toffee-opts"></div>
+      <p style="margin:10px 0 0;color:var(--muted);font-size:.85rem">Toffee prep affects heat the same way as caramel. <b>When both candies are present, either being deep-frozen forces the lower temp.</b></p>
     </div>
   </div>
 
@@ -282,8 +287,10 @@
       <p>Raw pine nuts taste chalky. Dry skillet, medium-low, <b>no oil</b>, shake constantly. The exact second they turn light golden and smell intensely fragrant (~2–3 min) → pour into a cool bowl to stop the cook.</p>
       <h5>Banana thickness</h5>
       <p>Slice ⅛"–¼" thick (ideally 3/16" — two stacked coins), sharp paring knife, right before cooking. Too thick = tears pancake on flip. Too thin = dissolves into mush, sticks to the cooking surface.</p>
-      <h5>Caramel prep</h5>
-      <p>Buy baking caramel bits, chop micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the cooking surface.</p>
+      <h5>Caramel &amp; toffee prep</h5>
+      <p>Buy baking caramel bits (e.g. Peter's Caramel Loaf) and toffee bits (e.g. Heath Bits O' Brickle), then chop them micro-fine. Use them <b>deep-frozen or 10-minute flash-frozen</b> so they don't melt too fast on the cooking surface.</p>
+      <h5>Candy Crushing Protocol</h5>
+      <p>Never attempt to chop or crush caramel or toffee at room temperature, as it will gum up your tools. Always freeze the candy solid first — <b>at least 60 minutes in the freezer, 24 hours to be safe</b> — to make it brittle. Place the frozen candy inside a <b>double-layered heavy-duty freezer bag</b> and strike it firmly with the flat side of a meat mallet or heavy rolling pin until broken into gravel-sized micro-bits. Sift through a mesh strainer to separate the uniform bits from the fine candy dust.</p>
       <h5>Banana Nut experimentation</h5>
       <ul>
         <li><b>Traditional Bakery Profile:</b> Melted Ghee + Cinnamon + Fresh Nutmeg.</li>
@@ -401,13 +408,15 @@
           <tr><td>Pine nuts</td><td>Nuts.com Mediterranean Pine Nuts (Pignolias) — Spain/Italy/Portugal</td><td>Generic bulk-bin Chinese pine nuts (<i>Pinus armandii</i>) → "pine mouth" metallic aftertaste</td></tr>
           <tr><td>Vanilla</td><td>Nielsen-Massey Madagascar Bourbon Vanilla Bean Paste</td><td>Imitation vanilla, cheap alcohol extracts (burn off on the cooking surface)</td></tr>
           <tr><td>Corn flour</td><td>Bob's Red Mill Organic Yellow Corn Flour <i>or</i> Maseca Corn Masa Flour</td><td>Yellow cornmeal (too coarse — makes pancakes gritty)</td></tr>
+          <tr><td>Caramel</td><td><b>Peter's Caramel Loaf</b> — bakery-supply caramel slab that chops cleanly when frozen and melts to a smooth, professional gooey center. The benchmark for pancake work.</td><td>Soft chewy candies (Werther's), chocolate-coated caramels, liquid caramel sauces, generic supermarket caramel squares</td></tr>
+          <tr><td>Toffee</td><td><b>Heath Bits O' Brickle</b> — clean buttery toffee bits with no chocolate coating; the premier choice for pancake recipes because the bits melt without scorching like coated toffee does.</td><td>Chocolate-coated toffee pieces, candy-bar toffee with mix-ins, mass-market store-brand "toffee" candies</td></tr>
           <tr><td>Maple syrup</td><td>Runamok "Sugarmaker's Cut", Crown Maple, Butternut Mountain Farm</td><td>Any HFCS-based table syrup</td></tr>
         </tbody>
       </table>
     </div>
   </details>
 
-  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.8.0</div>
+  <div class="footer">Ultimate Malted Pancakes Flight Picker · v1.9.0</div>
 </div>
 
 <script>
@@ -419,8 +428,8 @@ const BATCHES = [
 ];
 
 const BULK_OPTS = [
-  { id: 'measure', label: 'Measure each ingredient', bulk: false },
-  { id: 'bulk',    label: 'Use bulk dry mix from jar', bulk: true },
+  { id: 'measure', label: 'Measure Each ingredient', bulk: false },
+  { id: 'bulk',    label: 'Use Bulk Dry Mix', bulk: true },
 ];
 
 const SIZES = [
@@ -561,7 +570,7 @@ const FLAVORS = [
     strategy: 'BATTER SHIELD required. Espresso anchors the toffee flavor.',
     spices: [ { name: 'Espresso Powder', amounts: SPICE.espresso } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Very Dark Strong', shield: true,
+    syrup: 'Grade A Very Dark Strong', shield: true, hasToffee: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Plain Heath Bits \'O Brickle'],
       good: ['Grade A Dark Robust', 'Standard store-brand toffee pieces'],
@@ -585,7 +594,7 @@ const FLAVORS = [
     strategy: 'BATTER SHIELD required.',
     spices: [ { name: 'Nutmeg', amounts: SPICE.nutmeg } ],
     fat: 'Melted Ghee', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Very Dark Strong', shield: true, hasCaramel: true,
+    syrup: 'Grade A Very Dark Strong', shield: true, hasCaramel: true, hasToffee: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Micro-candy + Fresh Nutmeg'],
       good: ['Grade A Dark Robust', 'Standard candy + Jar Nutmeg'],
@@ -597,7 +606,7 @@ const FLAVORS = [
     strategy: 'BATTER SHIELD required. Vanilla paste anchors the cocoa.',
     spices: [ { name: 'Vanilla Bean Paste', amounts: SPICE.vanillaPaste } ],
     fat: 'Melted Unsalted Butter', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Very Dark Strong', shield: true,
+    syrup: 'Grade A Very Dark Strong', shield: true, hasToffee: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Plain Toffee + Dark Chips'],
       good: ['Grade A Dark Robust', 'Store Toffee + Semi-Sweet Chips'],
@@ -624,7 +633,7 @@ const FLAVORS = [
       { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt },
     ],
     fat: 'Avocado Oil (in batter)', panGrease: 'Pure Avocado Oil',
-    syrup: 'Grade A Very Dark Strong', shield: true, doubleShield: true, hasCaramel: true,
+    syrup: 'Grade A Very Dark Strong', shield: true, doubleShield: true, hasCaramel: true, hasToffee: true,
     tiers: {
       best: ['Grade A Very Dark Strong', 'Micro-candy + Avocado Oil Base'],
       good: ['Grade A Dark Robust', 'Standard candy + Ghee Base'],
@@ -715,12 +724,12 @@ const TOPPINGS = {
   ],
 };
 
-const CARAMEL_PREPS = [
-  { id: 'flash', label: 'Flash-frozen (10 min)', desc: 'Behaves like room-temp candy — normal heat 375°F (or 325°F for Triple)' },
-  { id: 'deep',  label: 'Deep-frozen (long-term)', desc: 'Takes longer to melt — lower heat 325°F (or 300°F for Triple)' },
+const CANDY_PREPS = [
+  { id: 'flash', label: 'Flash-frozen (10 min)', desc: 'Behaves like room-temp candy — normal heat 375°F (325°F for Triple).' },
+  { id: 'deep',  label: 'Deep-frozen (long-term)', desc: 'Takes longer to melt — lower heat 325°F (300°F for Triple).' },
 ];
 
-const state = { batch: 1, flavor: 'plain', size: 1, bulk: false, caramelPrep: 'flash' };
+const state = { batch: 1, flavor: 'plain', size: 1, bulk: false, caramelPrep: 'flash', toffeePrep: 'flash' };
 
 function render() {
   document.getElementById('batch-opts').innerHTML = BATCHES.map((b, i) =>
@@ -740,17 +749,42 @@ function render() {
   ).join('');
 
   const flavor = FLAVORS.find(f => f.id === state.flavor);
+
+  // Caramel prep selector
   const caramelInline = document.getElementById('caramel-inline');
   if (flavor && flavor.hasCaramel) {
     caramelInline.style.display = '';
-    document.getElementById('caramel-opts').innerHTML = CARAMEL_PREPS.map(p =>
+    document.getElementById('caramel-opts').innerHTML = CANDY_PREPS.map(p =>
       `<div class="opt ${state.caramelPrep === p.id ? 'active' : ''}" data-caramel="${p.id}" title="${p.desc}">${p.label}</div>`
     ).join('');
   } else {
     caramelInline.style.display = 'none';
   }
 
+  // Toffee prep selector
+  const toffeeInline = document.getElementById('toffee-inline');
+  if (flavor && flavor.hasToffee) {
+    toffeeInline.style.display = '';
+    document.getElementById('toffee-opts').innerHTML = CANDY_PREPS.map(p =>
+      `<div class="opt ${state.toffeePrep === p.id ? 'active' : ''}" data-toffee="${p.id}" title="${p.desc}">${p.label}</div>`
+    ).join('');
+  } else {
+    toffeeInline.style.display = 'none';
+  }
+
   renderOutput();
+}
+
+// Returns 'flash', 'deep', or null. When both candies are present,
+// either being deep-frozen forces 'deep' (the lower-temp path).
+function getEffectivePrep(flavor) {
+  const c = flavor.hasCaramel, t = flavor.hasToffee;
+  if (c && t) {
+    return (state.caramelPrep === 'deep' || state.toffeePrep === 'deep') ? 'deep' : 'flash';
+  }
+  if (c) return state.caramelPrep;
+  if (t) return state.toffeePrep;
+  return null;
 }
 
 function renderOutput() {
@@ -761,8 +795,10 @@ function renderOutput() {
   const batchInfo = BATCHES[b];
   const isBacon = flavor.id === 'bacon' || flavor.id === 'bnut_bacon';
   const hasBanana = flavor.id === 'bnut' || flavor.id === 'bnut_choc' || flavor.id === 'bnut_bacon';
+  const hasCandy = flavor.hasCaramel || flavor.hasToffee;
+  const effPrep = getEffectivePrep(flavor);
 
-  // Pancake yield (approximate)
+  // Yield
   const yieldCount = Math.max(1, Math.round(batchInfo.oz / sizeInfo.oz));
   const yieldText = `Yields ~${yieldCount} pancake${yieldCount === 1 ? '' : 's'}`;
 
@@ -820,20 +856,23 @@ function renderOutput() {
     }
   }
 
-  // Heat / cooking-surface logic
+  // Heat logic
   let heatLine;
   let lowHeatCalloutHtml = '';
   if (flavor.id === 'triple') {
-    if (state.caramelPrep === 'deep') {
+    if (effPrep === 'deep') {
       heatLine = '300°F (low — deep-frozen Triple)';
-      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 300°F</b> — Triple-Threat with rock-hard, deep-frozen caramel. Heat above this welds the candies to the cooking surface.</div>`;
+      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 300°F</b> — Triple-Threat with at least one deep-frozen candy. Heat above this welds the candies to the cooking surface.</div>`;
     } else {
       heatLine = '325°F (low — flash-frozen Triple)';
-      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — Triple-Threat with 10-minute flash-frozen caramel. Triple requires low heat in both prep states.</div>`;
+      lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — Triple-Threat with both candies flash-frozen. Triple requires low heat in every prep state.</div>`;
     }
-  } else if (flavor.hasCaramel && state.caramelPrep === 'deep') {
-    heatLine = '325°F (low — deep-frozen caramel)';
-    lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — deep-frozen caramel takes longer to melt and burns at the normal 375°F.</div>`;
+  } else if (hasCandy && effPrep === 'deep') {
+    heatLine = '325°F (low — deep-frozen candy)';
+    const which = (flavor.hasCaramel && flavor.hasToffee)
+      ? 'at least one candy is deep-frozen'
+      : (flavor.hasCaramel ? 'deep-frozen caramel' : 'deep-frozen toffee');
+    lowHeatCalloutHtml = `<div class="callout warn full-row">🌡 <b>Lower the cooking surface to 325°F</b> — ${which}, which takes longer to melt and burns at the normal 375°F.</div>`;
   } else {
     heatLine = '375°F (Med-Low / Med on most stoves)';
   }
@@ -849,16 +888,29 @@ function renderOutput() {
     toppingsInner = `<p style="margin:0;font-size:.92rem">None inside. Brush with unsalted butter <i>after</i> cooking.</p>`;
   }
 
-  // Shield + caramel notes inside toppings
+  // Single Batter Shield (only when shield && not doubleShield)
   if (flavor.shield && !flavor.doubleShield) {
     toppingsInner += `<div class="topping-note warn">🛡 <b>Batter Shield required:</b> after dropping toppings, drizzle a tiny bit of plain batter over them to seal before flipping. Candy will weld to the cooking surface otherwise.</div>`;
   }
-  if (flavor.hasCaramel) {
-    const prepText = state.caramelPrep === 'flash'
+
+  // Candy prep note (combined when both candies present)
+  if (flavor.hasCaramel && flavor.hasToffee) {
+    const cState = state.caramelPrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
+    const tState = state.toffeePrep === 'flash' ? 'flash-frozen (10 min)' : 'deep-frozen (long-term)';
+    toppingsInner += `<div class="topping-note info">🧊 <b>Candy prep:</b> chop both micro-fine and freeze before scattering onto wet batter. <b>Caramel:</b> ${cState}. <b>Toffee:</b> ${tState}.</div>`;
+  } else if (flavor.hasCaramel) {
+    const text = state.caramelPrep === 'flash'
       ? `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
       : `🧊 <b>Caramel prep:</b> micro-chop baking caramel bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
-    toppingsInner += `<div class="topping-note info">${prepText}</div>`;
+    toppingsInner += `<div class="topping-note info">${text}</div>`;
+  } else if (flavor.hasToffee) {
+    const text = state.toffeePrep === 'flash'
+      ? `🧊 <b>Toffee prep:</b> micro-chop toffee bits, freeze 10 minutes (flash-frozen) before scattering onto wet batter.`
+      : `🧊 <b>Toffee prep:</b> micro-chop toffee bits, freeze hard (long-term frozen). Keep frozen until the moment you scatter them on.`;
+    toppingsInner += `<div class="topping-note info">${text}</div>`;
   }
+
+  // Double Batter Shield (Triple)
   if (flavor.doubleShield) {
     toppingsInner += `<div class="topping-note warn">🛡🛡 <b>Double Batter Shield required.</b> After dropping toppings, drizzle plain batter over them twice (layered) before flipping. Triple-Threat candies will weld to the cooking surface otherwise.</div>`;
   }
@@ -869,8 +921,8 @@ function renderOutput() {
 
   // Below-grid callouts
   const callouts = [];
-  if (flavor.hasCaramel && state.caramelPrep === 'flash' && flavor.id !== 'triple') {
-    callouts.push(`<div class="callout info">🌡 Normal cooking-surface temp (375°F) is fine — you picked flash-frozen caramel.</div>`);
+  if (hasCandy && effPrep === 'flash' && flavor.id !== 'triple') {
+    callouts.push(`<div class="callout info">🌡 Normal cooking-surface temp (375°F) is fine — you picked flash-frozen candy.</div>`);
   }
   if (flavor.fat.toLowerCase().includes('butter')) {
     callouts.push(`<div class="callout info">🧈 Use <b>unsalted</b> butter. The dry base is already salt-balanced.</div>`);
@@ -892,7 +944,6 @@ function renderOutput() {
 
   cookingSteps.push(`<li>Pour wet into dry. Frother on lowest, <b>5–7 seconds max</b>. Leave it lumpy — small dry streaks are fine. <b>Do not over-mix</b> or pancakes turn rubbery.</li>`);
 
-  // Rest with sub-bullets
   const restSubSteps = [];
   restSubSteps.push(`<li>Fill a bowl (or any container that fits your ladles) with ice and water. Submerge the ladle scoops to keep them ice-cold.</li>`);
   if (isBacon) {
@@ -903,18 +954,15 @@ function renderOutput() {
   }
   cookingSteps.push(`<li><b>Rest the batter 10 minutes, undisturbed.</b> During the rest:<ul class="sub-steps">${restSubSteps.join('')}</ul></li>`);
 
-  // Scoop step (with sub-bullets)
   const scoopSubSteps = [];
   scoopSubSteps.push(`<li>2–3 quick pours can be done in succession before you need to chill the ladle again.</li>`);
   scoopSubSteps.push(`<li>Drop toppings tightly in the center.</li>`);
   cookingSteps.push(`<li><b>When ready to scoop:</b> pull a ${sizeInfo.oz} oz ladle from the ice bath (it must have soaked for <b>at least a few seconds</b>), tap it once on a clean towel to drop loose water, wipe the inside with a tiny dot of avocado oil. Scoop the batter quickly and pour it straight onto the heated grease.<ul class="sub-steps">${scoopSubSteps.join('')}</ul></li>`);
 
-  // Apply toppings step (skip for plain)
   if (flavor.id !== 'plain') {
     cookingSteps.push(`<li><b>Apply toppings:</b> place the items from the <i>Toppings per pancake</i> chart above onto the wet pancake top, tightly clustered in the dead center. Stay under the Max Combined Volume Limit and leave a clean batter perimeter — that ring is the seal zone for the Batter Shield.</li>`);
   }
 
-  // Batter Shield / Double Shield step
   if (flavor.doubleShield) {
     cookingSteps.push(`<li><b>Apply Double Batter Shield:</b> drizzle plain batter over the toppings <b>twice</b> (two layered coats) to fully cover them. Triple-Threat candies will weld to the cooking surface during the flip if you skip the second coat — it's non-negotiable for this combination.</li>`);
   } else if (flavor.shield) {
@@ -1001,6 +1049,12 @@ document.getElementById('caramel-opts').addEventListener('click', e => {
   const opt = e.target.closest('[data-caramel]');
   if (!opt) return;
   state.caramelPrep = opt.dataset.caramel;
+  render();
+});
+document.getElementById('toffee-opts').addEventListener('click', e => {
+  const opt = e.target.closest('[data-toffee]');
+  if (!opt) return;
+  state.toffeePrep = opt.dataset.toffee;
   render();
 });
 
