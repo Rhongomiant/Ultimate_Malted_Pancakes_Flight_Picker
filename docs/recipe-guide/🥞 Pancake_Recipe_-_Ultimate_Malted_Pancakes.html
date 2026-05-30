@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Master Pancake Flight Manual — Revised Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6ede0; --paper-2:#fbf5ea; --ink:#2c211a; --ink-soft:#5b4a3c;
+    --maple:#b3651d; --maple-deep:#8a4513; --butter:#e4a92b; --griddle:#241c16;
+    --rev:#3f6b4a; --rev-bg:#e6efe2; --rev-line:#bcd0b4; --rule:#d8c7ad;
+    --shadow:rgba(40,28,18,.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 18% 12%, rgba(228,169,43,.10), transparent 38%),
+      radial-gradient(circle at 86% 78%, rgba(179,101,29,.08), transparent 42%);
+    color:var(--ink); font-family:'Spectral',Georgia,serif; font-size:17px; line-height:1.62;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 30px 90px;}
+  header.mast{
+    text-align:center;border:3px double var(--maple-deep);background:var(--paper-2);
+    padding:34px 28px 30px;position:relative;box-shadow:0 8px 26px var(--shadow);
+  }
+  .mast .badge{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:.22em;text-transform:uppercase;background:var(--griddle);
+    color:var(--butter);padding:6px 14px;border-radius:2px;margin-bottom:14px;
+  }
+  .mast h1{
+    font-family:'Fraunces',serif;font-weight:900;font-size:clamp(34px,5.4vw,58px);
+    line-height:1.02;margin:.1em 0 .12em;color:var(--griddle);
+  }
+  .mast .pan{font-size:.62em;vertical-align:.12em;}
+  .mast .sub{font-style:italic;color:var(--ink-soft);font-size:18px;max-width:620px;margin:6px auto 0;}
+  .mast .rule{width:120px;height:3px;margin:18px auto 0;background:linear-gradient(90deg,transparent,var(--maple),transparent);}
+  .revbox{margin:34px 0 10px;border:2px solid var(--rev-line);background:var(--rev-bg);padding:24px 26px 20px;border-radius:6px;}
+  .revbox h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 4px;color:var(--rev);display:flex;align-items:baseline;gap:10px;}
+  .revbox h2 .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;background:var(--rev);color:#fff;padding:3px 9px;border-radius:3px;}
+  .revbox p.lead{margin:.3em 0 1em;font-size:15.5px;color:var(--ink-soft);}
+  .revbox ol{margin:0;padding-left:22px;}
+  .revbox ol li{margin:.5em 0;font-size:15.5px;}
+  .revbox ol li b{color:var(--rev);font-weight:600;}
+  .part-label{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--maple);margin:62px 0 2px;}
+  h2.part{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(26px,3.6vw,38px);margin:.05em 0 .1em;color:var(--griddle);border-bottom:3px solid var(--maple-deep);padding-bottom:8px;}
+  h3{font-family:'Fraunces',serif;font-weight:600;font-size:24px;margin:38px 0 8px;color:var(--maple-deep);}
+  h4{font-family:'Fraunces',serif;font-weight:600;font-size:19px;margin:24px 0 6px;color:var(--ink);}
+  p{margin:.7em 0;}
+  a{color:var(--maple-deep);}
+  table{width:100%;border-collapse:collapse;margin:16px 0 8px;background:var(--paper-2);font-size:15px;box-shadow:0 4px 14px var(--shadow);}
+  caption{caption-side:top;text-align:left;font-style:italic;color:var(--ink-soft);font-size:14.5px;padding:0 0 7px;}
+  th,td{border:1px solid var(--rule);padding:8px 11px;text-align:left;vertical-align:top;}
+  thead th{background:var(--griddle);color:var(--paper-2);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;letter-spacing:.05em;text-transform:uppercase;}
+  tbody tr:nth-child(even){background:rgba(216,199,173,.26);}
+  td.ing,th.ing{font-weight:600;color:var(--maple-deep);width:24%;}
+  .prim{font-weight:500;}
+  .alt{display:block;font-size:11.5px;font-style:italic;color:var(--ink-soft);margin-top:2px;font-weight:400;line-height:1.4;}
+  tr.changed td{background:rgba(228,169,43,.20);}
+  td.r4{background:rgba(63,107,74,.20);}
+  .r4block{background:rgba(63,107,74,.12);border-left:3px solid #3f6b4a;padding:8px 14px;margin:8px 0;}
+  h4.r4head{border-left:3px solid #3f6b4a;padding-left:11px;}
+  ul.r4block li{margin:3px 0;}
+  .r4inline{background:rgba(63,107,74,.22);color:#2d4d36;font-weight:700;font-size:.82em;padding:1px 7px;border-radius:3px;white-space:nowrap;}
+  .r4opt{display:block;margin-top:6px;background:rgba(63,107,74,.12);border-left:3px solid #3f6b4a;padding:6px 10px;font-size:.93em;}
+  .pill{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;background:var(--rev);color:#fff;padding:2px 6px;border-radius:3px;margin-left:7px;vertical-align:1.5px;}
+  .pill.new{background:var(--maple);}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 0;}
+  .card{border:1.5px solid var(--rule);border-top:5px solid var(--maple);background:var(--paper-2);padding:18px 18px 16px;box-shadow:0 4px 14px var(--shadow);border-radius:3px;}
+  .card.savory{border-top-color:var(--griddle);}
+  .card.candy{border-top-color:var(--butter);}
+  .card h4{margin:0 0 4px;font-size:20px;color:var(--maple-deep);}
+  .card.savory h4{color:var(--griddle);}
+  .card .strat{font-size:13.5px;color:var(--ink-soft);font-style:italic;margin:0 0 12px;}
+  .card table{font-size:13px;margin:6px 0 4px;box-shadow:none;}
+  .card th,.card td{padding:5px 7px;}
+  .card thead th{font-size:10px;}
+  .card td.ing{width:26%;font-size:12.5px;}
+  .card .alt{font-size:10.5px;}
+  .surface{font-size:13px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule);}
+  .surface b{color:var(--maple-deep);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;}
+  .note{border-left:5px solid var(--maple);background:rgba(228,169,43,.13);padding:14px 18px;margin:18px 0;border-radius:0 5px 5px 0;font-size:15px;}
+  .note.fix{border-left-color:var(--rev);background:var(--rev-bg);}
+  .note.warn{border-left-color:var(--maple-deep);background:rgba(179,101,29,.12);}
+  .note .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--maple-deep);display:block;margin-bottom:3px;}
+  .note.fix .lbl{color:var(--rev);}
+  ul.tidy{margin:.6em 0;padding-left:22px;}
+  ul.tidy li{margin:.34em 0;}
+  .tier-best{color:var(--rev);font-weight:600;}
+  .tier-bad{color:#9b3a2a;font-weight:600;}
+  dl.vocab{margin:14px 0;}
+  dl.vocab dt{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--maple-deep);margin-top:12px;font-size:14px;}
+  dl.vocab dd{margin:.2em 0 0;font-size:15px;}
+  footer{margin-top:70px;text-align:center;border-top:3px double var(--maple-deep);padding-top:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);}
+  @media(max-width:720px){
+    .wrap{padding:30px 16px 60px;}
+    .cards{grid-template-columns:1fr;}
+    body{font-size:16px;}
+    table{font-size:13.5px;}
+  }
+  @media print{
+    body{background:#fff;}
+    .card,table,header.mast,.revbox{box-shadow:none;}
+    .part-label{margin-top:34px;}
+    /* rev4.1: page-break rules. Each major section starts on its own page; .card never splits across pages. */
+    .card{page-break-inside:avoid;break-inside:avoid;}
+    h2.part{page-break-before:always;break-before:page;page-break-after:avoid;break-after:avoid;}
+    h3.section-break{page-break-before:always;break-before:page;page-break-after:avoid;break-after:avoid;}
+    /* Browsers handle "page-break-before:always" on the first printed element gracefully (no leading blank page) — no explicit override needed for the first h2.part. */
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <span class="badge">Revised Edition &nbsp;&bull;&nbsp; Rev. 4.1</span>
+  <h1><span class="pan">&#129366;</span> The Master Pancake Flight Manual</h1>
+  <p class="sub">The iconic professional malted diner profile &mdash; one neutral base, twelve standard flights plus three banana-in-batter variants, corrected and rebalanced.</p>
+  <div class="rule"></div>
+</header>
+
+<div class="revbox">
+  <h2><span class="tag">Rev. 4.1</span> Addendum</h2>
+  <p class="lead">Three new Banana-in-Batter variants of the Banana&nbsp;Nut family added to Section&nbsp;1, plus a print-layout pass so the manual reads cleanly on paper.</p>
+  <ol>
+    <li><b>Three Banana-in-Batter variant cards added</b> to Section&nbsp;1: Banana&nbsp;Nut, Banana&nbsp;Nut&nbsp;+&nbsp;Chocolate, and Bacon&nbsp;+&nbsp;Banana&nbsp;Nut. These are <em>separate dishes</em>, not substitutions &mdash; banana is mashed into the wet bowl (every bite tastes banana) instead of laid as discs on top, pine nuts stay on top, and the surface temperature drops to 350&deg;F so the banana's free sugars do not scorch. Milk is pulled back 2&ndash;3 tbsp at full batch to compensate for banana moisture. A new note block under Section&nbsp;1 documents the variant principles, banana sourcing (frozen-then-thawed is excellent here), mix order, and optional plate-finish presentations.</li>
+    <li><b>Print layout cleaned up.</b> Each major section now starts on a fresh page when printed: <em>The Master Base Recipes</em>, <em>The Bulk Pantry Mix</em>, <em>Master Add-ins: Spice, Fat &amp; Sizing</em>, <em>Section&nbsp;1 &middot; Add-ins Spice &amp; Fat Cards</em>, <em>Section&nbsp;2 &middot; Add-ins Sizing &amp; Maximum-Limit Chart</em>, <em>Section&nbsp;3 &middot; Component Synergy &amp; Quality Tiers</em>, <em>Cooking &amp; Troubleshooting Guide</em>, <em>Component &amp; Ingredient Sourcing</em>, and <em>Vocabulary Cheat Sheet</em>. Individual flight cards no longer split across page breaks &mdash; each card stays whole on a single page so a cook can read straight through it without flipping.</li>
+  </ol>
+</div>
+
+<div class="revbox">
+  <h2><span class="tag">Rev. 4</span> Correction Notes</h2>
+  <p class="lead">A focused review of the add-in charts. The Base Batch was reviewed and confirmed sound &mdash; a genuinely neutral base that serves every flight &mdash; so it is unchanged. This edition makes six refinements to the Spice &amp; Fat cards, adds a finishing-salt principle, fixes four errors in the Sizing &amp; Maximum-Limit chart, and rewrites the candy-prep instructions. Every corrected cell is tinted green.</p>
+  <ol>
+    <li><b>Bacon&nbsp;+&nbsp;Banana&nbsp;Nut batter fat changed to ghee.</b> It previously called for flavorless avocado oil, which threw away the chance to carry the banana-nut warmth. Ghee &mdash; matching the plain Banana&nbsp;Nut card &mdash; adds browned-butter depth; the cooking surface stays rendered bacon grease.</li>
+    <li><b>Cardamom dialed back to half the nutmeg amount.</b> Cardamom is more potent and more polarizing than nutmeg, so the old 1:1 amounts over-delivered it. The reduced amounts also match the half-batch cardamom in the Banana&nbsp;Nut Spice Experiments note, which the old card contradicted.</li>
+    <li><b>Espresso anchor added to the Caramel, Chocolate, and Toffee&nbsp;+&nbsp;Chocolate cards.</b> Caramel was the only sweet card with no aromatic anchor; the two chocolate-bearing cards lacked the roasted depth that espresso gives cocoa. A small amount of espresso powder &mdash; the same scale the Toffee card uses &mdash; deepens caramelized-sugar and chocolate flavor without reading as coffee.</li>
+    <li><b>Toffee&nbsp;+&nbsp;Caramel&nbsp;+&nbsp;Chocolate batter salt raised to the chocolate-family level.</b> It now reaches &frac34;&nbsp;tsp total, matching the other chocolate-bearing cards; the salt-principle note was updated to list it.</li>
+    <li><b>Vanilla added to the Plain card.</b> Plain previously carried only the &frac14;&nbsp;tsp base floor; a &frac14;&nbsp;tsp card addition brings it to &frac12;&nbsp;tsp total for more aromatic pop on the most exposed flight.</li>
+    <li><b>0.5&nbsp;oz Double Shield maximum corrected.</b> It was listed <em>below</em> the 0.5&nbsp;oz Single Shield maximum &mdash; impossible, since heavier shielding safely holds <em>more</em> filling. The whole 0.5&nbsp;oz column was under-scaled (toppings jumped 5&ndash;9&times; for a 2&times; pancake); it has been rescaled to a clean linear continuation of the 1.0&ndash;4.0&nbsp;oz values &mdash; each 0.5&nbsp;oz amount is now half of the 1.0&nbsp;oz target size.</li>
+    <li><b>Two sizing-chart breakdowns fixed.</b> The Unshielded 1.0&nbsp;oz &ldquo;&frac12;&nbsp;Tbsp&rdquo; sub-line wrongly read &ldquo;1&nbsp;tbsp&nbsp;+&nbsp;1&nbsp;tsp&nbsp;+&nbsp;&frac12;&nbsp;tsp&rdquo; (4&frac12;&nbsp;tsp) and now reads &ldquo;1&nbsp;tsp&nbsp;+&nbsp;&frac12;&nbsp;tsp.&rdquo; The Single&nbsp;Shield 1.0&nbsp;oz &ldquo;&frac34;&nbsp;Tbsp&rdquo; sub-line wrongly read &ldquo;2&nbsp;tbsp&nbsp;+&nbsp;&frac14;&nbsp;tsp&rdquo; and now reads &ldquo;2&nbsp;tsp&nbsp;+&nbsp;&frac14;&nbsp;tsp.&rdquo;</li>
+    <li><b>Chart usage note added.</b> The Bacon and Banana&nbsp;Nut rows are self-contained &mdash; measured in crumbles, slices, and nuts &mdash; and are not summed against the Max&nbsp;Combined rows.</li>
+    <li><b>Candy-prep instructions rewritten.</b> The old &ldquo;Candy Crushing Protocol&rdquo; told you to smash both candies after freezing them solid. That only works for toffee, which is brittle; caramel is soft and chewy and only deforms when struck. The section now splits into a <em>smash</em> method for toffee and a two-stage <em>cut</em> method for caramel &mdash; reduce the whole block to 3/8&Prime; slabs and freeze them individually, then temper and dice slabs into 1/4&Prime; cubes per batch &mdash; using an oiled, floured bench scraper. Includes tempering guidance by feel for both stages and the block coming straight from storage.</li>
+    <li><b>Finishing-salt principle added.</b> A pinch of sea-salt flakes on the <em>cooked</em> pancake creates the sweet-salt &ldquo;pop&rdquo; that sweet, unseasoned add-ins otherwise mute &mdash; confirmed in testing to revive a flight without syrup. A new note explains it, and the eight flights that benefit are tagged <span class="r4inline">&#9670; finishing flake</span> in their card headers (all sweet flights except the Banana&nbsp;Nut and bacon families).</li>
+    <li><b>Optional espresso swap noted on Caramel&nbsp;+&nbsp;Chocolate.</b> That card is anchored with cinnamon; if the chocolate reads flat against the caramel, the card now flags swapping cinnamon for espresso powder &mdash; a swap, not an addition, to keep a single anchor.</li>
+  </ol>
+</div>
+
+<div class="revbox">
+  <h2><span class="tag">Rev. 3</span> Revision Notes</h2>
+  <p class="lead">This edition corrects the base recipe so that a <em>single</em> dry mix and wet base genuinely serve every add-in combination &mdash; without over-salting bacon or muddying the candy flights. The guiding principle: the base is a true neutral; anything that must swing between savory and sweet lives in the add-in charts, never locked into the pre-mixed jar.</p>
+  <ol>
+    <li><b>Milk corrected (major).</b> Full batch is now <b>2 cups</b>, not 1. The &frac14;&nbsp;cup of cultured buttermilk powder consumes roughly a full cup of liquid just to reconstitute; the old amount left the flour badly under-hydrated.</li>
+    <li><b>Salt moved out of the locked base.</b> Base salt is reduced to a low universal floor (&frac14;&nbsp;tsp full batch). Every non-bacon add-in now adds its own batter salt. Bacon combos rely on the low base alone, so they are no longer over-salted.</li>
+    <li><b>Sugar raised slightly for browning.</b> Base sugar goes from 1&frac12;&nbsp;tsp to <b>1&nbsp;Tbsp</b> (full batch). Candy combos are unaffected &mdash; toffee and caramel are encased toppings, not dissolved into the batter.</li>
+    <li><b>Leavening rebalanced.</b> Baking soda trimmed to &frac14;&nbsp;tsp and baking powder to 1&frac12;&nbsp;tsp (full batch) to stop excess alkalinity from flattening flavor.</li>
+    <li><b>Vanilla added as a universal wet-base floor</b> (&frac14;&nbsp;tsp full batch). It cannot go in the shelf-stable dry jar, so it is added per batch.</li>
+    <li><b>Banana-nut spices made bolder</b> across every batch size.</li>
+    <li><b>Pine nuts now toasted in fat with salt</b> (and optionally lightly candied), replacing the flavorless dry-skillet method.</li>
+    <li><b>Bulk-mix list de-duplicated and re-scaled;</b> corn-flour sourcing corrected (masa harina is <em>not</em> a substitute).</li>
+    <li><b>Milk behavior documented</b> &mdash; why Lactaid browns faster, griddle-temperature handling, the 2%-vs-whole fat difference, and regular-milk substitution.</li>
+    <li><b>Measurement format standardized.</b> Every amount now shows its named measure and fraction, with an italic common-units breakdown for any uncommon amount. See <em>How to Read the Measurements</em> below.</li>
+    <li><b>Fat top-up and nut guidance added.</b> The milk note now explains how to match the card's wet fat when topping up the 2% milk-fat gap (and to skip it on bacon); the pine-nut section adds how to rescue dry-toasted nuts, why the glaze is always butter or ghee, and how to store toasted nuts.</li>
+    <li><b>Salt corrected upward.</b> Plain and the chocolate family now reach &frac34;&nbsp;tsp total (up from &frac12;) &mdash; the earlier revision had flattened them. Banana Nut holds at &frac12;&nbsp;tsp with a noted bump option. All cinnamon, cardamom, and nutmeg rows are now labeled fresh-ground/grated.</li>
+    <li><b>Banana Nut, vanilla, bacon &amp; finishing-salt corrections.</b> Fixed a broken cardamom table row and bumped cardamom to scale with nutmeg; added the salt-bump option to every Banana Nut column; restored chocolate-family vanilla to 1&nbsp;tsp total; added saved-bacon-grease melting guidance and a pre-peppered-bacon note; moved sea-salt flakes off the Caramel and Toffee+Caramel+Chocolate spice cards (they are a finishing step, now noted in the card strategy line).</li>
+  </ol>
+</div>
+
+<div class="note">
+  <span class="lbl">How to Read the Measurements</span>
+  Each amount is given as <b>name (fraction)</b>. Where the amount is not a single standard spoon &mdash; the &ldquo;Scant&rdquo; and &ldquo;Fat&rdquo; sizes, and odd spoon/cup amounts &mdash; an <em>italic line beneath it</em> breaks it into common pieces you can stack. Plain named measures (Hint, Drop, Smidgen, Pinch, Dash, Tad) stand alone: each is a direct micro-spoon or finger method, defined in the Vocabulary Cheat Sheet at the end.
+</div>
+
+<!-- ============ PART 1 ============ -->
+<p class="part-label">Part 1</p>
+<h2 class="part">The Master Base Recipes</h2>
+<p>This manual replicates the professional malted diner pancake profile using buttermilk powder and 2% Lactaid milk. The base below is deliberately neutral &mdash; correctly seasoned for an unadorned pancake and tuned no further. All flavor-specific seasoning lives in Part&nbsp;2.</p>
+
+<h3>1 &middot; The Normal Base Batch</h3>
+<p>Measure your dry and wet base ingredients from the table below. Before adding the liquid fat, consult the appropriate flavor card in Part&nbsp;2 for your batch size. Highlighted rows changed in this revision.</p>
+
+<table>
+  <caption>Single-serving base options. Whisk all wet ingredients together, then combine with dry.</caption>
+  <thead>
+    <tr><th class="ing">Ingredient</th><th>Quarter Batch</th><th>Half Batch</th><th>Three-Quarter Batch</th><th>Full Batch</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="ing" colspan="5" style="background:var(--griddle);color:var(--paper-2);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;">DRY INGREDIENTS</td></tr>
+    <tr><td class="ing">All-Purpose Flour</td>
+      <td><span class="prim">&frac38; cup</span><span class="alt">&frac14; cup + 2 tbsp</span></td>
+      <td><span class="prim">&frac34; cup</span><span class="alt">&frac12; cup + &frac14; cup</span></td>
+      <td><span class="prim">1&frac18; cups</span><span class="alt">1 cup + 2 tbsp</span></td>
+      <td><span class="prim">1&frac12; cups</span><span class="alt">1 cup + &frac12; cup</span></td></tr>
+    <tr><td class="ing">Yellow Corn Flour</td>
+      <td><span class="prim">&frac12; tbsp</span><span class="alt">1 tsp + &frac12; tsp</span></td>
+      <td><span class="prim">1 tbsp</span><span class="alt">3 tsp</span></td>
+      <td><span class="prim">1&frac12; tbsp</span><span class="alt">1 tbsp + 1 tsp + &frac12; tsp &middot; or 4&frac12; tsp</span></td>
+      <td><span class="prim">2 tbsp</span><span class="alt">6 tsp</span></td></tr>
+    <tr><td class="ing">Non-Diastatic Malt Powder</td>
+      <td><span class="prim">&frac12; tbsp</span><span class="alt">1 tsp + &frac12; tsp</span></td>
+      <td><span class="prim">1 tbsp</span><span class="alt">3 tsp</span></td>
+      <td><span class="prim">1&frac12; tbsp</span><span class="alt">1 tbsp + 1 tsp + &frac12; tsp &middot; or 4&frac12; tsp</span></td>
+      <td><span class="prim">2 tbsp</span><span class="alt">6 tsp</span></td></tr>
+    <tr><td class="ing">Cultured Buttermilk Powder</td>
+      <td><span class="prim">1 tbsp</span><span class="alt">3 tsp</span></td>
+      <td><span class="prim">2 tbsp</span><span class="alt">6 tsp</span></td>
+      <td><span class="prim">3 tbsp</span><span class="alt">9 tsp</span></td>
+      <td><span class="prim">&frac14; cup</span><span class="alt">4 tbsp</span></td></tr>
+    <tr class="changed"><td class="ing">Sugar<span class="pill">rev</span></td>
+      <td><span class="prim">&frac34; tsp</span><span class="alt">&frac12; tsp + &frac14; tsp</span></td>
+      <td><span class="prim">1&frac12; tsp</span><span class="alt">1 tsp + &frac12; tsp</span></td>
+      <td><span class="prim">2&frac14; tsp</span><span class="alt">2 tsp + &frac14; tsp</span></td>
+      <td><span class="prim">1 tbsp</span><span class="alt">3 tsp</span></td></tr>
+    <tr class="changed"><td class="ing">Baking Powder<span class="pill">rev</span></td>
+      <td><span class="prim">&frac38; tsp</span><span class="alt">&frac14; tsp + &frac18; tsp</span></td>
+      <td><span class="prim">&frac34; tsp</span><span class="alt">&frac12; tsp + &frac14; tsp</span></td>
+      <td><span class="prim">1&frac18; tsp</span><span class="alt">1 tsp + &frac18; tsp</span></td>
+      <td><span class="prim">1&frac12; tsp</span><span class="alt">1 tsp + &frac12; tsp</span></td></tr>
+    <tr class="changed"><td class="ing">Baking Soda<span class="pill">rev</span></td>
+      <td><span class="prim">Pinch (1/16 tsp)</span></td>
+      <td><span class="prim">Dash (&frac18; tsp)</span></td>
+      <td><span class="prim">Scant Tad (3/16 tsp)</span><span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td>
+      <td><span class="prim">Tad (&frac14; tsp)</span></td></tr>
+    <tr class="changed"><td class="ing">Salt &mdash; low floor<span class="pill">rev</span></td>
+      <td><span class="prim">Pinch (1/16 tsp)</span></td>
+      <td><span class="prim">Dash (&frac18; tsp)</span></td>
+      <td><span class="prim">Scant Tad (3/16 tsp)</span><span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td>
+      <td><span class="prim">Tad (&frac14; tsp)</span></td></tr>
+    <tr><td class="ing" colspan="5" style="background:var(--griddle);color:var(--paper-2);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;">WET INGREDIENTS</td></tr>
+    <tr class="changed"><td class="ing">2% Lactaid Milk<span class="pill">rev</span></td>
+      <td><span class="prim">&frac12; cup</span></td>
+      <td><span class="prim">1 cup</span></td>
+      <td><span class="prim">1&frac12; cups</span><span class="alt">1 cup + &frac12; cup</span></td>
+      <td><span class="prim">2 cups</span></td></tr>
+    <tr><td class="ing">Large Egg (whisked)</td>
+      <td><span class="prim">2 tsp whisked egg</span><span class="alt">1 tsp + 1 tsp</span></td>
+      <td><span class="prim">1&frac12; tbsp whisked egg</span><span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td>
+      <td><span class="prim">2 tbsp + &frac34; tsp whisked egg</span><span class="alt">or 6&frac34; tsp</span></td>
+      <td><span class="prim">1 whole large egg</span></td></tr>
+    <tr class="changed"><td class="ing">Vanilla Extract &mdash; base floor<span class="pill new">new</span></td>
+      <td><span class="prim">Pinch (1/16 tsp)</span></td>
+      <td><span class="prim">Dash (&frac18; tsp)</span></td>
+      <td><span class="prim">Scant Tad (3/16 tsp)</span><span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td>
+      <td><span class="prim">Tad (&frac14; tsp)</span></td></tr>
+    <tr><td class="ing">Custom Spices &amp; Fat</td>
+      <td colspan="4">See Part&nbsp;2, Section&nbsp;1 &mdash; selected by flavor and batch size.</td></tr>
+  </tbody>
+</table>
+
+<div class="note fix">
+  <span class="lbl">Why the milk doubled</span>
+  Cultured buttermilk powder reconstitutes at roughly &frac14;&nbsp;cup powder per 1&nbsp;cup of liquid. With the old 1&nbsp;cup of milk, essentially all of it was spent rehydrating the powder and almost none reached the 1&frac12;&nbsp;cups of flour. Two cups is one cup feeding the powder, one cup making batter.
+</div>
+
+<h3 class="section-break">2 &middot; The Bulk Pantry Mix (4&times; Scale)</h3>
+<p>This makes a large batch of the <em>dry base only</em> for shelf storage. Do not include liquids, wet items, or spice add-ins. Vanilla is a wet ingredient and is added per batch, never to the jar.</p>
+
+<table>
+  <caption>4&times; dry base. De-duplicated and re-scaled to the corrected single-batch amounts.</caption>
+  <thead><tr><th class="ing">Bulk Dry Base Ingredient</th><th>Amount (4&times;)</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="ing">All-Purpose Flour</td><td><span class="prim">6 cups</span></td><td>&mdash;</td></tr>
+    <tr><td class="ing">Yellow Corn Flour</td><td><span class="prim">&frac12; cup</span><span class="alt">8 tbsp</span></td><td>&mdash;</td></tr>
+    <tr><td class="ing">Non-Diastatic Malt Powder</td><td><span class="prim">&frac12; cup</span><span class="alt">8 tbsp</span></td><td>&mdash;</td></tr>
+    <tr><td class="ing">Cultured Buttermilk Powder</td><td><span class="prim">1 cup</span></td><td>&mdash;</td></tr>
+    <tr class="changed"><td class="ing">Sugar<span class="pill">rev</span></td><td><span class="prim">&frac14; cup</span><span class="alt">4 tbsp</span></td><td>Was 2 tbsp.</td></tr>
+    <tr class="changed"><td class="ing">Baking Powder<span class="pill">rev</span></td><td><span class="prim">2 tbsp</span><span class="alt">6 tsp</span></td><td>Old list printed this line twice &mdash; corrected to one.</td></tr>
+    <tr class="changed"><td class="ing">Baking Soda<span class="pill">rev</span></td><td><span class="prim">1 tsp</span></td><td>Was 2 tsp.</td></tr>
+    <tr class="changed"><td class="ing">Salt<span class="pill">rev</span></td><td><span class="prim">1 tsp</span></td><td>Was 2 tsp &mdash; now the low neutral floor.</td></tr>
+  </tbody>
+</table>
+<p>Mix thoroughly and store properly.</p>
+
+<h4>64 fl-oz Mason Jar Canning &amp; Storage Guide</h4>
+<p>A 4&times; bulk batch fits a standard half-gallon (64 fl-oz) wide-mouth glass mason jar. Because the mix contains active chemical leavening and dairy fats, it must never be exposed to heat or moisture.</p>
+<ul class="tidy">
+  <li><b>Crucial rule:</b> never water-bath or pressure-can a dry flour mix &mdash; heat and moisture ruin the leavening and turn flour to dough. Use <b>dry vacuum sealing</b> instead: bone-dry jar, a clean coffee filter over the powder to protect the machine, lid on, and a jar-hood vacuum attachment to draw out the oxygen.</li>
+  <li><b>Pantry, airtight (not vacuum-sealed):</b> 6&ndash;9 months.</li>
+  <li><b>Pantry, dry vacuum-sealed:</b> 1&ndash;2 years.</li>
+  <li><b>Refrigerator:</b> 12&ndash;18 months &mdash; seal completely tight; dry mixes rapidly absorb moisture and odors.</li>
+  <li><b>Freezer:</b> do not freeze this jar. 64-oz glass mason jars are not freezer-safe; thermal shock can crack the glass.</li>
+  <li><b>Re-opening:</b> if you only hand-tighten the lid after scooping, treat the remainder like an un-canned mix &mdash; use within 3&ndash;6 months. Pull a fresh vacuum every time and it holds 1&ndash;2 years.</li>
+</ul>
+
+<h4>How to Reconstitute the Bulk Dry Mix</h4>
+<table>
+  <caption>Scoop dry mix, then build the wet base in a separate bowl.</caption>
+  <thead><tr><th class="ing">Step</th><th>Quarter</th><th>Half</th><th>Three-Quarter</th><th>Full</th></tr></thead>
+  <tbody>
+    <tr><td class="ing">1. Scoop dry mix</td>
+      <td><span class="prim">&frac12; cup</span></td><td><span class="prim">1 cup</span></td>
+      <td><span class="prim">1&frac12; cups</span><span class="alt">1 cup + &frac12; cup</span></td><td><span class="prim">2 cups</span></td></tr>
+    <tr class="changed"><td class="ing">2. Add Lactaid milk<span class="pill">rev</span></td>
+      <td><span class="prim">&frac12; cup</span></td><td><span class="prim">1 cup</span></td>
+      <td><span class="prim">1&frac12; cups</span><span class="alt">1 cup + &frac12; cup</span></td><td><span class="prim">2 cups</span></td></tr>
+    <tr><td class="ing">3. Add beaten egg</td>
+      <td><span class="prim">2 tsp</span><span class="alt">1 tsp + 1 tsp</span></td>
+      <td><span class="prim">1&frac12; tbsp</span><span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td>
+      <td><span class="prim">2 tbsp + &frac34; tsp</span><span class="alt">or 6&frac34; tsp</span></td>
+      <td><span class="prim">1 whole egg</span></td></tr>
+    <tr class="changed"><td class="ing">4. Add vanilla extract<span class="pill new">new</span></td>
+      <td><span class="prim">Pinch (1/16 tsp)</span></td>
+      <td><span class="prim">Dash (&frac18; tsp)</span></td>
+      <td><span class="prim">Scant Tad (3/16 tsp)</span><span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td>
+      <td><span class="prim">Tad (&frac14; tsp)</span></td></tr>
+    <tr><td class="ing">5. Add spices &amp; wet fat</td><td colspan="4">Per your chosen flavor card, Part&nbsp;2 Section&nbsp;1.</td></tr>
+    <tr><td class="ing">6. Mix &amp; rest</td><td colspan="4">Combine wet into dry, then follow the handling rules in Part&nbsp;2 / Part&nbsp;3.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ PART 2 ============ -->
+<p class="part-label">Part 2</p>
+<h2 class="part">Master Add-ins: Spice, Fat &amp; Sizing</h2>
+
+<h3>How to Use These Charts</h3>
+<ul class="tidy">
+  <li>In one bowl, measure the dry base from Part&nbsp;1 for your batch size; in another, the wet base (including the vanilla floor).</li>
+  <li>Find your flavor card below, read the column for your batch size, and add those exact spices and fat to the <em>wet</em> bowl.</li>
+  <li>Whisk the wet bowl smooth, then pour into the dry bowl and blend on the lowest setting for 5&ndash;7 seconds &mdash; just until lumpy.</li>
+  <li>Rest the batter undisturbed for 10 minutes. Once rested, cook everything within the next 40 minutes.</li>
+  <li><b>Bacon:</b> cook the bacon during the rest; at the 7-minute mark prep the surface to cook in the bacon grease.</li>
+  <li><b>All other flavors:</b> at the 7-minute mark heat the surface and add the listed cooking-surface grease for your flavor and ladle size.</li>
+  <li>Ideal surface temperature: <b>375&deg;F (190&deg;C)</b> &mdash; usually Medium-Low to Medium &mdash; except where a card specifies lower for candy. With Lactaid milk, favor the low end of that range; see the milk note in Part&nbsp;3 &sect;10.</li>
+</ul>
+
+<div class="note">
+  <span class="lbl">The salt principle</span>
+  Every non-bacon card lists a <b>Salt (in batter)</b> line that adds to the &frac14;&nbsp;tsp base floor. Most sweet flavors land at <b>&frac12;&nbsp;tsp total</b>; <b>Plain and the chocolate family</b> (Chocolate, Banana&nbsp;Nut&nbsp;+&nbsp;Chocolate, Toffee&nbsp;+&nbsp;Chocolate, Caramel&nbsp;+&nbsp;Chocolate, and Toffee&nbsp;+&nbsp;Caramel&nbsp;+&nbsp;Chocolate) go to <b>&frac34;&nbsp;tsp total</b> &mdash; plain needs the lift to pop, and chocolate carries assertive salt well. The two bacon cards add <em>no</em> batter salt: their crumbles, rendered-grease wet fat, and rendered-grease surface supply more than enough sodium.
+</div>
+
+<div class="note r4block">
+  <span class="lbl">The finishing-salt principle</span>
+  Batter salt is dissolved and even; a <b>small pinch of sea-salt flakes on top of the cooked pancake</b> is undissolved and lands directly on the palate, creating the sweet-salt contrast that makes a flight &ldquo;pop&rdquo; without syrup. Add-ins (chocolate chips, toffee, caramel) are sweet and unseasoned, so they mute that pop &mdash; the finishing flake counteracts it. Apply it after flipping, while the surface is still warm so the flakes stick. This is a <em>finishing step, not a batter ingredient.</em>
+  <br><br>
+  <b>Use the finishing flake on:</b> Plain, Chocolate, Toffee, Caramel, Caramel&nbsp;+&nbsp;Toffee, Toffee&nbsp;+&nbsp;Chocolate, Caramel&nbsp;+&nbsp;Chocolate, and Toffee&nbsp;+&nbsp;Caramel&nbsp;+&nbsp;Chocolate. <b>Skip it on:</b> the Banana&nbsp;Nut flights (the warm-spice and banana profile is delicate and the salted pine nuts already provide a savory accent) and the two bacon flights (already salt-saturated). Use a flaky finishing salt &mdash; Maldon or a coarse sea salt &mdash; not fine table salt, which dissolves and disappears.
+</div>
+
+<h3 class="section-break">Section 1 &middot; Add-ins Spice &amp; Fat Cards</h3>
+<p>Use <b>unsalted</b> butter wherever butter is listed. Cards marked <span class="r4inline">&#9670; finishing flake</span> get a pinch of sea-salt flakes on the cooked pancake &mdash; see the finishing-salt principle above.</p>
+
+<div class="cards">
+
+  <div class="card">
+    <h4>Plain &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Standard method. Brush with butter after cooking. For more depth, brown the butter before adding it to the batter. Finish the cooked pancake with a small pinch of sea-salt flakes on top.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Salt (in batter)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing r4">Vanilla Extract &mdash; additional</td><td class="r4">Pinch (1/16 tsp)</td><td class="r4">Dash (&frac18; tsp)</td><td class="r4">Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td class="r4">Tad (&frac14; tsp)</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted (or browned) Butter</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp &middot; or 4&frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card">
+    <h4>Chocolate &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Scatter chips onto the wet top. Flip when bubbles pop. Espresso deepens the cocoa &mdash; it does not read as coffee. Finish the cooked pancake with a small pinch of sea-salt flakes on top.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing r4">Espresso Powder</td><td class="r4">Drop (1/64 tsp)</td><td class="r4">Smidgen (1/32 tsp)</td><td class="r4">Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td class="r4">Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Vanilla Extract &mdash; additional</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>9/16 tsp<span class="alt">&frac12; tsp + Pinch (1/16)</span></td><td>&frac34; tsp</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Butter</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card">
+    <h4>Banana Nut</h4>
+    <p class="strat">Lay fat-toasted, salted pine nuts first, then thin banana discs. Lightly brown the ghee for more depth.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td><td>Scant Dash (3/32 tsp)<span class="alt">Pinch (1/16) + Smidgen (1/32)</span></td><td>Dash (&frac18; tsp)</td></tr>
+        <tr><td class="ing">&hellip;or Cardamom (fresh ground)</td><td class="r4">Drop (1/64 tsp)</td><td class="r4">Smidgen (1/32 tsp)</td><td class="r4">Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td class="r4">Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Pinch (1/16 tsp)<span class="alt">bump to Dash (&frac18;) if flat</span></td><td>Dash (&frac18; tsp)<span class="alt">bump to Scant Tad (3/16) if flat</span></td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16) &middot; bump to Tad (&frac14;) if flat</span></td><td>Tad (&frac14; tsp)<span class="alt">bump to Fat Tad (&frac38;) if flat</span></td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card">
+    <h4>Banana Nut + Chocolate</h4>
+    <p class="strat">Pine nuts &amp; bananas first; chips in the open spaces.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td><td>Scant Dash (3/32 tsp)<span class="alt">Pinch (1/16) + Smidgen (1/32)</span></td><td>Dash (&frac18; tsp)</td></tr>
+        <tr><td class="ing">Vanilla Extract &mdash; additional</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>9/16 tsp<span class="alt">&frac12; tsp + Pinch (1/16)</span></td><td>&frac34; tsp</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card savory">
+    <h4>Bacon</h4>
+    <p class="strat">Cook bacon crisp first; press crumbles into the wet top. No batter salt &mdash; the bacon supplies it. Saved rendered grease sets solid &mdash; melt it gently and cool to just-warm before adding (see Part&nbsp;3 &sect;10). If your bacon is pre-peppered, halve or skip the batter pepper below.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Black Pepper</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Cayenne</td><td>Hint (1/128 tsp)</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Rendered Bacon Grease</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Rendered bacon grease. &nbsp;<b>No added batter salt.</b></p>
+  </div>
+
+  <div class="card savory">
+    <h4>Bacon + Banana Nut</h4>
+    <p class="strat">Pine nuts &amp; bananas first; press bacon into the wet top. No batter salt &mdash; the bacon supplies it. If your bacon is pre-peppered, halve or skip the batter pepper below. (Ghee in the batter carries the banana-nut warmth; the surface is rendered bacon grease &mdash; melt any saved grease before use.)</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td><td>Scant Dash (3/32 tsp)<span class="alt">Pinch (1/16) + Smidgen (1/32)</span></td><td>Dash (&frac18; tsp)</td></tr>
+        <tr><td class="ing">Black Pepper</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing r4">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Rendered bacon grease. &nbsp;<b>No added batter salt.</b></p>
+  </div>
+
+  <div class="card candy">
+    <h4>Toffee &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Batter Shield required. Espresso anchors the sweetness. Finish the cooked pancake with a small pinch of sea-salt flakes on top &mdash; the toffee bits are sweet and unseasoned, so this contrast is what makes the flight pop.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Espresso Powder</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Pinch (1/16 tsp)</td><td>Dash (&frac18; tsp)</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Tad (&frac14; tsp)</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card candy">
+    <h4>Caramel &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Batter Shield required. Espresso deepens the caramel without reading as coffee. Finish each cooked pancake with a small pinch of sea-salt flakes on top after flipping &mdash; a finishing step, not a batter ingredient.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing r4">Espresso Powder</td><td class="r4">Drop (1/64 tsp)</td><td class="r4">Smidgen (1/32 tsp)</td><td class="r4">Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td class="r4">Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Pinch (1/16 tsp)</td><td>Dash (&frac18; tsp)</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Tad (&frac14; tsp)</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card candy">
+    <h4>Caramel + Toffee &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Batter Shield required. Lower the griddle to 325&deg;F. Finish the cooked pancake with a small pinch of sea-salt flakes on top.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Pinch (1/16 tsp)</td><td>Dash (&frac18; tsp)</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Tad (&frac14; tsp)</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card candy">
+    <h4>Toffee + Chocolate &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Batter Shield required. Vanilla paste anchors the cocoa; espresso deepens it &mdash; neither reads as coffee. Finish the cooked pancake with a small pinch of sea-salt flakes on top.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing r4">Espresso Powder</td><td class="r4">Drop (1/64 tsp)</td><td class="r4">Smidgen (1/32 tsp)</td><td class="r4">Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td class="r4">Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Vanilla Bean Paste &mdash; additional</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>9/16 tsp<span class="alt">&frac12; tsp + Pinch (1/16)</span></td><td>&frac34; tsp</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Butter</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card candy">
+    <h4>Caramel + Chocolate &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Batter Shield required. Encase the candy fully inside. Finish the cooked pancake with a small pinch of sea-salt flakes on top. <span class="r4opt"><b>Optional:</b> this card is anchored with cinnamon; if the chocolate reads flat against the caramel, you may <em>swap</em> the cinnamon for espresso powder (same scale as the Chocolate card) rather than running both &mdash; espresso pairs especially well with cocoa. Keep one anchor, not two.</span></p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Butter</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card candy">
+    <h4>Toffee + Caramel + Chocolate &nbsp;<span class="r4inline">&#9670; finishing flake</span></h4>
+    <p class="strat">Double Batter Shield required. Heat low: 300&deg;F for deep-frozen caramel, 325&deg;F for 10-min flash-frozen. Finish each cooked pancake with a small pinch of sea-salt flakes on top.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Espresso Powder</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td class="r4">Dash (&frac18; tsp)</td><td class="r4">Tad (&frac14; tsp)</td><td class="r4">Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td class="r4">&frac12; tsp</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Avocado Oil</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil.</p>
+  </div>
+
+  <div class="card">
+    <h4>Banana Nut &mdash; Banana&nbsp;in&nbsp;Batter <span class="r4inline">variant</span></h4>
+    <p class="strat">A separate dish from the standard Banana Nut card, not a substitution. Banana is mashed into the wet bowl (every bite tastes banana), pine nuts stay on the wet pancake top (every bite still has a textured accent). Lightly brown the ghee for more depth. Use very ripe banana &mdash; heavily speckled to mostly brown skin &mdash; for the sweetest, cleanest mash. Frozen-then-thawed banana is excellent here; the broken cell structure incorporates evenly. See the variant notes below the card.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Mashed Ripe Banana <span class="alt">fork-mashed to chunky-applesauce; add to wet bowl</span></td><td>2 tbsp<span class="alt">&frac14; medium banana</span></td><td>&frac14; cup<span class="alt">&frac12; medium banana</span></td><td>6 tbsp<span class="alt">&frac14; cup + 2 tbsp &middot; &frac34; medium banana</span></td><td>&frac12; cup<span class="alt">1 medium banana</span></td></tr>
+        <tr><td class="ing">Milk &mdash; reduce by</td><td>&frac34; tbsp<span class="alt">2&frac14; tsp less than the base table</span></td><td>1&frac12; tbsp<span class="alt">4&frac12; tsp less</span></td><td>2&frac14; tbsp<span class="alt">6&frac34; tsp less</span></td><td>3 tbsp<span class="alt">9 tsp less than 2 cups</span></td></tr>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td><td>Scant Dash (3/32 tsp)<span class="alt">Pinch (1/16) + Smidgen (1/32)</span></td><td>Dash (&frac18; tsp)</td></tr>
+        <tr><td class="ing">&hellip;or Cardamom (fresh ground)</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Pinch (1/16 tsp)<span class="alt">bump to Dash (&frac18;) if flat</span></td><td>Dash (&frac18; tsp)<span class="alt">bump to Scant Tad (3/16) if flat</span></td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16) &middot; bump to Tad (&frac14;) if flat</span></td><td>Tad (&frac14; tsp)<span class="alt">bump to Fat Tad (&frac38;) if flat</span></td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted (or browned) Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+        <tr><td class="ing">Pine Nuts &mdash; on top</td><td>3&ndash;4 toasted nuts</td><td>6&ndash;8 toasted nuts</td><td>2 tsp (about 2.0 oz pancake)</td><td>scale to size &mdash; see Section&nbsp;2 chart</td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil. &nbsp;<b>Surface temperature: 350&deg;F</b> &mdash; not the standard 375. Banana's free sugars scorch at the standard temp before the interior sets. Expect a slightly longer cook per side (~3&nbsp;min first side, ~2&nbsp;min after flip).</p>
+  </div>
+
+  <div class="card">
+    <h4>Banana Nut + Chocolate &mdash; Banana&nbsp;in&nbsp;Batter <span class="r4inline">variant</span></h4>
+    <p class="strat">Banana mashed into the wet bowl; chocolate chips and pine nuts both on the wet pancake top. This card sits in the chocolate family for salt (&frac34;&nbsp;tsp total with the base floor) and carries the full 1&nbsp;tsp total vanilla as the standard chocolate-bearing cards do. Cook at 350&deg;F, surface 25&deg;F lower than standard.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Mashed Ripe Banana <span class="alt">fork-mashed; add to wet bowl</span></td><td>2 tbsp<span class="alt">&frac14; medium banana</span></td><td>&frac14; cup<span class="alt">&frac12; medium banana</span></td><td>6 tbsp<span class="alt">&frac34; medium banana</span></td><td>&frac12; cup<span class="alt">1 medium banana</span></td></tr>
+        <tr><td class="ing">Milk &mdash; reduce by</td><td>&frac34; tbsp</td><td>1&frac12; tbsp</td><td>2&frac14; tbsp</td><td>3 tbsp</td></tr>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td><td>Scant Dash (3/32 tsp)<span class="alt">Pinch (1/16) + Smidgen (1/32)</span></td><td>Dash (&frac18; tsp)</td></tr>
+        <tr><td class="ing">Vanilla Extract &mdash; additional</td><td>Scant Tad (3/16 tsp)<span class="alt">Dash (&frac18;) + Pinch (1/16)</span></td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>9/16 tsp<span class="alt">&frac12; tsp + Pinch (1/16)</span></td><td>&frac34; tsp</td></tr>
+        <tr><td class="ing">Salt (in batter)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+        <tr><td class="ing">Chocolate Chips &mdash; on top</td><td colspan="4">Use the Section&nbsp;2 chart by pancake size; reduce by ~25&percnt; vs the standard chart because the batter is already banana-sweet.</td></tr>
+        <tr><td class="ing">Pine Nuts &mdash; on top</td><td colspan="4">Use the Banana&nbsp;Nut row of the Section&nbsp;2 chart, by pancake size.</td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Pure avocado oil. &nbsp;<b>Surface temperature: 350&deg;F.</b></p>
+  </div>
+
+  <div class="card savory">
+    <h4>Bacon + Banana Nut &mdash; Banana&nbsp;in&nbsp;Batter <span class="r4inline">variant</span></h4>
+    <p class="strat">Banana mashed into the wet bowl; bacon crumbles and pine nuts both on the wet pancake top. No batter salt &mdash; the bacon supplies it. If your bacon is pre-peppered, halve or skip the batter pepper below. Ghee in the batter carries the banana-nut warmth; the cooking surface stays rendered bacon grease &mdash; melt any saved grease before use. Cook at 350&deg;F &mdash; the lower banana temperature wins over the standard bacon temperature.</p>
+    <table>
+      <thead><tr><th class="ing">Item</th><th>Qtr</th><th>Half</th><th>3/4</th><th>Full</th></tr></thead>
+      <tbody>
+        <tr><td class="ing">Mashed Ripe Banana <span class="alt">fork-mashed; add to wet bowl</span></td><td>2 tbsp<span class="alt">&frac14; medium banana</span></td><td>&frac14; cup<span class="alt">&frac12; medium banana</span></td><td>6 tbsp<span class="alt">&frac34; medium banana</span></td><td>&frac12; cup<span class="alt">1 medium banana</span></td></tr>
+        <tr><td class="ing">Milk &mdash; reduce by</td><td>&frac34; tbsp</td><td>1&frac12; tbsp</td><td>2&frac14; tbsp</td><td>3 tbsp</td></tr>
+        <tr><td class="ing">Cinnamon (fresh ground)</td><td>Dash (&frac18; tsp)</td><td>Tad (&frac14; tsp)</td><td>Fat Tad (&frac38; tsp)<span class="alt">Tad (&frac14;) + Dash (&frac18;)</span></td><td>&frac12; tsp</td></tr>
+        <tr><td class="ing">Nutmeg (fresh grated)</td><td>Smidgen (1/32 tsp)</td><td>Pinch (1/16 tsp)</td><td>Scant Dash (3/32 tsp)<span class="alt">Pinch (1/16) + Smidgen (1/32)</span></td><td>Dash (&frac18; tsp)</td></tr>
+        <tr><td class="ing">Black Pepper</td><td>Drop (1/64 tsp)</td><td>Smidgen (1/32 tsp)</td><td>Scant Pinch (3/64 tsp)<span class="alt">Smidgen (1/32) + Drop (1/64)</span></td><td>Pinch (1/16 tsp)</td></tr>
+        <tr><td class="ing">Wet Fat &mdash; Melted Ghee</td><td>1&frac12; tsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 tbsp<span class="alt">3 tsp</span></td><td>1&frac12; tbsp<span class="alt">1 tbsp + 1 tsp + &frac12; tsp</span></td><td>2 tbsp<span class="alt">6 tsp</span></td></tr>
+        <tr><td class="ing">Bacon Crumbles &mdash; on top</td><td colspan="4">Use the Bacon row of the Section&nbsp;2 chart, by pancake size.</td></tr>
+        <tr><td class="ing">Pine Nuts &mdash; on top</td><td colspan="4">Use the Banana&nbsp;Nut row of the Section&nbsp;2 chart, by pancake size.</td></tr>
+      </tbody>
+    </table>
+    <p class="surface"><b>Surface grease:</b> Rendered bacon grease. &nbsp;<b>Surface temperature: 350&deg;F.</b> &nbsp;<b>No added batter salt.</b></p>
+  </div>
+
+</div>
+
+<div class="note">
+  <span class="lbl">Notes on the banana-in-batter variants</span>
+  <p style="margin:.2em 0 .6em;"><b>What changes from the standard Banana&nbsp;Nut family.</b> Banana goes <em>into</em> the batter (mashed and dispersed evenly &mdash; every bite tastes banana) instead of laid as discs on the wet top (concentrated bites of fruit). The pancake is more tender, browns slightly faster from the banana's free sugars, and goes a touch denser than the same recipe without banana. You lose the visible banana-disc presentation entirely. Pine nuts stay on top &mdash; they are the only textural accent left and the only reason this still reads as "banana nut" rather than just "banana pancake."</p>
+  <p style="margin:.2em 0 .6em;"><b>The four card-level adjustments</b> (already in the tables above): (1) mash banana into the wet bowl; (2) pull milk back 2&ndash;3 Tbsp at full batch to compensate for banana moisture; (3) drop the surface temperature to 350&deg;F &mdash; banana's free sugars scorch at the standard 375; (4) mash to a chunky-applesauce consistency, not diced &mdash; diced banana leaves wet pockets that don't cook through and a finished pancake that tears when you flip.</p>
+  <p style="margin:.2em 0 .6em;"><b>Mix order.</b> Dry into a bowl. Wet bowl in this order: milk, egg, vanilla base floor, mashed banana, melted ghee, then card cinnamon / nutmeg / salt / vanilla. Whisk wet thoroughly so the banana disperses. Combine wet into dry with no more than 12 strokes; lumps are fine.</p>
+  <p style="margin:.2em 0 .6em;"><b>If using the Bulk Pantry Mix dry-scoop.</b> The bulk jar contains sugar at the Rev. 3 ratio (&frac14;&nbsp;cup per 6&nbsp;cups flour); the banana brings its own sugar on top, so the bulk-scoop default is a touch sweeter than ideal for this variant. Two acceptable approaches: <b>easy</b> &mdash; scoop the jar as normal and accept a slightly sweeter pancake (this is the recommended default for service work); <b>tight</b> &mdash; build the dry from individual ingredients per the Normal Base Batch table and trim Sugar by about &frac13; (drop 1 Tbsp full batch to about 2 tsp). For a single home batch, the easy path is fine.</p>
+  <p style="margin:.2em 0 .6em;"><b>Banana sourcing.</b> Heavily speckled to mostly-brown ripe banana is ideal &mdash; sweeter, mashes effortlessly, incorporates evenly. Underripe banana doesn't mash cleanly and tastes starchy in the cooked pancake. Frozen-then-thawed banana is <em>better</em> than fresh for this card &mdash; the freeze-thaw cycle ruptures the cell walls and the banana incorporates perfectly; drain off any liquid that weeps out as it thaws before measuring.</p>
+  <p style="margin:.2em 0 .6em;"><b>Finishing flake.</b> Skip it. The banana-in-batter cards stay in the Banana&nbsp;Nut family for the finishing-salt principle &mdash; the warm-spice and banana profile is delicate and the salted pine nuts on top already provide a savory accent. If a flight reads flat, use the salt-bump option in the table, not a finishing flake.</p>
+  <p style="margin:.2em 0 0;"><b>Plate finish (optional).</b> These cards brown less than the rest of the menu, so the cooked face can look pale next to higher-temperature flights. Two presentation finishes that add visual weight without changing the flavor architecture: a light dust of cinnamon sugar on top while warm, or 2&ndash;3 thin banana slices laid on the cooked top and briefly bruléed with a torch. Both are presentation choices, not required.</p>
+</div>
+
+
+<div class="note">
+  <span class="lbl">A note on vanilla</span>
+  Cards that list vanilla show the amount <em>additional</em> to the &frac14;&nbsp;tsp base floor. The chocolate family (Chocolate, Banana&nbsp;Nut&nbsp;+&nbsp;Chocolate, Toffee&nbsp;+&nbsp;Chocolate) adds &frac34;&nbsp;tsp on the card, reaching <b>1&nbsp;tsp total</b> &mdash; the level the original recipe used, restored here because chocolate carries a full measure of vanilla well. For Toffee&nbsp;+&nbsp;Chocolate, vanilla is best as <b>bean paste</b>, which holds its flavor on the hot surface where alcohol-based extract would burn off.
+</div>
+
+<h3 class="section-break">Section 2 &middot; Add-ins Sizing &amp; Maximum-Limit Chart</h3>
+<p>Use these limits when sprinkling items onto the wet top. Keep the combined total at or below the listed limit for that pancake size, and keep toppings away from the outer edge of the batter pool. These are approximate maximums, not precise measuring targets. The <b>Bacon</b> and <b>Banana&nbsp;Nut</b> rows are self-contained &mdash; their amounts are measured in crumbles, slices, and nuts and are read on their own line, not summed against the Max&nbsp;Combined rows. The three <b>banana-in-batter variant</b> cards do not have their own chart rows &mdash; banana is in the batter, not a topping; pine nuts use the <b>Banana&nbsp;Nut</b> row; chips use the <b>Chocolate Chips</b> row at ~75&percnt; (the batter is already banana-sweet); bacon crumbles use the <b>Bacon</b> row.</p>
+
+<table>
+  <caption>Topping amounts and limits by pancake size.</caption>
+  <thead>
+    <tr>
+      <th class="ing">Topping / Shield</th>
+      <th>0.5 oz &mdash; 1 Tbsp scoop</th>
+      <th>1.0 oz &mdash; 2 Tbsp scoop</th>
+      <th>2.0 oz &mdash; &frac14; cup</th>
+      <th>3.0 oz &mdash; &frac38; cup</th>
+      <th>4.0 oz &mdash; &frac12; cup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="ing">Max Combined &mdash; Unshielded</td><td class="r4">&frac34; tsp<span class="alt">&frac12; tsp + &frac14; tsp</span></td><td class="r4">&frac12; Tbsp<span class="alt">1 tsp + &frac12; tsp</span></td><td>1 Tbsp<span class="alt">3 tsp</span></td><td>1&frac12; Tbsp<span class="alt">4&frac12; tsp</span></td><td>2 Tbsp<span class="alt">6 tsp</span></td></tr>
+    <tr><td class="ing">Max Combined &mdash; Single Shield</td><td class="r4">1&frac18; tsp<span class="alt">1 tsp + &frac18; tsp</span></td><td class="r4">&frac34; Tbsp<span class="alt">2 tsp + &frac14; tsp</span></td><td>1&frac12; Tbsp<span class="alt">4&frac12; tsp</span></td><td>2&frac14; Tbsp<span class="alt">2 tbsp + &frac34; tsp</span></td><td>3 Tbsp<span class="alt">9 tsp</span></td></tr>
+    <tr><td class="ing">Max Combined &mdash; Double Shield</td><td class="r4">1&frac13; tsp</td><td>2&frac23; tsp</td><td>1&frac34; Tbsp<span class="alt">5&frac14; tsp</span></td><td>2 Tbsp + 1&frac12; tsp</td><td>3 Tbsp + &frac34; tsp</td></tr>
+    <tr><td class="ing">Chocolate Chips</td><td>3&ndash;4 standard (6 mini)</td><td>6&ndash;8 standard (12 mini)</td><td>12&ndash;15 standard</td><td>18&ndash;20 standard</td><td>25&ndash;30 standard</td></tr>
+    <tr><td class="ing">Toffee (Single Shield)</td><td class="r4">Tad (&frac14; tsp) bits</td><td>&frac12; tsp bits</td><td>1 tsp bits</td><td>1&frac12; tsp bits</td><td>2 tsp bits</td></tr>
+    <tr><td class="ing">Caramel (Single Shield)</td><td class="r4">&frac34; tsp<span class="alt">&frac12; tsp + &frac14; tsp</span></td><td>1&frac12; tsp</td><td>1 Tbsp<span class="alt">3 tsp</span></td><td>1&frac12; Tbsp<span class="alt">4&frac12; tsp</span></td><td>2 Tbsp<span class="alt">6 tsp</span></td></tr>
+    <tr><td class="ing">Bacon</td><td class="r4">&frac58; tsp crumbles<span class="alt">&frac12; tsp + &frac18; tsp</span></td><td>1&frac14; tsp crumbles</td><td>1 Tbsp crumbles</td><td>1&frac12; Tbsp crumbles</td><td>2 Tbsp crumbles, or 2 whole strips flat</td></tr>
+    <tr><td class="ing">Banana Nut</td><td>&frac34;&ndash;1 slice quartered; 3&ndash;4 pine nuts</td><td>1&frac12;&ndash;2 slices quartered; 6&ndash;8 pine nuts</td><td>2&ndash;3 slices; 1 Tbsp pine nuts</td><td>3&ndash;4 slices; 1&frac12; Tbsp pine nuts</td><td>5&ndash;6 slices; 2 Tbsp pine nuts</td></tr>
+    <tr><td class="ing">Caramel + Toffee (Single Shield)</td><td class="r4">Caramel &frac12; tsp; Toffee Dash (&frac18; tsp)</td><td>Caramel 1 tsp; Toffee &frac13; tsp</td><td>Caramel 2 tsp; Toffee &frac23; tsp</td><td>Caramel 1 Tbsp; Toffee 1 tsp</td><td>Caramel 1 Tbsp + 1 tsp; Toffee 1&frac13; tsp</td></tr>
+    <tr><td class="ing">Toffee + Chocolate (Single Shield)</td><td class="r4">Toffee Dash (&frac18; tsp); 2&ndash;3 chips</td><td>Toffee &frac13; tsp; 4&ndash;5 chips</td><td>Toffee &frac23; tsp; 8&ndash;10 chips</td><td>Toffee 1 tsp; 12&ndash;13 chips</td><td>Toffee 1&frac13; tsp; 17&ndash;22 chips</td></tr>
+    <tr><td class="ing">Caramel + Chocolate (Single Shield)</td><td class="r4">Caramel &frac12; tsp; 2&ndash;3 chips</td><td>Caramel 1 tsp; 4&ndash;5 chips</td><td>Caramel 2 tsp; 8&ndash;10 chips</td><td>Caramel 1 Tbsp; 12&ndash;13 chips</td><td>Caramel 1 Tbsp + 1 tsp; 17&ndash;22 chips</td></tr>
+    <tr><td class="ing">Toffee + Caramel + Chocolate (Double Shield)</td><td class="r4">Toffee Dash (&frac18; tsp); Caramel &frac12; tsp; 2&ndash;3 chips</td><td>Toffee &frac13; tsp; Caramel 1 tsp; 4&ndash;5 chips</td><td>Toffee &frac23; tsp; Caramel 2 tsp; 8&ndash;10 chips</td><td>Toffee 1 tsp; Caramel 1 Tbsp; 12&ndash;13 chips</td><td>Toffee 1&frac13; tsp; Caramel 1 Tbsp + 1 tsp; 17&ndash;22 chips</td></tr>
+  </tbody>
+</table>
+
+<h4>Key Mix-In Prep Rules</h4>
+<ul class="tidy">
+  <li><b>Banana thickness:</b> slice &frac18;&Prime;&ndash;&frac14;&Prime; thick (ideally 3/16&Prime;, two stacked coins) with a sharp paring knife right before cooking. Too thick tears the pancake on the flip; too thin dissolves to mush and sticks.</li>
+  <li><b>Banana flavor boost:</b> dust the discs lightly with sugar or cinnamon-sugar right before placing, or press them into the wet batter so they caramelize against the surface. You can also mash a small amount of banana into the batter so the flavor runs all the way through.</li>
+  <li><b>Caramel &amp; toffee:</b> buy baking caramel and toffee bits, chop into micro-pieces, and use them deep-frozen or 10-minute flash-frozen. When both are present, either one being deep-frozen forces the lower surface temperature; if both are flash-frozen, keep the higher temperature.</li>
+  <li><b>Candy edge buffer:</b> drop micro-chopped candy tightly into the dead center of small pools, leaving a wide ring of clean dough so the Batter Shield can seal.</li>
+</ul>
+
+<h3 class="section-break">Section 3 &middot; Component Synergy &amp; Quality Tiers</h3>
+<table>
+  <caption>A quality checklist for designing flights. Syrup acts as the flavor anchor and must scale with the richness of the add-ins.</caption>
+  <thead><tr><th class="ing">Flavor</th><th class="tier-best">Best (Chef Tier)</th><th>Good (Reliable)</th><th>OK in a Pinch</th><th class="tier-bad">Avoid</th></tr></thead>
+  <tbody>
+    <tr><td class="ing">Plain</td><td>Grade A Amber Rich; brushed unsalted butter</td><td>Grade A Dark Robust; melted butter in batter</td><td>Grade A Very Dark; salted butter in batter</td><td>Imitation/corn syrup; savory fats in plain dough</td></tr>
+    <tr><td class="ing">Chocolate</td><td>Grade A Dark Robust; dark chips</td><td>Grade A Amber Rich; semi-sweet chips</td><td>Grade A Very Dark; milk chips</td><td>Imitation syrup; cheap waxy morsels</td></tr>
+    <tr><td class="ing">Banana Nut</td><td>Grade A Dark Robust; toasted Mediterranean pine nuts</td><td>Grade A Amber Rich; chopped English walnuts</td><td>Grade A Very Dark; un-toasted nuts</td><td>Imitation syrup; over-ripe mushy banana</td></tr>
+    <tr><td class="ing">Banana Nut + Chocolate</td><td>Grade A Dark Robust; toasted pine nuts + dark chips</td><td>Grade A Very Dark; walnuts + semi-sweet</td><td>Grade A Amber Rich; raw nuts + milk chips</td><td>Imitation syrup; large un-chopped walnut chunks</td></tr>
+    <tr><td class="ing">Bacon</td><td>Grade A Very Dark; crisp bacon seared in bacon fat</td><td>Grade A Dark Robust; standard crisp crumbles</td><td>Grade A Amber Rich; thick-cut chewy chunks</td><td>Imitation syrup; raw/under-cooked bacon</td></tr>
+    <tr><td class="ing">Bacon + Banana Nut</td><td>Grade A Very Dark; toasted pine nuts + bacon-grease pan</td><td>Grade A Dark Robust; walnuts + butter pan</td><td>Grade A Amber Rich; raw nuts + standard skillet</td><td>Imitation syrup; adding caramel/toffee to this row</td></tr>
+    <tr><td class="ing">Toffee</td><td>Grade A Very Dark; plain Heath Bits O' Brickle</td><td>Grade A Dark Robust; store-brand toffee</td><td>Grade A Amber Rich; chocolate-coated toffee</td><td>Imitation syrup; skipping the Batter Shield</td></tr>
+    <tr><td class="ing">Caramel</td><td>Grade A Very Dark; frozen baking caramel bits</td><td>Grade A Dark Robust; micro-chopped Kraft bits</td><td>Grade A Amber Rich; chopped caramel squares</td><td>Imitation syrup; liquid caramel sauce in wet mix</td></tr>
+    <tr><td class="ing">Caramel + Toffee</td><td>Grade A Very Dark; micro-candy + fresh nutmeg</td><td>Grade A Dark Robust; standard candy + jar nutmeg</td><td>Grade A Amber Rich; standard candy + no nutmeg</td><td>Imitation syrup; surface heat above 325&deg;F</td></tr>
+    <tr><td class="ing">Toffee + Chocolate</td><td>Grade A Very Dark; plain toffee + dark chips</td><td>Grade A Dark Robust; store toffee + semi-sweet</td><td>Grade A Amber Rich; choc-toffee bits + milk chips</td><td>Imitation syrup; mixing candy into the dry bowl</td></tr>
+    <tr><td class="ing">Caramel + Chocolate</td><td>Grade A Very Dark; frozen caramel + dark chips</td><td>Grade A Dark Robust; store caramel + semi-sweet</td><td>Grade A Amber Rich; store caramel + milk chips</td><td>Imitation syrup; skipping the 10-min candy freeze</td></tr>
+    <tr><td class="ing">Toffee + Caramel + Chocolate</td><td>Grade A Very Dark; micro-candy + avocado-oil base</td><td>Grade A Dark Robust; standard candy + ghee base</td><td>Grade A Amber Rich; standard candy + butter base</td><td>Imitation syrup; regular coffee grounds in batter</td></tr>
+  </tbody>
+</table>
+
+<h4>Core Quality Rules</h4>
+<ul class="tidy">
+  <li><b>Structural Conflict Rule:</b> ripe banana discs release heavy water-sugar compounds when seared, so bananas with pure melting candies (toffee, caramel) sit firmly in the "Avoid" tier &mdash; the liquid interior tears pancakes on the flip and burns onto the pan.</li>
+  <li><b>Syrup Scaling Law:</b> as profiles shift toward heavy fats, roasted nuts, or complex candies, scale syrup from Amber to Dark to Very Dark. A delicate Amber on a heavy candy or bacon stack gets washed out into flat sweetness.</li>
+</ul>
+
+<!-- ============ PART 3 ============ -->
+<p class="part-label">Part 3</p>
+<h2 class="part">Cooking &amp; Troubleshooting Guide</h2>
+
+<h3>1 &middot; Sizing &amp; Ladle Reference</h3>
+<ul class="tidy">
+  <li><b>0.5 oz (1 Tbsp):</b> ultra-mini sample bites; drop toppings the instant you pour. Eight equal a normal stack.</li>
+  <li><b>1.0 oz (2 Tbsp):</b> 2.5&ndash;3&Prime; silver-dollar tasting flight &mdash; the target flight size (four per single-serving batch).</li>
+  <li><b>2.0 oz (&frac14; cup):</b> standard 4&Prime; diner pancake; easiest size for practicing flips.</li>
+  <li><b>3.0 oz (&frac38; cup):</b> 5&Prime; thick stack; leave on the griddle slightly longer so the center cooks through.</li>
+  <li><b>4.0 oz (&frac12; cup):</b> 6&ndash;7&Prime; flapjack; hardest to flip; best for whole strips of bacon.</li>
+</ul>
+
+<h3>2 &middot; Mixing &amp; Preventing Over-Mixing</h3>
+<p>Use a handheld frother with the whisk attachment on its lowest setting to emulsify the wet ingredients (milk, egg, vanilla, spices, fat). Do not run the electric tool on dry powder alone. When you pour wet into dry, blend on the absolute lowest setting for a maximum of 5&ndash;7 seconds. Stop while the batter still looks thick and lumpy &mdash; a few dry streaks are normal. If it turns smooth, shiny, or elastic, it is over-mixed and will cook rubbery.</p>
+
+<h3>3 &middot; The Mandatory Rest &amp; Batter Lifespan</h3>
+<p>After the 5&ndash;7-second mix, rest the batter undisturbed for 10 minutes. The buttermilk powder activates the leavening and the dry streaks hydrate; the surface will look puffy and slightly bubbly when ready. Do not stir or whisk after the rest &mdash; it pops the gas pockets. Gently swirling a ladle through to scoop is fine. Use the batch within 20&ndash;40 minutes; after 40 minutes the leavening is spent and pancakes cook flat.</p>
+
+<h3>4 &middot; Getting the Consistency Right</h3>
+<div class="note fix">
+  <span class="lbl">Corrected</span>
+  With the base milk now set correctly (full batch 2 cups), the rested batter should already pour properly. The old "add water a tablespoon at a time" was patching a roughly one-cup shortfall &mdash; any adjustment below should now be a minor fine-tune, not a rescue. Always adjust <em>after</em> the 10-minute rest, never before: the flour keeps absorbing liquid during the rest, so batter checked early will look thinner than it ends up.
+</div>
+<p><b>The target.</b> After the rest, properly mixed batter should fall off a spoon in a thick, steady ribbon &mdash; about the consistency of a pourable milkshake. It should spread slowly on its own when poured but not run instantly across the pan.</p>
+<ul class="tidy">
+  <li><b>If it is not runny enough</b> (too thick &mdash; it mounds up, clings to the spoon, will not spread): whisk in <b>2% Lactaid milk</b> (or water) <b>1 tablespoon at a time</b>, waiting a few seconds after each addition for it to fully blend, until the batter falls off the spoon in that slow, thick ribbon. Expect this to take only 1&ndash;3 tablespoons with the corrected base; stop the moment it ribbons. Do not add it all at once &mdash; overshooting into thin batter is harder to correct than nudging up.</li>
+  <li><b>If it is too runny</b> (watery, runs instantly across the pan &mdash; common if a thinner milk like skim, oat, or soy was substituted): whisk in <b>all-purpose flour 1 tablespoon at a time</b> until it thickens back to the pourable-milkshake consistency. Let it sit a minute between additions so the flour can hydrate before you judge it.</li>
+</ul>
+
+<h3>5 &middot; The Batter Shield Technique</h3>
+<p>Immediately take your dedicated shielding ladle (a 1-oz Winco ladle or a spring-loaded 2-Tbsp cookie scoop) from the ice bath, where it must have soaked at least 45&ndash;60 seconds. Scoop the precise volume of cold, plain batter from a small separate reservoir and drizzle it in a tight concentric circle over the candy core, keeping the outer rim of the pancake clean to form a seal on the flip. This locks the candy inside so it melts smoothly instead of welding to the bare surface. Toffee&nbsp;+&nbsp;Caramel&nbsp;+&nbsp;Chocolate combinations need a Double Batter Shield &mdash; the same volume applied twice in layered coats, each smoothed with the back of a chilled spoon.</p>
+<table>
+  <caption>Precise plain-batter shield volume per pancake size.</caption>
+  <thead><tr><th class="ing">Pancake Size</th><th>Single Shield Volume</th><th>Execution</th></tr></thead>
+  <tbody>
+    <tr><td class="ing">0.5 oz</td><td><span class="prim">&frac12; tsp</span></td><td>Drizzle a tiny drop over the toffee specks; flatten with the cold ladle bottom.</td></tr>
+    <tr><td class="ing">1.0 oz</td><td><span class="prim">1 tsp</span></td><td>Thin ring over the caramel bits; leave a wide plain perimeter.</td></tr>
+    <tr><td class="ing">2.0 oz</td><td><span class="prim">2 tsp</span><span class="alt">1 tsp + 1 tsp</span></td><td>Pour into the center; spiral outward with a spoon to a 3&Prime; circle.</td></tr>
+    <tr><td class="ing">3.0 oz</td><td><span class="prim">1 Tbsp</span><span class="alt">3 tsp</span></td><td>Drizzle heavily; the thicker shield insulates candy through a longer bake.</td></tr>
+    <tr><td class="ing">4.0 oz</td><td><span class="prim">1&frac12; Tbsp</span><span class="alt">1 tbsp + 1 tsp + &frac12; tsp &middot; or 4&frac12; tsp</span></td><td>Web the batter across the top, then sweep flat with the ladle to seal.</td></tr>
+  </tbody>
+</table>
+
+<h3>6 &middot; The Golden Rule of Flipping</h3>
+<p>Flip when surface bubbles form and pop into holes that stay open, and the wet sheen turns matte around the edges. Slide the spatula fully under the center, lift just 1&ndash;2&Prime;, and turn with a quick, gentle wrist motion &mdash; never toss it high.</p>
+
+<h3>7 &middot; Flight Cooking Order</h3>
+<p>Cook from cleanest to stickiest so you avoid washing the pan between every pancake: <b>Plain &amp; Chocolate</b> first (mostly contained), then <b>Bacon &amp; Banana Nut</b> (wipe the surface after), and <b>Toffee &amp; Caramel combos last</b> (sticky sugar residue).</p>
+
+<h3>8 &middot; Between-Batch Griddle Cleanup</h3>
+<p>A rapid 30-second routine: <b>scrape</b> loose crumbs and dark spots off with a metal spatula; if sugar has hardened on, drop one ice cube or a tablespoon of water on the spot so the steam blasts it free; <b>wipe</b> with a thick-folded paper towel pressed under the spatula; <b>re-oil</b> with a fresh teaspoon of avocado oil wiped to a micro-thin film.</p>
+
+<h3>9 &middot; Storage &amp; Leftovers</h3>
+<ul class="tidy">
+  <li><b>Whole nutmeg seeds:</b> stay fresh 4&ndash;5 years in a sealed glass jar in a cool, dark, dry pantry. Never store above the stove; do not freeze (condensation rots the seed).</li>
+  <li><b>Leftover whisked egg</b> (from half-batches): refrigerate airtight up to 2 days; use in scrambled eggs, as an egg wash, or for the next half-batch.</li>
+  <li><b>Leftover mixed wet batter:</b> cannot be saved &mdash; cold kills the leavening, leaving flat gummy paste. Scale down rather than over-mixing; discard any unused batter.</li>
+  <li><b>Leftover dry mix:</b> shelf-stable per the canning guide in Part&nbsp;1.</li>
+  <li><b>Cooked pancakes:</b> freeze beautifully. Cool fully, stack with parchment between layers, freeze in a heavy-duty bag, and reheat from frozen in a toaster or toaster oven.</li>
+</ul>
+
+<h3>10 &middot; Advanced Tips &amp; Ingredient Nuances</h3>
+
+<h4>Milk &mdash; Fat Level, Lactaid, and Substitutions</h4>
+<div class="note fix">
+  <span class="lbl">Why Lactaid behaves differently</span>
+  The lactase enzyme in Lactaid splits milk's lactose into glucose and galactose &mdash; two free, fast-reacting reducing sugars. That is why Lactaid tastes slightly sweeter than regular milk <em>and</em> browns faster and darker on the griddle.
+</div>
+<ul class="tidy">
+  <li><b>Browning &mdash; the quirk that matters most.</b> Lactaid's split sugars, the non-diastatic malt, and the added sugar all push browning, so this batter colors quickly. Keep the surface toward the low end of the 375&deg;F range &mdash; closer to Medium-Low &mdash; and trust the visual cues (matte edges, popped bubbles) over the clock, especially on 3.0 and 4.0 oz stacks where the inside needs longer to set. The candy combos already run cooler (300&ndash;325&deg;F), where this faster browning works in your favor.</li>
+  <li><b>2% vs. whole milk.</b> The base specifies 2% Lactaid because it is what most kitchens keep on hand for an impromptu pancake session. Across a full batch the difference between 2% and whole is only about 1&ndash;1&frac12; tsp of fat, and the recipe already adds 2&nbsp;Tbsp (6 tsp) of wet fat per full batch &mdash; which dominates. No compensation is built in, and none is really needed. If you happen to have it, <b>Whole Lactaid</b> restores the fat uniformly in the milk itself with zero per-card bookkeeping &mdash; the cleanest fix &mdash; but it is a convenience, not a requirement.</li>
+  <li><b>If you do want to top up the 2% fat gap &mdash; match the card's wet fat.</b> Add about 1 tsp per full batch of the <em>same fat the flavor card already calls for</em>: extra butter on a butter card, extra ghee on a ghee card, extra avocado oil on an avocado-oil card. <b>Skip the top-up on the bacon cards</b> &mdash; rendered bacon grease is the richest fat on the chart and carries plenty on its own; adding butter there only muddies a deliberately savory profile. Note this top-up is the <em>milk-fat</em> fix and is separate from the pine-nut glaze rule below.</li>
+  <li><b>Substituting regular (lactose-containing) milk.</b> It works, but it is slightly less sweet and browns less. Nudge the base sugar up by about 1 tsp at full batch, and expect to run the griddle a hair hotter for the same color.</li>
+</ul>
+
+<h4>Salted vs. Unsalted Butter</h4>
+<p>Always use unsalted butter in the wet mix. The base salt is now a deliberately low, calibrated floor; salted butter brands vary wildly and can tip your sweet flights savory.</p>
+
+<h4>Managing Melted Fats Across Flights</h4>
+<p>If melted butter or ghee drops below room temperature it solidifies into chunks when it hits cold Lactaid milk. <b>Warm-water bath method:</b> pour melted butter and ghee into small heatproof jars, set them in a skillet or bowl of hot tap water reaching halfway up the jars, and keep it near your station &mdash; it holds fats liquid for over an hour; swap the water when it cools. <b>Quick method:</b> melt fat per batch in a small microwave-safe cup, 10&ndash;15 seconds, and let it sit a minute before adding.</p>
+<p><b>Saved rendered bacon grease</b> behaves the same way &mdash; it sets firm in the fridge or freezer and will seize into lumps if added cold to batter. Melt it gently (low heat or a short microwave burst) back to a clear liquid, then let it cool to just-warm before it goes in; fat that is still hot will start to cook the egg. A common workflow &mdash; oven-cooking bacon in large batches, saving the rendered grease, and freezing the par-cooked bacon to finish later in a pan &mdash; works well here: the saved grease easily covers the batter fat and the surface grease even though finishing the bacon in a pan would not render enough on its own.</p>
+
+<h4>Vanilla Bean Paste vs. Extract</h4>
+<p>Paste carries real pod seeds and a deeper profile, and holds inside the dough on a hot surface. Pure extract is alcohol-based and burns off faster &mdash; fine for the wet-base floor, but paste is preferred where a card calls for it as a candy anchor.</p>
+
+<h4>Fresh-Ground Spices &mdash; Nutmeg, Cinnamon, Cardamom</h4>
+<p>Ground spices lose their volatile aromatic oils fast, so the cards call for all three freshly ground or grated. Freshly grated nutmeg releases bright, warm oils; pre-ground loses them quickly and can taste dusty or medicinal. Use a Microplane rasp at a 45&deg; angle over the wet bowl, holding the seed firmly; for safety, stop grating when the seed reaches pea size and start a fresh one. Cinnamon and cardamom behave the same way &mdash; grind cinnamon from a fresh stick on the Microplane, and cardamom from seeds (husk the green pods first) in a mortar or small spice grinder. Pre-ground works in a pinch but the difference is noticeable, especially in the spice-forward Banana&nbsp;Nut flights. Avoid stick blenders and electric grinders for the tiny nutmeg amounts.</p>
+
+<h4 id="pinenuts">Pine Nuts &mdash; Toast in Fat with Salt</h4>
+<div class="note fix">
+  <span class="lbl">Corrected method</span>
+  The previous dry-skillet method left the pine nuts mild with nothing for seasoning to grab. Toasting them in a little fat browns them evenly, carries flavor, and lets salt adhere.
+</div>
+<ul class="tidy">
+  <li>Warm about 1 tsp of ghee or unsalted butter in a skillet over medium-low. Add the pine nuts with a small pinch of fine salt.</li>
+  <li>Stir or shake constantly for 2&ndash;3 minutes until light golden and intensely fragrant.</li>
+  <li><b>Optional candied finish:</b> in the last 30 seconds, add a few drops of maple syrup or a scant &frac14; tsp of sugar and toss to glaze &mdash; this is the strongest "pop."</li>
+  <li>Pour out onto a cool plate the instant they are done so they stop cooking, and finish with a tiny pinch of flaky salt off the heat.</li>
+  <li><b>Always glaze in butter or ghee &mdash; never avocado oil</b>, even for the Toffee&nbsp;+&nbsp;Caramel&nbsp;+&nbsp;Chocolate flight, whose batter fat is avocado oil. The point of the glaze is a fat that carries flavor; avocado oil is neutral and would deliver salt without richness. A teaspoon of ghee on a small handful of nuts is localized and sits comfortably with either profile. This is separate from the milk-fat top-up rule, which <em>does</em> match the card's fat.</li>
+  <li><b>Alternative for louder nut flavor:</b> pine nuts are deliberately mild and delicate. Pecans or English walnuts toasted in browned butter with salt out-pop them noticeably &mdash; the Synergy chart's "Good" tier &mdash; if you want the nut to read more strongly.</li>
+</ul>
+
+<h4>Rescuing &amp; Storing Toasted Pine Nuts</h4>
+<p><b>If you already dry-toasted nuts without fat,</b> they are fine &mdash; just give them the missing step now. Melt about 1 tsp of ghee or butter over <em>low</em> heat, add the toasted nuts and a small pinch of fine salt, and toss 30&ndash;60 seconds &mdash; long enough to coat and let the salt grab, no longer. They are already toasted, so this is a glaze-and-warm step, not a re-toast; watch closely and pour them onto a cool plate the second they turn glossy. For the candied version, add a few drops of maple or a scant &frac14; tsp of sugar in the last 20&ndash;30 seconds. With no skillet at all, tossing them in a little warm fat and salt off the heat also works &mdash; less even, but zero scorch risk. Pine nuts are the most scorch-prone nut there is, so keep the heat genuinely low.</p>
+<p><b>Storing toasted nuts:</b> toasting shortens shelf life &mdash; heat starts the oils oxidizing, and pine nuts are especially prone to going rancid. Store them as <em>plain dry-toasted</em> nuts, fully cooled first (residual warmth traps condensation and softens them), sealed airtight: about 1&ndash;2 weeks at room temperature, a few weeks to a month refrigerated, a couple of months frozen. Fat-glazed or candied nuts keep less well &mdash; the fat and sugar pull moisture and soften the crunch &mdash; so do the glaze step fresh on cooking day, per-flight, in the small amount you need. Frozen nuts need no thawing; they come up to temp the moment they hit the warm glazing fat.</p>
+
+<h4>Banana Prep &mdash; Brief Chill, Not a Solid Freeze</h4>
+<p>Chill the whole, unpeeled banana in the freezer 15&ndash;30 minutes (or fridge 1&ndash;2 hours) before slicing. Cooler fruit slices crisply at the &frac18;&Prime;&ndash;&frac14;&Prime; target, holds its disc shape on the hot surface, and releases its water-sugar more slowly so the batter sets around it first. Chill with the peel on, then peel and slice right before cooking to avoid oxidation. <b>Do not freeze solid</b> &mdash; ice crystals rupture the cells, the fruit turns to mush, won't hold a disc, and ironically releases <em>more</em> water on the griddle. Long refrigeration is also discouraged: the peel blackens within 12 hours and cold-dulled enzymes mute the aroma. The brief 15&ndash;30-minute chill is the sweet spot.</p>
+
+<h4>Banana Nut Spice Experiments</h4>
+<p>Because the dry base stays separate in the jar, you can test spice profiles in micro-batches. Two starting points for a half batch (the chart amounts are the bolder revised defaults):</p>
+<ul class="tidy">
+  <li><b>Traditional bakery profile:</b> ghee wet fat; Tad (&frac14; tsp) fresh-ground cinnamon + Pinch (1/16 tsp) fresh-grated nutmeg.</li>
+  <li><b>Modern cafe profile:</b> melted butter wet fat; Tad (&frac14; tsp) fresh-ground cinnamon + Smidgen (1/32 tsp) fresh-ground cardamom. A small pinch of allspice also reads well as banana-bread depth.</li>
+</ul>
+
+<h4 class="r4head">Candy Prep Protocol</h4>
+<p class="r4block">Caramel and toffee are physically opposite candies and must be prepped by different methods. <b>Toffee</b> (Heath Bits O' Brickle) is a hard-crack candy &mdash; brittle and glassy &mdash; so it shatters when struck. <b>Caramel</b> (Peter's Caramel Loaf) is a soft, chewy candy that never turns brittle; struck with a mallet it only deforms. Caramel must be <em>cut</em>, not smashed, and it needs <em>less</em> freezing, not more.</p>
+
+<p class="r4block"><b>Toffee &mdash; smash method.</b> Bits O' Brickle usually comes pre-broken and is fine straight from the bag. If you want a finer, more uniform bit, freeze it solid, seal it in a double freezer bag, and strike with the flat of a meat mallet or rolling pin until gravel-sized; sift through a mesh strainer to separate uniform bits from fine dust. Keep it frozen until you scatter so it does not melt too fast on the griddle.</p>
+
+<p class="r4block"><b>Caramel &mdash; cut method.</b> Do not smash it, and do not work it frozen rock-solid &mdash; a fully frozen caramel block is hard enough to resist the blade yet still too tough to cleave, which makes cutting feel like sawing a log. Caramel is cut in <em>two stages</em>: first the whole block is reduced to slabs, then the slabs are diced as needed. Slabbing the block while it is large means few long cuts instead of hundreds of small ones, and freezing the slabs individually lets you dice only what a given service needs. An <b>oiled and floured bench scraper</b>, pressed straight down, is the tool for both stages &mdash; the wide flat blade does not wedge in the candy and the straight-down press needs no knife skill.</p>
+
+<p class="r4block"><b>Stage 1 &mdash; reduce the block to slabs.</b></p>
+<ul class="r4block">
+  <li><b>Temper the block to slab-cutting firmness.</b> Let the block thaw in its sealed freezer bag for about 30 minutes &mdash; whether it is starting fully frozen from storage or fresh, tempering in the bag keeps surface condensation off the candy. It is ready when a bench scraper presses through with steady, moderate effort: firm and cold, like a cold stick of butter, but no longer rock-hard. Go by feel, not the clock &mdash; a larger or colder block needs longer.</li>
+  <li><b>Slab it.</b> Oil and flour the bench scraper and cut the block into slices roughly <b>3/8&Prime; thick</b>, pressing straight down. Re-oil and re-flour the scraper whenever it begins to stick.</li>
+  <li><b>Wrap and freeze each slab separately.</b> Wrap each slab and place it in a freezer-safe bag, then freeze. Individually wrapped slabs thaw quickly and let you process one at a time.</li>
+</ul>
+
+<p class="r4block"><b>Stage 2 &mdash; dice a slab into cubes (do this per batch, as needed).</b></p>
+<ul class="r4block">
+  <li><b>Temper one frozen slab to dicing firmness.</b> Take a slab from the freezer, sprinkle a generous coat of flour on both sides, and let it thaw about 10 minutes. Because a slab is thin it tempers far faster than a whole block. It is ready when it is soft enough to cut cleanly but still firm &mdash; the knife or scraper passes through and the cut faces stay sharp. Too hard and it fragments; too soft (sticky, holds a fingerprint) and it smears &mdash; you want the firm, matte, not-tacky middle.</li>
+  <li><b>Strip, then cube.</b> Oil and flour the bench scraper and cut the slab into strips about <b>1/4&Prime; wide</b>, then cross-cut the strips into <b>1/4&Prime; cubes</b>. This size is correct for pancakes &mdash; large enough to survive the griddle and leave a molten center, small enough to scatter evenly. Do not chase smaller cubes; caramel diced too fine fully liquefies and the gooey pocket is lost.</li>
+  <li><b>Dust and separate.</b> Sprinkle a generous amount of flour over the cubes and toss to separate them so the tacky cut faces do not re-fuse into a clump. (Cornstarch or powdered sugar work in place of flour.)</li>
+  <li><b>Bag and freeze.</b> Put the dusted cubes in a freezer-safe bag and freeze. Keep them frozen until the moment you scatter onto wet batter.</li>
+</ul>
+
+<p class="r4block"><b>Working notes.</b> If the caramel warms and turns sticky mid-task at either stage, stop and re-chill it for 10&ndash;15 minutes, then continue &mdash; you can move caramel in and out of the freezer as many times as needed. The candy is not harmed by long freezing or by repeated chilling; it is only ever <em>too hard</em> or <em>too soft</em> to work, never ruined. Cutting a little coarsely and unevenly is fine &mdash; the cubes melt the same and a hand-cut look reads as scratch-kitchen, not a defect; do not let dicing become precision work.</p>
+
+<h4>Cooking-Surface Grease Amount</h4>
+<p>You want a micro-thin film, not a pool. Applied correctly the surface looks like a shiny, shimmering mirror; if tilting the pan makes the oil puddle to one side, it is too much. Apply a teaspoon of oil and immediately wipe it across the surface with a folded paper towel.</p>
+
+<h4>The Ideal Syrup</h4>
+<p>Skip commercial high-fructose table syrups. Use 100% Pure Grade A Maple Syrup: <b>Amber Rich</b> for Plain, Chocolate, and Banana Nut; <b>Dark Robust</b> for Bacon and Banana Nut + Chocolate (and a reliable choice for the candy combos); <b>Very Dark Strong</b> for Bacon + Banana Nut, Toffee, Caramel, and all complex candy combinations &mdash; it cuts through heavy sugar and fat.</p>
+
+<!-- ============ PART 4 ============ -->
+<p class="part-label">Part 4</p>
+<h2 class="part">Component &amp; Ingredient Sourcing</h2>
+<p>True scratch-kitchen results call for specialized, professional-grade components rather than generic supermarket brands.</p>
+
+<table>
+  <thead><tr><th class="ing">Component</th><th>Recommended Source</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td class="ing">Malt</td><td>King Arthur Baking Non-Diastatic Malt Powder</td><td>Pure flavor and browning enhancer with the classic malted-diner aroma. Avoid diastatic malt (turns quick batter gummy) and drinking-malt syrups.</td></tr>
+    <tr><td class="ing">Buttermilk</td><td>Saco Pantry Cultured Buttermilk Blend Powder</td><td>Real cultured buttermilk and lactic acid &mdash; deep "scratch-like" tang and lift. Activates the instant it hits liquid.</td></tr>
+    <tr><td class="ing">Espresso</td><td>King Arthur Baking Espresso Powder</td><td>Dissolves cleanly in cold liquid; anchors toffee batches without making the pancake taste of coffee. Avoid ground beans (grit) and instant crystals (scorched aftertaste).</td></tr>
+    <tr><td class="ing">Pine Nuts</td><td>Mediterranean Pine Nuts / Pignolias (Spain, Italy, Portugal)</td><td>Long, torpedo-shaped kernels &mdash; sweeter, creamier, no "pine mouth." Avoid bulk-bin Chinese pine nuts (<em>Pinus armandii</em>), which leave a metallic aftertaste.</td></tr>
+    <tr><td class="ing">Vanilla</td><td>Nielsen-Massey Madagascar Bourbon Vanilla Bean Paste</td><td>Honey-like paste with real pod seeds; holds aromatic integrity on a hot surface. Pure extract is fine for the wet-base floor.</td></tr>
+    <tr><td class="ing">Corn Flour</td><td>Bob's Red Mill Organic Yellow Corn Flour</td><td>Ultra-fine, silky milled corn flour for golden color and a crisp edge. <b>Not</b> cornmeal (gritty).</td></tr>
+    <tr><td class="ing">Caramel</td><td>Peter's Caramel Loaf</td><td class="r4">Bakery-supply slab that dices cleanly when flash-frozen firm (not frozen solid &mdash; see the Candy Prep Protocol) and melts to a smooth gooey center. Avoid soft chewy candies, coated caramels, and liquid sauces.</td></tr>
+    <tr><td class="ing">Toffee</td><td>Heath Bits O' Brickle</td><td>Clean, buttery, uncoated bits that melt without scorching. Freeze solid before chopping. Avoid chocolate-coated toffee (the cocoa scorches).</td></tr>
+    <tr><td class="ing">Syrup</td><td>Runamok "Sugarmaker's Cut", Crown Maple, or Butternut Mountain Farm</td><td>Pure estate-grade maple with true caramel and brown-sugar depth. Match the grade to the flight per the Syrup Scaling Law.</td></tr>
+  </tbody>
+</table>
+
+<div class="note warn">
+  <span class="lbl">Sourcing correction</span>
+  The earlier edition listed <b>Maseca corn masa flour</b> as an equivalent to yellow corn flour. It is not. Masa harina is nixtamalized &mdash; treated with lime &mdash; so it is alkaline and carries a distinct corn-tortilla flavor. It would worsen the batter's pH balance (working against the rebalanced baking soda) and push a taco note into your pancakes. Use plain yellow corn flour only.
+</div>
+
+<!-- ============ VOCABULARY ============ -->
+<p class="part-label">Reference</p>
+<h2 class="part">Vocabulary Cheat Sheet</h2>
+<dl class="vocab">
+  <dt>Hint</dt><dd>1/128 tsp &mdash; half of a Drop; a pin-point dip with the very tip of a finger. No spoon equivalent.</dd>
+  <dt>Drop</dt><dd>1/64 tsp &mdash; one level scoop of the 1/64 micro-spoon; half of a Smidgen.</dd>
+  <dt>Smidgen</dt><dd>1/32 tsp &mdash; one level scoop of the 1/32 micro-spoon; half of a Pinch.</dd>
+  <dt>Pinch</dt><dd>1/16 tsp &mdash; one level scoop of a standard pinch spoon; two Smidgens.</dd>
+  <dt>Dash</dt><dd>1/8 tsp &mdash; two Pinches.</dd>
+  <dt>Tad</dt><dd>1/4 tsp &mdash; two Dashes; a standard quarter-teaspoon spoon.</dd>
+  <dt>Scant</dt><dd>Filled just below the brim &mdash; halfway between this measure and the next smaller one. Scant Pinch = 3/64 tsp; Scant Dash = 3/32 tsp; Scant Tad = 3/16 tsp.</dd>
+  <dt>Fat</dt><dd>Overfilled &mdash; halfway between this measure and the next larger one. Fat Tad = 3/8 tsp; Scant Fat Tad = 9/32 tsp.</dd>
+  <dt>Batter Shield</dt><dd>A thin concentric drizzle of cold plain batter over toppings, smoothed and flipped, trapping candy inside the dough so it melts to a gooey center instead of burning on the surface. Toffee + Caramel + Chocolate combos need a Double Shield.</dd>
+  <dt>Ghee</dt><dd>Clarified butter with the milk solids strained out &mdash; a deep, nutty, browned-butter note that pairs naturally with malt.</dd>
+  <dt>Avocado Oil</dt><dd>High-smoke-point, flavorless oil &mdash; ideal for the pan against burning candy sugars, and used inside the batter of the loudest candy flight (Toffee&nbsp;+&nbsp;Caramel&nbsp;+&nbsp;Chocolate) so the add-ins lead.</dd>
+</dl>
+
+<footer>
+  The Master Pancake Flight Manual &nbsp;&bull;&nbsp; Revised Edition, Rev. 4.1 &nbsp;&bull;&nbsp; One Neutral Base, Twelve Standard Flights + Three Banana-in-Batter Variants
+</footer>
+
+</div>
+</body>
+</html>
