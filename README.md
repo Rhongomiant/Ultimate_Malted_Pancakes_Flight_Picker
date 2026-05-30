@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker_v3.0.0-rc.8.html` — the picker app (current)
+- `Ultimate_Malted_Pancakes_Flight_Picker.html` — the picker app (current; v3.0.0 final)
 - `Ultimate_Malted_Pancakes_Manual.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## What it does
@@ -16,7 +16,7 @@ The manual is a binder of cross-referenced tables: 4 batch sizes × 12 flavor co
 1. **Pancake size / ladle** (0.5 oz mini → 4.0 oz plate-sized) — *(v2.2.0)* in its own sticky bar above the recipe card; collapses to a `Reveal Pancake Size (Ladle Size)` pill when not in use
 2. **Batch size** (Quarter / Half / Three-Quarter / Full) and **dry mix source** (Measure Each Ingredient vs. Use Bulk Dry Mix)
 3. **Flavors & Combinations** (12 options):
-   Plain · Chocolate · Bacon · Banana Nut · Bacon + Banana Nut · Banana Nut + Chocolate · Caramel · Toffee · Caramel + Chocolate · Caramel + Toffee · Toffee + Chocolate · Toffee + Caramel + Chocolate
+ Plain · Chocolate · Bacon · Banana Nut · Bacon + Banana Nut · Banana Nut + Chocolate · Caramel · Toffee · Caramel + Chocolate · Caramel + Toffee · Toffee + Chocolate · Toffee + Caramel + Chocolate
 
 **Conditional sub-pickers** appear when the selected flavor contains candy:
 
@@ -74,6 +74,38 @@ A pile of UX polish + a long-requested feature, layered onto v2.1.0's Flight mod
 **Topping rendering fix** *(v2.1.1)*: toppings now render with a new `ul.topping-list` class that allows free wrapping inside narrow sub-cards (the old `ul.list .v { white-space: nowrap }` was preventing wrap). The Triple-Threat's `📐 Formula: …` legacy line is also gone — all combo-flavor toppings (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`) are now structured as one ingredient per line in the form `Toffee: …`, `Caramel: …`, `Chocolate: …` — matching the way Banana Nut already rendered.
 
 **Single mode parity** *(v2.1.1)*: Single mode also picks up the `out-header` wrap (for sticky header support) and the `topping-list` rendering. Byte-identity to v2.0.0/v2.1.0 Single-mode output is therefore broken **on purpose** for any flavor whose toppings table changed (`toffee_caramel`, `toffee_choc`, `caramel_choc`, `triple`, plus the header wrap on all 12). The change is identical to the Flight-mode improvement.
+
+### v3.0.0 — Final ship (rc.9 spiral close + Master Shopping List + Setup-phase subgrid + Flight Checklist)
+
+v3.0.0 closes out the rc.9 development cycle that began with the v2.10.2 forward-merge of external recipe-data revisions. The release lands four major bodies of work plus a long tail of UI / UX slice work that polished the rc.9 surface to ship quality.
+
+**Master Shopping List (Phase 3)**: `sumMeasurements(amounts)` aggregates the project's full measurement vocabulary (Trace Dusting 1/256 tsp through Tablespoon and Cup) using `TSP_DENOM = 768` as the canonical denominator. The aggregator greedy-decomposes summed totals to the largest displayable vocabulary unit (prefers `1 Tbsp + 1 tsp` over `4 tsp`; prefers `Pinch + Drop` over `5/32 tsp`); Trace Dusting inputs are preserved as separate annotation rows rather than aggregated. `buildShoppingList(state)` produces `{ dry, wet, spices, toppings }` aggregated across every visible batch in `state.batches` with per-batch multiplier correctly threaded. The recipe model uses `DRY × flavors.length` (each flavor in a multi-flavor batch gets its own DRY portion). The populated card replaces the rc.9 placeholder with JS-driven collapse (native `<details>` proved unreliable in this page's CSS/JS environment), brand annotations inline per ingredient, round-up display to 0.25 increments. Five iterative fix-patches landed after browser smoke-test surfaced math + display defects. Plan 03-03 (Playwright baselines for the populated card) is deferred to a post-v3 carry-out — regression-detection only; the feature itself ships intact.
+
+**Setup-phase subgrid refactor (Phase 2)**: the rc.5→rc.8 visual-regression spiral is closed. Four `grid-template-columns: 1fr` blowout sites (HTML lines 157, 595, 742, 951) are defended with `minmax(0, 1fr)` plus paired `min-width: 0` + `overflow-wrap: anywhere`. The aligned-rows Setup layout is reimplemented using CSS Subgrid (one owning grid declaring 4 named rows — header / bowls / spices / toppings; each `.batch-column` set to `grid-template-rows: subgrid`) with an `@supports not (grid-template-rows: subgrid)` block restoring the rc.7 independent-column pattern for Safari 15 and earlier. A new user-facing batch column sizing control (Scale / Fixed × 5 sizes XS / S / M / L / XL) addresses the subgrid equal-width-column consequence uncovered during cross-browser verification. Plan 02-04 (cross-browser manual verification on Chrome / Firefox / Safari / Opera) completed during the rc.9.74 slice cycle.
+
+**In-repo test suite + Playwright harness (Phase 1)**: rewritten from picker behavior, ships as 477 tests across 19 suites (`npm test` exits 0). `tests-visual/setup-phase.spec.js` enumerates 54 (orderMode × outputGrouping × batchLayout × flavorCardsLayout) URL-parameter combinations with PNG baselines in `tests-visual/setup-phase.spec.js-snapshots/`. Six pre-fix rc.9 baselines committed as historical record. Every `prepCalloutsFor(...)` / `singlePrepNotes(...)` length assertion accounts for the v2.10.2 +1 unconditional 🥄 Ladle prep callout from forward-merge commit `5a4f302`.
+
+**v2.10.2 recipe data forward-merge (carried in via the rev3 / rev4 sync)**: external-AI rev3 + rev4 + rev4.1 revisions landed as a single rev3+4 master sync with 3 manual gap fills, parser entry for Scant Dash, and 9 test-assertion realignments. Bacon flights pull Avocado Oil out of the in-batter list (Bacon + Banana Nut switches to Melted Ghee in batter); finishing-flake principle (Sea Salt Flakes) gets per-pancake per-warm timing; chocolate-family salt floor rebalances to a universal ¼ tsp with per-card additions; Banana-Nut family spice schedule strengthens (cinnamon one step heavier across the three Banana Nut cards). Banana-in-Batter variant adds: per-batch `bananaVariant` field ('top' default | 'inBatter'); the in-batter variant is fork-mashed into the wet bowl after milk + egg + vanilla floor, before ghee; selection-time disable of non-banana flavor pills when in-batter is the active style.
+
+**Flight mode + per-batch independent sizing**: the v3 picker is built around the Flight concept — multiple batches per Flight Set, each batch can carry its own pancake size (Quarter / Half / Three-Quarter / Full / null), its own multiplier (1..40 at Full only), its own flavors, and its own banana variant. Batch tabs UI with Allow Same-Flavor + Duplicate Sthāla buttons (the duplicate clones the active batch entry preserving size / flavors / variant). The Master Recipe View shows the cooking-order-grouped output (Clean → Savory → Candy) per flavor with per-flavor delta cards. **Plan-a-Flight / Prep-Bulk-Dry-Mix mode toggle** lets the user switch from per-Flight planning to a single-batch dry-bulk-prep mode that emits only the scaled dry list for batch-multiplier-aware advance prep.
+
+**Flight Checklist (floating prep + cook panel)**: a sticky-collapsible card sibling to the Pancake Size Bar hosting a hybrid-checkbox + sub-step UI across four temporal phases (Pre-Cook / During Cook / End of Cook / Cleanup). Conditional items (Banana prep, Pine-nut toast, Candy prep, Bacon prep) emit only when the relevant flavor family is in the flight, partitioned by per-batch banana variant when both 'top' and 'inBatter' are present in the same flight. State persists to localStorage + URL. The renderer was rewritten in rc.9.74.6 to use CSS multi-column layout for the 2-column responsive mode (item-level balance, phases may split mid-section, individual items + phase headers stay intact). **Density modes** (rc.9.74.5+): 4-option segmented Display Mode picker — Title (one-line) / Snippet (line-clamped body, default for fresh users) / Full (full body + sub-steps hidden) / Expanded (everything visible). Per-item axis-independent overrides (¶ body cycler + ≡ sub-steps toggle + ↺ default reset) with a 3-tier CSS specificity cascade and no `!important`.
+
+**Setup callouts + Apply add-ins reminder**: the top-of-output Setup callouts mirror the Flight Checklist order — ladle setup / candy prep / banana(on top) / banana(in batter) / pine-nut toast / bacon prep. Bacon emits LAST in the prep panel (its only setup-time action is "cook crisp during the 10-min batter rest" — a single discrete cook-time cue, not multi-stage prep). The cook card (per-flavor recipe sequence) keeps its own pine-nut → banana → bacon → candy order — different ordering axis. Apply add-ins (during-cook Flight Checklist item) carries a scoop-time reminder: "slice bananas and keep caramel / toffee frozen until just before scooping."
+
+**Print rewrite**: the rc.9.67 `@media print` override pile is replaced with a separate print-only DOM tree (`#print-root`) that `renderPrintRoot()` builds eagerly on every state change. Display and print share zero CSS — the cross-cascade race class that drove rc.5→rc.8 is closed entirely. Per-batch paginated `.pb-page` model with FLAVORS_PER_PAGE cap, cross-batch packing, continuation pages; Category-grouped mode banner per continuation page; Print Options popover (Mode + Flavors / Page + Flavor Order + Master Shopping List toggle); per-flavor `🍳 Cooking-Surface Grease` line, per-flavor Yield section, Flight Checklist + Shared Cooking Instructions + Master Shopping List appendix pages.
+
+**Pancake Size Bar header restructure (slice 5F)**: `.psb-head` becomes a 3-slot row reading `[title | flight info | compact yield (collapse-only) | toggle]`; yield grid migrates out of `.out-header` into `.psb-body` with a border-top divider; flight-title prefix restored; yield-total reworded to "TOTAL: ~N PANCAKES FROM M BATCHES" (uppercase via CSS).
+
+**Sthāla naming + Batch Set Name switcher (slices 5E + 5N)**: the multi-batch container noun is user-pickable from 8 options (ASSIETTE / ASSORTMENT / BATCH SET / COLLECTION / LANX / PASSEL / SET / STHĀLA) via a chip + popover picker in `.controls-flow`. Default: `'Batch Set'`. Persisted to localStorage `pancakeFlightBatchSetName`. The cooking-batch concept (state.batches[i].batch) is intentionally NOT renamed — the cooking unit stays "Batch" terminology to preserve clarity against the user-pickable display noun.
+
+**Other slice UI work**: Floating Prep Checklist → Flight Checklist rename (slice 5K, 39 + 82 + 34 site touches); 2-column responsive layout (slice 5L); flavor-table cell sizing (slice 5M); batch-set-name switcher (slice 5N); Flight Zoom popover replaces the 2-row Display Zoom widget (slice 5O); Full-batch multiplier + Plan-a-Flight / Prep-Bulk-Dry-Mix mode (slice 5P); Pancake Size Bar yield flex-wrap layout; PSB stacked-mode Mode-0 placement fix; bacon prep parity in Setup callout + Flight Checklist; per-batch banana-variant scoping; FC item-level column balance + slice-5L paired-collapse retirement.
+
+**Locked invariants preserved through the rc cycle**: 12-flavor list + ids + order; cooking-order grouping (Clean / Savory / Candy); colder-candy-wins heat rule; `pancakeFlight*` localStorage prefix; print fidelity `.out-card { zoom: 1 !important }`; single-file HTML with zero runtime dependencies; measurement vocabulary (Hint / Drop / Smidgen / Pinch / Dash / Tad / Trace Dusting); "cooking surface" terminology (skillet for pine-nut toast + fat baths; griddle in section titles).
+
+**Carry-outs**: Playwright baselines for the populated Master Shopping List card (across representative Flight states) are deferred to a future capture session. The "Batch is overloaded" terminology rename — touching the internal `state.batches[]` / `activeBatchIdx` / cooking-batch references — is parked for a future scoped slice. Neither blocks production use.
+
+**Versioning + push**: VERSION advanced from `v2.10.2.0.0.0.0.0-prod-p00.00_m01` to `v3.0.0.0.0.0.0.0-dev-p03.20_m02`; promoted dev → uat → prod with promotion tags; production format `v3.0.0_build_0.0.0.0_03.20_02` on prod; release tags `release/v3.0.0` + `source/v3.0.0`. Pushed to `private_vault_for_full_project_archive` (full archive including `_local_*` branches) then `origin_for_clean_project_tracking` (sanitized `dev` / `uat` / `prod` only — `_local_*` never reaches origin per the multi-remote policy).
 
 ### v2.10.1 — Switcher alignment fix + tightened row gap
 
@@ -217,9 +249,9 @@ A polish pass that fixes the bugs and gaps users hit in v2.3.0, plus one UX addi
 4. **Side-by-side sub-card overlap** *(bug)*: in v2.3.0, `sideGridStyle()` emitted `repeat(N, minmax(0, 1fr))` for the inline `grid-template-columns`. Combined with the CSS rule `.subcards-grid[data-subcard-layout="side"] .subcard { min-width: 220px }`, columns shrank to nearly 0 while children refused to shrink below 220px — the children overflowed their cells and visually overlapped. Fix: inline `minmax(220px, 1fr)` so the grid columns themselves honor the 220-pixel floor and grow the grid container to whatever total width is needed. Horizontal scrolling now actually moves the cards instead of just nudging.
 5. **Syrups everywhere** *(restructure)*: v2.3.0 split syrup display by mode (shared list in Recommended, per-flavor row in Menu/Selection). In practice that was confusing — when switching modes, the syrup info would teleport between places. v2.4.0 shows syrups in **both** places, in **all** modes — a per-flavor `Syrup: …` row inside every delta card AND a deduped `Recommended syrups (one line per distinct syrup)` list inside the shared cook card. Switching modes now only changes ordering, not content placement.
 6. **Stacked-mode width + compact pair refinement** *(layout)*: the v2.3.0 stacked layout was using the default `.wrap { max-width: 920px }` — substantially narrower than side-by-side's 1600px — which made the compact-pair Batch+Flavors band feel cramped after the animation. Default wrap is now `1200px`. The compact-pair CSS also shrinks the cards visually when in compact mode (padding `8px 12px`, smaller h2, tighter opts gap, smaller opt padding/font) so the sticky band takes considerably less vertical space. A new CSS variable `--picker-compact-h` is set live by JS (in `updateStickyHeights` + the `ResizeObserver`) to the picker pane's measured height, and is consumed by:
-    - `body[data-picker-compact="1"] .pancake-size-bar` — sticky top becomes `calc(var(--controls-h) + var(--picker-compact-h))`, so the size bar sits *below* the compact pair instead of overlapping it
-    - `body[data-picker-compact="1"] .out-header` — sticky top becomes `calc(var(--controls-h) + var(--picker-compact-h) + var(--psb-h) + 12px)`, so the recipe title also stacks below everything
-   The result: in stacked mode, when the user scrolls past the picker, the chrome band reorganizes to {controls} → {compact pair} → {pancake size} → {recipe title (sticky)} with no overlaps and visibly less vertical space than the un-compacted version.
+ - `body[data-picker-compact="1"] .pancake-size-bar` — sticky top becomes `calc(var(--controls-h) + var(--picker-compact-h))`, so the size bar sits *below* the compact pair instead of overlapping it
+ - `body[data-picker-compact="1"] .out-header` — sticky top becomes `calc(var(--controls-h) + var(--picker-compact-h) + var(--psb-h) + 12px)`, so the recipe title also stacks below everything
+ The result: in stacked mode, when the user scrolls past the picker, the chrome band reorganizes to {controls} → {compact pair} → {pancake size} → {recipe title (sticky)} with no overlaps and visibly less vertical space than the un-compacted version.
 
 **No state shape changes** vs v2.3.0 — same `orderMode`, `recommendedSubOrder`, `cookLayout` fields. Same localStorage keys, same URL parameters. Pure CSS + rendering + event-binding fixes.
 
@@ -264,9 +296,9 @@ Ten user-driven layout refinements:
 4. **Wet bowl content restructured** *(Flight)*: the Wet Bowl block now shows **only the shared ingredients** (2% Lactaid milk + egg) in a single block — these are identical across every bowl. The previous `Spices (into wet bowls)` block becomes **`FAT & Spices (into wet bowls)`** and now includes the per-flavor melted fat (varies by flavor: butter / ghee / bacon grease etc.) alongside spices and any pick-one spice groups.
 5. **Selection Order extended** *(Flight)*: the Cook-phase toggle now also affects Setup-phase sub-cards. The labels are clearer too — `Cooking order` → `Recommended Order` (cook-phase grouping for the cook phase + menu order for setup sub-cards), and `Selection order` → `Selection Order` (your raw pick order everywhere, both phases). New `getRenderOrderedFlavors()` helper centralizes the choice.
 6. **Sub-card readability fix** (the trickiest of the bunch): when many flavor sub-cards rendered side-by-side, ingredient lines like `Cinnamon … Pinch (1/16 tsp)` were squashed into a too-narrow flex `space-between` row. Fix is three-pronged:
-   - **k/v stacks vertically inside sub-cards**: the ingredient name renders on its own line in `--ink`/600-weight; the measurement renders on a second line, bulleted with `•` in `--accent`. No more `nowrap` squish.
-   - **horizontal scroll fallback** on the sub-card grid in side-by-side mode (`overflow-x: auto`, slim themed scrollbar, `min-width: 200px` per sub-card) so even at high column counts the content remains readable rather than truncating.
-   - **wider recipe card**: side-by-side wrap max-width bumped from `1320px` to `1600px`, giving the recipe column ~280px more room.
+ - **k/v stacks vertically inside sub-cards**: the ingredient name renders on its own line in `--ink`/600-weight; the measurement renders on a second line, bulleted with `•` in `--accent`. No more `nowrap` squish.
+ - **horizontal scroll fallback** on the sub-card grid in side-by-side mode (`overflow-x: auto`, slim themed scrollbar, `min-width: 200px` per sub-card) so even at high column counts the content remains readable rather than truncating.
+ - **wider recipe card**: side-by-side wrap max-width bumped from `1320px` to `1600px`, giving the recipe column ~280px more room.
 7. **Pancake Size moved out of the picker pane**: it now lives as its own sticky bar (`#pancake-size-bar`) above the recipe card in both layouts. Sits below the controls row, above the recipe. Collapses to a compact pill reading `Reveal Pancake Size (Ladle Size)` via the `▲ Hide` / `▼ Show` button. Picker pane now contains only Card 2 (Batch & dry mix) and Card 3 (Flavors & Combinations).
 8. **Hide Options button**: grouped with `Hide Controls` on the right side of the controls row (in a new `.controls-actions` container). Clicking collapses the entire picker pane, giving the recipe + size bar the full page width. The two buttons stay together on the right whether the controls themselves are collapsed or not; `data-options-collapsed="1"` on `<body>` drives the CSS.
 9. **Stacked-mode sticky picker cards** *(independent collapse)*: in Stacked layout, the Pancake Size bar and Batch card stay on screen as you scroll (each `position: sticky` with stacked `top:` offsets from `--controls-h` + `--psb-h` CSS variables). The longer Flavors card scrolls with the page. Each of the picker cards has its own `▲ Hide` / `▼ Show` chevron — collapse just the card you're not currently editing.
@@ -284,9 +316,9 @@ All four new switchers (Wet/Spices/Toppings/Tier layout) and the controls-collap
 
 ```bash
 # Either double-click the HTML file, or:
-open  Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html   # macOS
+open Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html # macOS
 xdg-open Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html # Linux
-start Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html   # Windows
+start Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html # Windows
 ```
 
 That's it. No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~3245 lines as of v2.10.0) with inline CSS and vanilla JS.
@@ -297,41 +329,41 @@ The companion `.html` manual opens the same way in a browser. To import into Wor
 
 ```
 pancake-flight-app/
-├── Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html   # the app
-├── Ultimate_Malted_Pancakes_Manual.html                 # source-of-truth reference doc
-└── README.md                                            # this file
+├── Ultimate_Malted_Pancakes_Flight_Picker_v2.10.1.html # the app
+├── Ultimate_Malted_Pancakes_Manual.html # source-of-truth reference doc
+└── README.md # this file
 ```
 
 ## How the code is organized
 
 All in the picker HTML file. Approximate landmarks (line numbers from v2.2.0):
 
-| Lines       | What lives there |
+| Lines | What lives there |
 |-------------|------------------|
-| 1–278       | `<style>` block — design tokens (CSS custom properties + dark-theme overrides), pickers, output cards, tier badges, reference accordion, print rules; side-by-side grid w/ wider 1600px wrap and options-collapse fallback *(v2.2.0)* |
-| 279–340     | Layout switcher CSS · Theme switcher CSS (share visual language) |
-| 341–380     | Card-scale switcher CSS *(v2.0.0)* |
-| 381–540     | Flight-mode CSS *(v2.1.0)* — mode switcher, flavor-status row, empty state, phase headers, wet-flavor cards, toppings-by-flavor grid, grease lines, cook-group blocks, inline pill toggles, shared/per-flavor tier blocks |
-| 541–600     | Base print rules + other utility CSS |
-| 601–740     | v2.1.1 CSS — sticky+collapsible controls row, `subcards-grid` with `data-subcard-layout`, `topping-list` wrapping class, `cook-shared` + `flavor-delta-card` styles |
-| 741–890     | v2.2.0 CSS additions — `.controls-actions`, `.pancake-size-bar` (sticky+collapsible), `.card-collapse` per-card toggles, split `.out-title` / `.out-yield`, sub-card list k/v stacking, sub-card grid horizontal scroll, stacked-mode sticky batch card |
-| 891–980     | HTML — controls row w/ `controls-actions`, new `pancake-size-bar`, picker pane w/ `data-card` + `card-head/card-body` on Batch and Flavors *(v2.2.0)* |
-| 981–1265    | Reference content (`<details>` accordions) — unchanged |
-| 1267–1330   | Theme switcher IIFE · Layout switcher IIFE |
-| 1331–1400   | Card-scale switcher IIFE |
-| 1401–1460   | Lookup tables (`BATCHES`, `SIZES`, `SHIELD_VOLUMES`, `DRY`, `WET`, etc.) |
-| 1461–1590   | `FLAVORS` array (each entry has `cookGroup`) |
-| 1485–1556   | `TOPPINGS` matrix — combo flavors and Triple cleaned to one-ingredient-per-line |
-| 1591       | `state` object — now includes `pancakeSizeCollapsed`, `batchCardCollapsed`, `flavorCardCollapsed`, `optionsCollapsed` *(v2.2.0)* |
-| 1608       | localStorage restore — 4 new keys for v2.2.0 collapse states |
-| 1631       | `parseUrlState()` and `updateUrlState()` |
-| 1730–1985   | Shared helpers — `FLAVOR_INDEX`, `getSortedSelectedFlavors`, **`getRenderOrderedFlavors`** *(v2.2.0)*, `groupSelectedByCooking`, heat helpers, `dryBowlHtml`, `wetBowlHtml`, **`wetBowlSharedHtml`** *(v2.2.0 — shared milk + egg only)*, `spicesHtml`, **`fatAndSpicesHtml`** *(v2.2.0 — per-flavor fat + spices + pickOneSpices)*, `toppingsInnerHtml`, `flavorCallouts`, `tierGridHtml`, `compareTiers` |
-| 1986–2000   | `layoutSwitcherHtml`, `sideGridStyle` |
-| 2000–2090   | `flavorDeltaCardHtml`, `sharedCookingFlowHtml` |
-| 2086–2183   | `render()` — calls `updateStickyHeights()` *(v2.2.0)* after each render |
-| 2185–2299   | `renderSingleOutput()` — split `.out-title` / `.out-yield` *(v2.2.0)* |
-| 2301–2556   | `renderFlightOutput()` — uses `getRenderOrderedFlavors`, single Wet block (shared only), `FAT & Spices` per-flavor block, sticky-split header, `Recommended Order` / `Selection Order` Cook toggle |
-| 2559–2825   | Event listeners — `controls-toggle`, **`options-toggle`** *(v2.2.0)*, **`psb-toggle`** *(v2.2.0)*, **`[data-card-toggle]` delegation** *(v2.2.0)* for Batch + Flavors collapse; **`applyCollapseStates()` + `updateStickyHeights()`** replace v2.1.1's narrower helpers |
+| 1–278 | `<style>` block — design tokens (CSS custom properties + dark-theme overrides), pickers, output cards, tier badges, reference accordion, print rules; side-by-side grid w/ wider 1600px wrap and options-collapse fallback *(v2.2.0)* |
+| 279–340 | Layout switcher CSS · Theme switcher CSS (share visual language) |
+| 341–380 | Card-scale switcher CSS *(v2.0.0)* |
+| 381–540 | Flight-mode CSS *(v2.1.0)* — mode switcher, flavor-status row, empty state, phase headers, wet-flavor cards, toppings-by-flavor grid, grease lines, cook-group blocks, inline pill toggles, shared/per-flavor tier blocks |
+| 541–600 | Base print rules + other utility CSS |
+| 601–740 | v2.1.1 CSS — sticky+collapsible controls row, `subcards-grid` with `data-subcard-layout`, `topping-list` wrapping class, `cook-shared` + `flavor-delta-card` styles |
+| 741–890 | v2.2.0 CSS additions — `.controls-actions`, `.pancake-size-bar` (sticky+collapsible), `.card-collapse` per-card toggles, split `.out-title` / `.out-yield`, sub-card list k/v stacking, sub-card grid horizontal scroll, stacked-mode sticky batch card |
+| 891–980 | HTML — controls row w/ `controls-actions`, new `pancake-size-bar`, picker pane w/ `data-card` + `card-head/card-body` on Batch and Flavors *(v2.2.0)* |
+| 981–1265 | Reference content (`<details>` accordions) — unchanged |
+| 1267–1330 | Theme switcher IIFE · Layout switcher IIFE |
+| 1331–1400 | Card-scale switcher IIFE |
+| 1401–1460 | Lookup tables (`BATCHES`, `SIZES`, `SHIELD_VOLUMES`, `DRY`, `WET`, etc.) |
+| 1461–1590 | `FLAVORS` array (each entry has `cookGroup`) |
+| 1485–1556 | `TOPPINGS` matrix — combo flavors and Triple cleaned to one-ingredient-per-line |
+| 1591 | `state` object — now includes `pancakeSizeCollapsed`, `batchCardCollapsed`, `flavorCardCollapsed`, `optionsCollapsed` *(v2.2.0)* |
+| 1608 | localStorage restore — 4 new keys for v2.2.0 collapse states |
+| 1631 | `parseUrlState()` and `updateUrlState()` |
+| 1730–1985 | Shared helpers — `FLAVOR_INDEX`, `getSortedSelectedFlavors`, **`getRenderOrderedFlavors`** *(v2.2.0)*, `groupSelectedByCooking`, heat helpers, `dryBowlHtml`, `wetBowlHtml`, **`wetBowlSharedHtml`** *(v2.2.0 — shared milk + egg only)*, `spicesHtml`, **`fatAndSpicesHtml`** *(v2.2.0 — per-flavor fat + spices + pickOneSpices)*, `toppingsInnerHtml`, `flavorCallouts`, `tierGridHtml`, `compareTiers` |
+| 1986–2000 | `layoutSwitcherHtml`, `sideGridStyle` |
+| 2000–2090 | `flavorDeltaCardHtml`, `sharedCookingFlowHtml` |
+| 2086–2183 | `render()` — calls `updateStickyHeights()` *(v2.2.0)* after each render |
+| 2185–2299 | `renderSingleOutput()` — split `.out-title` / `.out-yield` *(v2.2.0)* |
+| 2301–2556 | `renderFlightOutput()` — uses `getRenderOrderedFlavors`, single Wet block (shared only), `FAT & Spices` per-flavor block, sticky-split header, `Recommended Order` / `Selection Order` Cook toggle |
+| 2559–2825 | Event listeners — `controls-toggle`, **`options-toggle`** *(v2.2.0)*, **`psb-toggle`** *(v2.2.0)*, **`[data-card-toggle]` delegation** *(v2.2.0)* for Batch + Flavors collapse; **`applyCollapseStates()` + `updateStickyHeights()`** replace v2.1.1's narrower helpers |
 
 ### Data model
 
@@ -339,27 +371,27 @@ Each entry in `FLAVORS[]` looks like this:
 
 ```js
 {
-  id: 'caramel',
-  cookGroup: 'candy',      // 'clean' | 'savory' | 'candy' — used by Flight mode to group cooking steps
-  label: 'Caramel',
-  strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
-  spices: [
-    { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt },   // 4-element array, one per batch size
-  ],
-  pickOneSpices: { ... },   // optional: a "choose ONE" group (used by Banana Nut)
-  fat: 'Melted Ghee',
-  panGrease: 'Pure Avocado Oil',
-  syrup: 'Grade A Very Dark Strong',
-  shield: true,            // shows the Batter Shield warning + step
-  doubleShield: true,      // shows the Double Shield warning + step (Triple only)
-  hasCaramel: true,        // triggers the Caramel Prep picker + heat logic
-  hasToffee: true,         // triggers the Toffee Prep picker + heat logic
-  tiers: {
-    best: ['Grade A Very Dark Strong', 'Frozen Baking Caramel Bits'],
-    good: ['Grade A Dark Robust',      'Micro-chopped Kraft Caramel Bits'],
-    ok:   ['Grade A Amber Rich',       'Chopped standard caramel squares'],
-    bad:  ['Imitation Maple / Corn Syrup', 'Liquid caramel sauce in wet mix'],
-  },
+ id: 'caramel',
+ cookGroup: 'candy', // 'clean' | 'savory' | 'candy' — used by Flight mode to group cooking steps
+ label: 'Caramel',
+ strategy: 'BATTER SHIELD required. Add flake salt on top after flipping.',
+ spices: [
+ { name: 'Sea Salt Flakes', amounts: SPICE.seaSalt }, // 4-element array, one per batch size
+ ],
+ pickOneSpices: { ... }, // optional: a "choose ONE" group (used by Banana Nut)
+ fat: 'Melted Ghee',
+ panGrease: 'Pure Avocado Oil',
+ syrup: 'Grade A Very Dark Strong',
+ shield: true, // shows the Batter Shield warning + step
+ doubleShield: true, // shows the Double Shield warning + step (Triple only)
+ hasCaramel: true, // triggers the Caramel Prep picker + heat logic
+ hasToffee: true, // triggers the Toffee Prep picker + heat logic
+ tiers: {
+ best: ['Grade A Very Dark Strong', 'Frozen Baking Caramel Bits'],
+ good: ['Grade A Dark Robust', 'Micro-chopped Kraft Caramel Bits'],
+ ok: ['Grade A Amber Rich', 'Chopped standard caramel squares'],
+ bad: ['Imitation Maple / Corn Syrup', 'Liquid caramel sauce in wet mix'],
+ },
 }
 ```
 
@@ -367,9 +399,9 @@ Spice "ladders" are stored in `SPICE` as 4-element arrays indexed by batch size 
 
 ```js
 const SPICE = {
-  cinnamon: ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant Tad (3/16 tsp)', 'Tad (¼ tsp)'],
-  nutmeg:   ['Drop (1/64 tsp)',  'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
-  // ...
+ cinnamon: ['Pinch (1/16 tsp)', 'Dash (⅛ tsp)', 'Scant Tad (3/16 tsp)', 'Tad (¼ tsp)'],
+ nutmeg: ['Drop (1/64 tsp)', 'Smidgen (1/32 tsp)', 'Scant Pinch (3/64 tsp)', 'Pinch (1/16 tsp)'],
+ // ...
 };
 ```
 
@@ -377,9 +409,9 @@ const SPICE = {
 
 ```js
 const SHIELD_VOLUMES = {
-  's05': { volume: '½ tsp',           fill: '...', execution: 'Drizzle a tiny drop ... micro-stamp.' },
-  's10': { volume: '1 tsp',           fill: '...', execution: 'Drizzle a thin ring ... perimeter seal.' },
-  // ...
+ 's05': { volume: '½ tsp', fill: '...', execution: 'Drizzle a tiny drop ... micro-stamp.' },
+ 's10': { volume: '1 tsp', fill: '...', execution: 'Drizzle a thin ring ... perimeter seal.' },
+ // ...
 };
 ```
 
@@ -458,25 +490,33 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 `X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins.
 
-**Current: v3.0.0-rc.8** — aligned-rows Setup grid + merged Flavor Cards layout switcher.
+**Current: v3.0.0-rc.9** — v2.10.2 data forward-merge (TOPPINGS values + prep-callout function bodies).
 
-The Setup phase now renders as a true CSS grid when batchLayout is side-by-side (the default). Columns map to visible batches; rows are block types (Header, Bowls, F&S, Toppings, Grease). Cells in the same row share that row's height, so Dry Bowl cells align horizontally across batches, F&S cells align, Toppings cells align, etc. The result reads as horizontal bands across batches: a reader can scan top-to-bottom along one batch's column for that batch's recipe, or scan left-to-right along one row to compare the same step across batches. Each cell has its own card border + accent header so batch column boundaries stay clear even with content of wildly different heights (a batch with 1 flavor's F&S cell is the same height as a batch with 4 flavors' F&S cell, but its content stays anchored to the top with the rest as empty space inside the cell).
+v3.0.0-rc.8 forked its `TOPPINGS` data and Section 2 recipe-guide values from v2.10.1. v2.10.2 then shipped a candy-combo rescale and chef-level area-scaling banana adjustments on the v2 line, which had not yet been carried forward to v3. rc.9 is the surgical forward-merge of those v2.10.2 changes. No render code or state shape changes — the `TOPPINGS` keys keep their existing shape (`[size][index]` arrays of `"<Candy>: <amount>"` strings), and the prep-callout function bodies are extended but signatures and return types are unchanged.
 
-When batchLayout is stacked or grid, the renderer falls back to the rc.7 independent-batch-column behavior. Aligned rows only make sense when all batches share one horizontal row, so stacked-batches (each batch vertical) and grid-batches (2-per-row wrapping) keep independent column flow. The dispatch happens in `renderFlightOutput` for Mode A and inside each `.category-section` for Mode B.
+**Option A scaling philosophy (carried forward from v2.10.2 for in-place reference):**
+- **Toffee in any candy combo** = 2/3 of single Toffee max at that size → Smidgen / ⅓ tsp / ⅔ tsp / 1 tsp / 1⅓ tsp across 0.5→4.0 oz. 0.5 oz is a perceptual-floor exception (2/3 of Smidgen would fall below the 1/64 tsp anchor).
+- **Caramel in any candy combo** = 2/3 of single Caramel max at that size → Dash / 1 tsp / 2 tsp / 1 Tbsp / 1 Tbsp + 1 tsp. 0.5 oz uses Dash (⅛ tsp); the combo value drops below the single's Scant Tad to preserve "combos < singles" at the smallest size.
+- **Chocolate in any candy combo** = 2/3 of single Chocolate max for that size → 2 / 4–5 / 8–10 / 12–13 / 17–22 standard chips across 0.5→4.0 oz. The 4.0 oz upper bound is 17–22 (raised from 17–20 in this revision for visual coverage on the plate-size pancake).
+- Toffee/Caramel/Chocolate columns read identically across all four combo flavors at each size (toffee in C+T = toffee in T+Ch = toffee in TCC, etc.), prioritizing internal consistency across the three candy columns over external benchmark replication.
 
-The separate Spices and Toppings layout switchers are merged into a single "Flavor Cards" switcher per the reviewer item. The F&S row and Toppings row remain visually distinct rows in the aligned grid; only the inner sub-card layout state is merged. New state field `state.flavorCardsLayout` (default 'side'); the legacy `state.spicesLayout` and `state.toppingsLayout` fields are kept for one release and read on localStorage load for back-compat migration (the spices value becomes the merged default if no new key is set). URL param `flayout=`; localStorage key `pancakeFlightFlavorCardsLayout`; reset clears the new key.
+**Singles bumps**: `TOPPINGS.toffee` 0.5 oz raised 6× from Smidgen to Scant Tad (3/16 tsp) for full-presence flavor at the smallest size. `TOPPINGS.bacon` 0.5 oz raised to Tad (¼ tsp) with explicit ¼" thickness; 1.0 oz raised to 1¼ tsp. `TOPPINGS.caramel` converted across all 5 sizes from bit-counts to volume measurements (Scant Tad / 1½ tsp / 1 Tbsp / 1½ Tbsp / 2 Tbsp); volumes match MCVL exactly at 1.0+ oz.
 
-The new aligned-rows renderer is `renderAlignedSetupHtml(batchIdxsToShow, opts)`. It takes the same `categoryFilter` option as `renderBatchColumnHtml` so it works identically in Mode A (full flavor list per batch) and in Mode B's per-category sections (flavors filtered to one cookGroup). It emits a single `.setup-aligned-grid` element with inline `grid-template-columns: repeat(N, minmax(320px, 1fr))` based on visible batch count, then per-cell `grid-column` and `grid-row` inline styles for placement. Each cell has class `setup-cell` plus a block-specific modifier (`setup-header`, `setup-bowls`, `setup-spices`, `setup-toppings`, `setup-grease`). Empty/partial-batch cells use a single row-spanning placeholder (`grid-row: 2 / span 4`) so the column doesn't render F&S/Toppings/Grease rows when there's no flavor to render.
+**Banana refinements**: 0.5/1.0 oz banana cells across `bnut`, `bnut_choc`, `bnut_bacon` reformatted to "quartered slice" with explicit thickness ranges (Unicode fraction-slash `3⁄16`, U+2044, not ASCII `3/16`). 4.0 oz banana count bumped 4 → 5–6 slices per area-scaling math (1.69× area vs. previous 1.29–1.33× count ratio). Bacon thickness ¼" added to every `bnut_bacon` cell; 0.5/1.0 oz bacon amounts in `bnut_bacon` bumped to Dash and ⅝ tsp respectively.
 
-**Combinatorial coverage**: with 2 modes × 3 orderModes × 3 batchLayouts × 3 flavorCardsLayouts = 54 valid combinations, all render without JS errors and produce consistent output. The aligned-rows renderer handles the 18 combinations where batchLayout=side (9 in Mode A, 9 in Mode B's per-category sections); the existing independent-column renderer handles the 36 combinations where batchLayout=stacked or grid.
+**Prep-callout extensions** (function bodies only; `prepCalloutsFor` and `singlePrepNotes` signatures unchanged; renderers consume the same array-of-`<div class="callout info">` strings):
+- New **universal 🥄 Ladle prep** callout pushed unconditionally on every recipe (Single and Flight) — describes the three oil-application methods (folded paper-towel, fingertip rub, dip and shake) paired with the 45–60 sec ice-bath rhythm.
+- **🍌 Banana callout** extended with the chill protocol (whole banana in peel, freezer 15–30 min or fridge 1–2 hours, do not freeze solid) upstream of the existing slice-thickness guidance.
+- **🧊 Candy callouts** (caramel-and-toffee, caramel-only, toffee-only branches) now reference **Peter's Caramel Loaf** and **Heath Bits O' Brickle** by name and embed the freeze-smash-sift protocol from Part 3 of the manual. The flash-frozen vs deep-frozen variation still keys off `state.caramelPrep` / `state.toffeePrep` exactly as before.
+- `singlePrepNotes` (Single mode) had a regression in rc.8 where it only emitted banana callouts; rc.9 restores the full ladle + banana + caramel + toffee + caramel-and-toffee branch set on equal footing with `prepCalloutsFor`. It now reads `flavor.hasCaramel` and `flavor.hasToffee` (already populated on the `FLAVORS` array entries since v2.x — no data-model change).
 
-**v3.1 prep** is in place but not implemented. The code iterates `visibleCategoriesOrdered` (derived from state) for Mode B's category sections rather than hardcoding "Clean / Savory / Candy" anywhere new. In v3.1, when user-defined groupings are introduced, the grouping definition will swap behind the existing array and category iteration code, leaving aligned-rows rendering unchanged.
+**Test impact**: tests that assert the *number* of callouts returned by `prepCalloutsFor` / `singlePrepNotes` will need +1 per assertion (the new unconditional ladle-prep callout). Tests asserting callout *DOM structure* (`<div class="callout info">`) are unaffected since the wrapper element is unchanged. Per project lessons from rc.5→rc.8: **passing tests do not mean correct rendering** — pair every CSS or layout change with manual visual verification before claiming a fix is shipped. rc.9 is data-only (no CSS/layout changes), so the visual-regression risk surface is limited to the new callout strings rendering correctly.
 
-**Test totals: 264/264 across 10 suites** — alpha.2 10/10 · beta 39/39 · rc 48/48 · rc.2 38/38 · rc.3 34/34 · rc.4 17/17 · rc.5 10/10 · rc.6 21/21 · rc.7 14/14 · rc.8 33/33. Eight prior assertions were updated to reflect the new structure (rc's `.batch-column` count checks became `.setup-cell.setup-header` count checks; rc.2's `data-batches-row="all"` Mode A check became `.setup-aligned-grid` check; rc.2's separate Spices/Toppings switcher assertions became single Flavor Cards switcher assertion; rc.3's `.batches-row` Mode A check became `.setup-aligned-grid` check). Plus a 54-combination combinatorial smoke test verifying all (orderMode, outputGrouping, batchLayout, flavorCardsLayout) tuples render without error.
+**Versioning bookkeeping**: per the project's 8-segment versioning scheme (`vA.B.C.D.E.F.G.H-branch-pXX.YY_mZZ`), rc.9 is a within-phase polish bump → H goes 0 → 1 → `v3.0.0.0.0.0.0.1-dev-p00.00_m01` as the in-progress NEXT version. Stable remains `v2.10.2.0.0.0.0.0-prod-p00.00_m01` until v3.0.0 final ships.
 
-**Prior releases**: rc.7 (shared cooking inside each category section + hybrid batch column sizing), rc.6 (order toggle restructure with By Recipe / By Category sub-control), rc.5 (intermediate sharedCookCard hoist + Flavor-card toggle placement — reverted in rc.6), rc.4 (explicit outputGrouping toggle with placeholder pills — reverted in rc.5), rc.3 (group/batch layout switchers + per-category Cook+Tier in Mode B), rc.2 (picker consolidation), rc (output rendering reorg), beta (picker UI for batches model), alpha.2 (data-model plumbing). v3.0.0-final still pending: master shopping list math.
+**Prior releases**: rc.8 (aligned-rows Setup grid + merged Flavor Cards layout switcher — still under evaluation per the continue-v3 handoff; tests pass but visual layout was reported broken in actual browser use), rc.7 (shared cooking inside each category section + hybrid batch column sizing), rc.6 (order toggle restructure with By Recipe / By Category sub-control), rc.5 (intermediate sharedCookCard hoist + Flavor-card toggle placement — reverted in rc.6), rc.4 (explicit outputGrouping toggle with placeholder pills — reverted in rc.5), rc.3 (group/batch layout switchers + per-category Cook+Tier in Mode B), rc.2 (picker consolidation), rc (output rendering reorg), beta (picker UI for batches model), alpha.2 (data-model plumbing). v3.0.0-final still pending: master shopping list math + rc.8 visual evaluation outcome.
 
-**v2 line**: v2.10.1 (controls-row alignment fix). v2.10.0 (single-row controls). v2.9.0 (candy-combo recipe data + Trace Dusting vocab). v2.8.0 → v2.0.0 covered direct-bind layout switchers, picker-region wrapper, stacked width parity, layout-overhaul polish through 8/10/12-item refinements, URL state + sticky chrome, Flight mode, card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; v3 is specified in `v3_HANDOFF.md` but the design evolved past the handoff's per-flavor-override mental model. The companion manual update remains queued for a dedicated next session.
+**v2 line**: v2.10.2 (candy-combo Option A rescale, banana area-scaling, caramel volumes, toffee/bacon singles bumps, prep-callout ladle/banana/candy extensions — the data source for rc.9's forward-merge). v2.10.1 (controls-row alignment fix). v2.10.0 (single-row controls). v2.9.0 (candy-combo recipe data + Trace Dusting vocab). v2.8.0 → v2.0.0 covered direct-bind layout switchers, picker-region wrapper, stacked width parity, layout-overhaul polish through 8/10/12-item refinements, URL state + sticky chrome, Flight mode, card-scale slider. The v2 roadmap is in `v2_HANDOFF.md`; v3 is specified in `v3_HANDOFF.md` and continued in `continue-v3_HANDOFF.md`. The companion manual update is tracked separately in `recipe-guide-update_HANDOFF.md`.
 
 ## License
 
