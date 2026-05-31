@@ -1,4 +1,4 @@
 # Ultimate Malted Pancakes Flight Picker version tracking
 # Stable: last completed change set
 # Next: current change set (removed on completion)
-UMPFP_VERSION_STABLE="v3.0.0_build_0.0.0.0_03.20_02"
+UMPFP_VERSION_STABLE="v3.0.0.0.0.0.0.1-uat-p03.20_m02"
