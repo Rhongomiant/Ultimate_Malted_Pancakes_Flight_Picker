@@ -387,6 +387,73 @@
   .tier-bad .tier-h { color: var(--tier-bad-fg); }
   .tier .syr { font-weight: 600; display: block; }
   .tier .ing { color: var(--tier-ing-fg); }
+  /* rc.10.0.10.2 (slice 260607-48i Feature 3B): clickable Quality Tier rows.
+     A click delegate on #output (HTML L13700+) reads data-tier-name +
+     data-flavor-id and writes state.qualityChosen[flavorId] = tierName; the
+     render() call then re-emits tierGridHtml with the `chosen` class on the
+     matching row. Cursor + transition make the affordance discoverable; the
+     chosen treatment is a bolder font weight + accent background tint +
+     subtle border emphasis so it reads at a glance against the colored
+     tier-best/good/ok/bad row backgrounds. Outline avoids stacking with the
+     existing border (which carries the tier color); box-shadow gives the
+     subtle "I'm picked" lift. */
+  .tier[data-tier-name] { cursor: pointer; transition: transform .08s ease, box-shadow .08s ease; }
+  .tier[data-tier-name]:hover { transform: translateY(-1px); }
+  .tier.chosen {
+    font-weight: 700;
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent) inset;
+  }
+  .tier.chosen .tier-h { color: var(--accent-strong); }
+  /* rc.10.0.10.2 (slice 260607-48i Feature 3A): per-row recipe checkmarks.
+     The `<input class="ri-check">` is the leading child inside the `.k` span
+     of every bowl-list row, or the leading child of every `<li>` in the
+     non-bowl-list .flavor-deltas / .steps / .topping-list / .finishing-list.
+     A click delegate on #output toggles state.recipeCheckmarks[key]; the
+     `:has(input.ri-check:checked)` selector strikes through + dims the row
+     in-place (no render() call needed). The bowl-list selector has to
+     target the .k + .v cells directly because the <li> uses display:contents
+     (HTML L317); the rest use the simpler li-targeted form.
+     :has() browser support: Chrome 105+ / Safari 15.4+ / Firefox 121+ /
+     Opera 91+ — all current. If a future browser quirk breaks this, fall
+     back to a JS-side data-attr flip in the click delegate. */
+  input.ri-check {
+    margin: 0 6px 0 0;
+    vertical-align: middle;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  /* Strike-through + dim for the non-bowl-list lists where <li> has a
+     real box. */
+  ul.flavor-deltas > li:has(input.ri-check:checked),
+  ol.steps > li:has(input.ri-check:checked),
+  ul.steps > li:has(input.ri-check:checked),
+  ul.topping-list > li:has(input.ri-check:checked),
+  ul.finishing-list > li:has(input.ri-check:checked) {
+    opacity: 0.55;
+    text-decoration: line-through;
+  }
+  /* Bowl-list: <li> uses display:contents, so target .k + .v cells when
+     the `<li>` contains a checked .ri-check. */
+  ul.list.bowl-list > li:has(input.ri-check:checked) > .k,
+  ul.list.bowl-list > li:has(input.ri-check:checked) > .v {
+    opacity: 0.55;
+    text-decoration: line-through;
+  }
+  /* rc.10.0.10.2 (slice 260607-48i Feature 3): print empty-box glyph for the
+     pen-tick affordance. Display-side this would render as a hairline
+     rectangle (it's still there if the user opens print preview); display
+     callers do NOT emit `.pb-check` — they use `.ri-check` instead.
+     The `@media print` block below restyles it for paper output. */
+  .pb-check {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    border: 1px solid currentColor;
+    margin-right: 4px;
+    vertical-align: middle;
+    box-sizing: border-box;
+  }
 
   .footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
   .print-btn { background: var(--accent); color: var(--on-accent); border: 0; padding: 10px 16px;
@@ -1385,6 +1452,18 @@
     display: flex; width: 100%; min-width: 0;
     margin-bottom: 10px;
   }
+  /* rc.10.0.10.0.1 fix-patch: .bcr-group's `display: inline-flex` (L1371) and
+     .bcr-group.bcr-standalone's `display: flex` (L1384) override the UA's
+     `[hidden] { display: none }` default at higher specificity (0,1,0 / 0,2,0
+     vs. UA's 0,1,0). Without these explicit author-side rules, every JS
+     write of `multGroup.hidden = true` / `predefGroup.hidden = true` was
+     visually inert — the attribute toggled but CSS kept the element shown.
+     Two selectors at (0,2,0) and (0,3,0) respectively so both the plain
+     .bcr-group (e.g. #multi-batch-group at L3953) and the .bcr-standalone
+     variant (e.g. #batch-multiplier-group at L3922, #batch-predefined-group
+     at L3939) hide when `hidden` is set. No !important. */
+  .bcr-group[hidden],
+  .bcr-group.bcr-standalone[hidden] { display: none; }
   .bcr-group .bcr-label {
     width: 100%; box-sizing: border-box;
     display: flex; align-items: center; justify-content: center;
@@ -1546,6 +1625,36 @@
     border-left: 1px solid var(--line);
     border-right: 1px solid var(--line);
     padding: 0 8px;
+  }
+  /* rc.10.0.10.1 (slice 260607-48i Feature 2): .batch-multiplier-value is now
+     an <input type=number>. Reset the UA chrome that doesn't belong inside the
+     stepper row — top/bottom borders, background, default focus ring — while
+     keeping the L1553 left/right borders (the cell separators between +/- and
+     the value). Text-align center mimics the flex centering of the prior span
+     (text-input flex doesn't center the text node the same way as a span). The
+     spin-button reset is sane defaults — keeping the native arrows is fine
+     because the +/- buttons are the primary affordance and the spinners are
+     redundant-but-harmless. Width is constrained so multi-digit values stay
+     compact. */
+  .bcr-group input.batch-multiplier-value {
+    background: transparent;
+    border-top: none;
+    border-bottom: none;
+    text-align: center;
+    width: 3.5em;
+    box-sizing: border-box;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .bcr-group input.batch-multiplier-value:focus {
+    outline: none;
+    background: var(--bg, transparent);
+  }
+  .bcr-group input.batch-multiplier-value::-webkit-outer-spin-button,
+  .bcr-group input.batch-multiplier-value::-webkit-inner-spin-button {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
   }
   /* Slice 5P fix-patch (rc.9.71.0.1): when active batch size is not Full
      the stepper row fades to indicate the multiplier is not applicable,
@@ -3396,6 +3505,23 @@
       display: block;
     }
 
+    /* rc.10.0.10.2 (slice 260607-48i Feature 3): print empty-box glyph
+       for the pen-tick affordance. Restyle in print-scope to use point
+       units + a slightly bolder hairline so it prints crisp at 600dpi
+       on letter paper. Display-state never propagates — the box is
+       always empty regardless of which checkboxes the user ticked on
+       screen. Lives inside #print-root scope so it only fires when the
+       print path is active. */
+    #print-root .pb-check {
+      display: inline-block;
+      width: 9pt;
+      height: 9pt;
+      border: 0.75pt solid #000;
+      margin-right: 4pt;
+      vertical-align: middle;
+      box-sizing: border-box;
+    }
+
     /* rc.9.70.2.7: page grid columns match total card count on the page
        (data-page-cards). 1 card → full page width; 2 cards → halves; 3
        cards → thirds. Each .pb-batch-section spans its flavor count.
@@ -3923,7 +4049,7 @@
         <span class="bcr-label" id="bcr-label-batch-multiplier">FULL BATCH MULTIPLIER (per this BATCH SET)</span>
         <div class="batch-multiplier-row" id="batch-multiplier-row">
           <button type="button" class="batch-multiplier-btn" data-multiplier-action="dec" aria-label="Decrease multiplier">−</button>
-          <span class="batch-multiplier-value" id="batch-multiplier-value">1</span>
+          <input type="number" class="batch-multiplier-value" id="batch-multiplier-value" inputmode="numeric" step="1" min="1" max="40" value="1" aria-label="Batch quantity">
           <button type="button" class="batch-multiplier-btn" data-multiplier-action="inc" aria-label="Increase multiplier">+</button>
         </div>
       </div>
@@ -4403,7 +4529,7 @@
 //     reads from it on boot via #app-version. Replaces the hardcoded
 //     "v3.0.0-rc.9.51" string that had been stale through every rc from
 //     5D.4 onward. ===
-const APP_VERSION = 'v3.1.0 (rc.10.0.9.0.3)';  // rc.10.0.9.0.3 fix-patch (slice 260606-m4q follow-up): subcard bowl-list column layout. Inside a `.subcards-grid .subcard` the v2.2.0 rule at L3302 forces `<li>` to `display: block` (kills the horizontal name/amount squish — name above, amount below with bullet). Combined with the base bowl-list 2-track grid at L311 (`grid-template-columns: minmax(0,max-content) minmax(0,max-content); justify-content: space-between`), the `<li>` boxes auto-flow into two narrow columns with a WIDE horizontal gap between them, because space-between pushes the max-content tracks to opposite parent edges. This patch overrides the column template inside subcard context to `repeat(auto-fit, minmax(220px, 1fr))` with `justify-content: start` + explicit `column-gap: 24px`. Result: columns sit closer together (24px gap, not the visual ~40% whitespace from space-between), and when the subcard is narrow enough that two 220px columns don't fit (multiple flavor cards packed in subcards-grid, or viewport narrowing), the grid collapses to a single column and all ingredients stack vertically. Scope: ALL `.subcards-grid .subcard ul.list.bowl-list` — fatAndSpicesHtml + spicesHtml emit five such ULs per flavor card. Top-level Wet/Dry Ingredient Bowl blocks (NOT inside `.subcards-grid`) keep their pre-patch layout — the `.k`/`.v` 2-track grid with space-between is the correct posture there because the parent block is full-width. VERSION file unchanged per rc.10.0.x convention. // rc.10.0.9.0.2 fix-patch (slice 260606-m4q follow-up): Fat/Scant extension + named-amount alts. (1) MEASUREMENT_VOCAB gains 7 new entries — Fat Dash, Fat Pinch, Fat Smidgen, Scant Smidgen, Fat Drop, Scant Drop, Fat Hint. Fat-prefix listed BEFORE Scant-counterpart at colliding nums (3/16 / 3/32 / 3/64 / 3/128 / 3/256 tsp) so namedVocabToken's first-match picks Fat as the rendered primary; Scant-counterpart still surfaces as an alt. Scant Hint (3/512 tsp = 4.5 in 768-base) is NOT integer-representable and is excluded (would require expanding TSP_DENOM). (2) formatHierarchicalDisplay returns a new displayAlts: string[] field ordered tier-set Alt-1, tier-set Alt-2, name-swap (Scant counterpart), fractional decomposition (Fat X = X+X/2; Scant X = X/2+X/4). Dedupe vs primary. displayAlt1/displayAlt2 retained as back-compat aliases for displayAlts[0]/[1]. (3) Multi-token sums: named-amount substitution is in place — "1 cup + a fat dash" gets alts "1 cup + a scant tad" + "1 cup + ⅛ tsp + 1/16 tsp". (4) Four renderer call sites (renderAmount L9510, renderBatchAmount L9595, pbScaledAmount L10859, pbBatchAmount L10899) now iterate displayAlts — variable number of v-note spans inline (HTML) / parenthetical "; "-joined alts (print). // rc.10.0.9.0.1 fix-patch (slice 260606-m4q follow-up): NAMED_VOCAB rule correction. (1) NAMED_VOCAB derivation now reads from MEASUREMENT_VOCAB directly (filter to entries whose label is alphabetic and not a tier name) — adding a new named amount to MEASUREMENT_VOCAB now auto-extends NAMED_VOCAB without code changes. (2) Fat Tad promoted from hardcoded parser alias at L8215 to a real MEASUREMENT_VOCAB entry (num 288, after ⅜ tsp); MEASUREMENT_VOCAB lookup at L8210 handles the parse, so the hardcoded alias is removed. Fat Tad data rows now render named ('Fat Tad (⅜ tsp)' standalone, 'a fat tad (⅜ tsp)' as continuation) instead of falling back to ⅜ tsp. (3) namedVocabToken now takes (tspNum, isContinuation) — STANDALONE (no prior '+' token) emits BARE capitalized form 'Dash (⅛ tsp)' / 'Scant Tad (3/16 tsp)' / 'Smidgen (1/32 tsp)' / 'Fat Tad (⅜ tsp)'; CONTINUATION (after '+' in the decomposition) emits lowercase "a"-prefix form 'a dash (⅛ tsp)' / 'a scant tad (3/16 tsp)' / 'a smidgen (1/32 tsp)' / 'a fat tad (⅜ tsp)'. (4) _formatHierarchicalTokens caller passes parts.length > 0 as isContinuation. Closes the user-flagged inconsistency at rc.10.0.9 visual-verify where Locked-3 (tad/dash/pinch) always emitted "a"-prefix even standalone, conflicting with the Vanilla Extract reference layout where 'Dash' is the standalone primary. VERSION file at repo root unchanged. // rc.10.0.9 (slice 260606-m4q): tiered hierarchical measurement decomposition + NAMED_VOCAB inline translations + factor=1 / single-pass short-circuit removal + 5 broken `<ul class="list">` alt-slot layouts normalized to `list bowl-list`. New ladder Gallon → Quart → Pint → Cup [whole + ½ + ¼] → Tbsp [whole + ½] → tsp [any]; primary always renders, Alt-1 (no ½ Tbsp) + Alt-2 (no ½ Tbsp, no ¼ cup) emit only when materially different from primary via re-decompose-under-primary-rules. Closes the Patisserie Plain Sugar baked-alt bug (`1½ tsp (1 tsp + ½ tsp)` → `1½ tsp` with both alts suppressed). NAMED_VOCAB covers all 9 named tokens in MEASUREMENT_VOCAB (Tad/Scant Tad/Dash/Scant Dash/Pinch/Scant Pinch/Smidgen/Drop/Hint) — user-locked tad/dash/pinch render with the "a"-prefix form (`a dash (⅛ tsp)`); the extended six preserve the capitalized-bare form (`Smidgen (1/32 tsp)`). MEASUREMENT_VOCAB retained for sub-tsp granularity (drives the tsp-tier `granularity: 'any'` resolution via _formatTspTotal). All four factor=1 / single-pass short-circuits removed (renderAmount L9030 / renderBatchAmount L9095 / pbScaledAmount L10341 / pbBatchAmount L10369) so every render path runs through sumMeasurements + the new formatHierarchicalDisplay. Data tables scrubbed in Task A — DRY/WET/SPICE/TOPPINGS/DRY_HALF_GAL_FIT_A/WET_BANANA_IN_BATTER_MILK/MASHED_BANANA + three inline FLAVORS `amounts:` arrays now hold canonical base only (no baked numerical alts; named-vocab parentheticals stripped; lowercase tbsp → Tbsp normalization in WET_BANANA_IN_BATTER_MILK + MASHED_BANANA). CSS layout fix: 5 `<ul class="list">` declarations in fatAndSpicesHtml (L9219/L9223/L9231) + spicesHtml (L9252/L9260) extended to `list bowl-list` so alt .v-note cells sit directly below the primary, right-aligned, matching the Wet Ingredient Bowl reference. Fat Tad data rows now render as `⅜ tsp` post-slice (Fat Tad is a parseToTspNum-side alias, not a NAMED_VOCAB entry — acknowledged trade-off; future slice can add to NAMED_VOCAB if desired). VERSION file at repo root unchanged per rc.10.0.x convention. rc.10.0.8.0.1 fix-patch (no new feature; canonical correction): DRY_HALF_GAL_FIT_A baking soda + salt adjusted from ¾ tsp to 13/16 tsp so 2× Half-Gal Fit A = the recipe guide's Gallon Fit row 1⅝ tsp. Prior ¾ tsp summed to 1½ tsp at Jar-Fit index 2, conflicting with docs/recipe-guide/...html L316-333 (Gallon Fit row reads 1⅝ tsp, apparently derived from 13/16 tsp at half-gal scale). User decision: gallon row is authoritative; Fit A canonical adjusted to match. Recipe-guide HTML L299-300 baking soda + salt rows updated in lockstep (¾ tsp + "scant +" alt → 13/16 tsp). Slash-fraction tsp form parses via the existing fracTspMatch branch at HTML L8206 — no parser change needed. rc.10.0.8 (slice close after rc.10.0.8.1 + rc.10.0.8.2): Prep Bulk Dry Mix jar-fit picker — adds a Predefined option to the Prep-mode batch-size picker with two increment series. Series A "Nominal": 4× Full batch through 40× (index N = N × 4× Full); Series B "Jar-Fit": 1 × Half-Gal Fit A through 12 × (index N = N × Half-Gal Fit A ≈ 6.5N cups settled). Series B base unit canonical-sourced from docs/recipe-guide/🥞 Pancake_Recipe_-_Ultimate_Malted_Pancakes.html lines 281-303 (flour 4⅞ cups, corn flour 6½ Tbsp, malt 6½ Tbsp, buttermilk 13 Tbsp, baking pwd 4⅞ tsp, baking soda ¾ tsp, salt ¾ tsp); index 2 (= Gallon Fit by construction) matches docs lines 316-333. NEW state field state.batches[i].predefined: { series: 'A'|'B', index: N } | null, with clampPredefined helper (clamps A to [1,10], B to [1,12]). One-way coupling: selecting Predefined SETS the state and greys the Full Batch Multiplier stepper read-only (multiplier value retained for restore-on-Full). Persistence: localStorage stamps pred_v1: true per batch; URL emits ?pp=A:N or ?pp=B:N (active iff state.mode === 'bulk' AND active batch's predefined is non-null). Renderer wiring: new DRY_HALF_GAL_FIT_A constant (immediately after DRY) + renderPredefinedAmount + pbPredefinedAmount helpers; dryBowlHtml and pbDrySection gain Predefined branches (Series A: 4N × DRY[*][3]; Series B: N × DRY_HALF_GAL_FIT_A[*]); shared computePrepSublines helper drives both renderFlightOutput's .out-card[data-prep="1"] and renderPrintRoot's .pb-page[data-prep="1"] subline pair (primary "Predefined · Nominal/Jar-Fit index N = ..." + jar storage line for Series B only). New CSS .prep-sub-jar / .pb-prep-sub-jar (bumped weight, non-italic) for the jar-storage second line. Picker DOM: #batch-predefined-group .bcr-group between #batch-multiplier-group and #batch-combined-row (hidden in Plan-a-Flight); two stacked .opts rows (.predef-series-row | .predef-index-row) reusing the existing .opts/.opt pill styling, plus .predef-sublabel showing the human-readable interpretation. #batch-opts collapses to Full | Predefined in Prep mode only (Plan-a-Flight retains the 4-size picker). Click delegation on series-row clamps the index to the new series' upper bound on Series-A↔Series-B switch. rc.10.0.7.2: fractional batch quantity for non-Full sizes. Stored .multiplier semantics are now size-aware — for Full it stays an integer count [1,40] default 1; for non-Full it becomes a "qty" of ADDITIONAL Full batches on top of the size's base fraction, range [0,39] default 0. Quarter @ qty 1 = 1 Quarter base + 1 Full add-on = 1.25× Full equivalent; Half @ qty 2 = 2.5×; Three-Quarter @ qty 3 = 3.75×. Helpers (near BATCHES): baseFraction (Q=0.25 / H=0.5 / TQ=0.75 / F=1.0), clampStoredMultiplier (size-dependent clamp), effectiveFullBatches (display value — float), forEachBatchPass / forEachIngredientCell (integer-clean per-pass iteration: 1 base pass at b.batch + qty Full passes at idx 3), effectivePancakes (sum of per-pass yields). Display/print helpers: renderBatchAmount + pbBatchAmount sum a per-batchIdx amount array across the row's passes via sumMeasurements, returning a single rendered amount (e.g. Quarter @ qty 1 of flour = Quarter's flour + Full's flour summed). In Prep mode (state.mode === 'bulk') #batch-opts collapses to Full | Predefined; selecting Predefined opens a two-tier sub-picker — Series row (Nominal | Jar-Fit) above an Index row (10 pills A:1..10, 12 pills B:1..12). New state field state.batches[i].predefined: { series: 'A'|'B', index: N } | null seeded on first Predefined click, cleared on Full click. clampPredefined helper (after clampStoredMultiplier) clamps to series-specific bounds and returns null on malformed input (tampering defense parallel to clampStoredMultiplier). Multiplier stepper greyed (data-disabled="1" + .disabled on both buttons) when Predefined active; value retained for restore-on-Full. Persistence: localStorage stamps pred_v1: true on each batch (informational; clampPredefined tolerates absence), URL emits ?pp=A:N or ?pp=B:N (active only when state.mode === 'bulk' AND active batch's predefined non-null). Output card + print page UNCHANGED in this commit — rc.10.0.8.2 lands the DRY_HALF_GAL_FIT_A constant, renderPredefinedAmount + pbPredefinedAmount helpers, and the subline/dry-bowl wiring. rc.10.0.7.2: fractional batch quantity for non-Full sizes. Stored .multiplier semantics are now size-aware — for Full it stays an integer count [1,40] default 1; for non-Full it becomes a "qty" of ADDITIONAL Full batches on top of the size's base fraction, range [0,39] default 0. Quarter @ qty 1 = 1 Quarter base + 1 Full add-on = 1.25× Full equivalent; Half @ qty 2 = 2.5×; Three-Quarter @ qty 3 = 3.75×. Helpers (near BATCHES): baseFraction (Q=0.25 / H=0.5 / TQ=0.75 / F=1.0), clampStoredMultiplier (size-dependent clamp), effectiveFullBatches (display value — float), forEachBatchPass / forEachIngredientCell (integer-clean per-pass iteration: 1 base pass at b.batch + qty Full passes at idx 3), effectivePancakes (sum of per-pass yields). Display/print helpers: renderBatchAmount + pbBatchAmount sum a per-batchIdx amount array across the row's passes via sumMeasurements, returning a single rendered amount (e.g. Quarter @ qty 1 of flour = Quarter's flour + Full's flour summed). Consumer migration: buildShoppingList loops (DRY/WET+FAT/spices/finishing-salt/pickOne/toppings) iterate the new per-pass model; per-bowl/per-card live helpers (dryBowlHtml / wetBowlHtml / wetBowlSharedHtml / fatAndSpicesHtml) take batchObj directly; print pb*Section family (pbDrySection / pbWetSection / pbSpicesSection / pbYieldSection + renderFlavorHtml) drops factor arg and takes batchObj; per-pancake count sites (syrup totals, finishingInnerHtml, pbToppingsSection finishing-count, computeButterTotal) use effectivePancakes; per-batch totals UI replaces "x N" suffix with " ×eff" (e.g. " ×1.25" for Quarter @ qty 1) using effectiveFullBatches, flavorBatchCount denominator uses per-pass count, perFlavor uses effectivePancakes; Prep Bulk subline (display + print) uses BATCHES[3].oz × effectiveFullBatches for totalOz so Quarter @ qty 1 reads "= 20 oz"; print header uses " ×eff" annotation. scalingFactor() kept on its legacy "Full mult or 1" contract for back-compat — no consumer site reaches it anymore. Stepper widget active at every size with size-dependent bounds (Full [1,40], non-Full [0,39]); sublabel "= X.YZ× Full equivalent" shows on non-Full when qty > 0. batch-opts size-transition handler clamps .multiplier (Full→non-Full drops to 0 since non-Full mult now carries qty semantics, not an inert Full-mode value; non-Full→Full clamps to >=1; non-Full↔non-Full preserved). Persist shims: localStorage stamps `qty_v2: true` per batch on save; URL stamps top-level `?qv=2` on emit. Hydrate without the sentinel zeros non-Full multipliers (LD-2 was inert under pre-rc.10.0.7.2, so zero preserves the equivalent batch count = baseFraction); Full multiplier is forward-compatible across v1/v2. URL emit per-batch rule: Full mult>1 emits, non-Full qty>0 emits, bvar non-default force-emits the size-clamped mult. rc.10.0.7.1.1 fix-patch: three corrections to rc.10.0.7.1's Patisserie Plain after user verification. (1) Wet fat reverted Avocado Oil → Melted Unsalted Butter — the avocado-oil posture from the Triple was justified there by the candy load needing a neutral base; without candy, Plain's butter leads cleaner. (2) Vanilla Bean Paste removed; Vanilla Extract from Classic Plain restored. The bean-paste insertion at rc.10.0.7.1 was an unjustified flavor upgrade on top of the user's literal "Plain + Triple's anchors" spec — Triple has no vanilla, so the merge keeps Plain's vanilla unchanged. (3) Four renderer sites that hardcoded `flavor.id === 'plain'` for the "None inside" toppings display (toppingsInnerHtml, cookCardHtml, pbToppingsSection, pbCardHtml) widened to `flavor.id === 'plain' || flavor.id === 'plain_pat'` so Patisserie Plain also shows "None inside" everywhere Classic Plain does. Docs manual Section 1 + 3 updated to match (Vanilla Extract row replaces Vanilla Bean Paste; Wet Fat row reads "Melted (or browned) Butter" matching Classic Plain; Section 3 best/good/ok cells re-worded around butter rather than avocado oil / ghee). Tests updated: plain_pat fat assertion now expects "Melted Unsalted Butter". rc.10.0.7.1 base: Patisserie Plain — Classic Plain (the rev3-era "Plain", relabeled in this slice) gains a sibling card whose batter is Plain's posture but whose Spices/Sugar/Fat profile mirrors the Triple. New flavor id `plain_pat`, label "Patisserie Plain", cookGroup 'clean', inserted immediately after `plain` in FLAVORS. Spices: Sugar — White + Vanilla Bean Paste + Non-Diastatic Malt — additional (~50% bump for roasty backbone) + Espresso Powder (single scale — no chocolate to over-stack against) + Cultured Buttermilk Powder — additional (brightness; bump milk ½ tsp per ¼ tsp powder) + Salt (chocSalt with bump-to-taste note). Wet fat: Avocado Oil in batter (Triple's neutral-base posture; the brushed-on browned-butter finish provides the butter character). TOPPINGS.plain_pat = null (no toppings). Tests: FLAVORS count 12 → 13; cookGroup distribution 4 clean → 5 clean; finishing.salt list 8 → 9 (joins plain). Docs manual: Section 1 gains the Patisserie Plain card (renaming the Plain card's h4 to "Classic Plain"), Section 2 Finishing table gains the Patisserie Plain row + relabels Plain → Classic Plain, Section 3 Tier table same. rc.10.0.6.2 base: docs/recipe-guide Section 3 best-tier toffee references. — fix three "best" tier cells that were missing or generic about toffee. (1) Toffee + Chocolate best: "plain toffee + dark chips" → "plain Heath Bits O' Brickle + dark chips" (mirrors the Toffee row's "plain Heath Bits" naming; the "plain" qualifier flags uncoated bits vs. the "ok" row's "choc-toffee bits"). (2) Caramel + Toffee best: "Peter's ¼" cubes + fresh nutmeg" → "Peter's ¼" cubes + plain Heath Bits O' Brickle + fresh nutmeg" (toffee was wholly missing). (3) Toffee + Caramel + Chocolate best: "Peter's ¼" cubes + avocado-oil base" → "Peter's ¼" cubes + plain Heath Bits O' Brickle + avocado-oil base" (toffee was missing). The good-tier cells for the two Caramel + Toffee combos picked up "store-brand toffee" the same way, matching the Toffee row's "good" pattern. Picker is unchanged — docs-only patch. rc.10.0.6.1 base: revert the rc.10.0.6 docs/recipe-guide manual swap. The Downloads copy used at rc.10.0.6 was OLDER than the manual already committed in docs/ at 1b99357 — it regressed the four Section/Part-2 headers from the user-preferred "FAT, Spices & Sugar" / "FAT, Spices, Sugar, Topping & Finishing" naming back to "Spice, Sugar & Fat". Restored docs/recipe-guide manual from HEAD~1 (be0889d), preserving the FAT-cap convention per [[project-batch-set-naming-refactor]]. Picker section labels unchanged — they were already on the FAT-first naming. rc.10.0.6 base: TOPPINGS chart synced to Rev 5 manual Section 2. (1) New Chocolate Chip schedule across every chip-bearing flavor — choc 5–6 / 8–10 / 14–17 / 20–22 / 27–32 standard (mini eq on the two smallest sizes only); +something flavors (bnut_choc, toffee_choc, caramel_choc, triple) take 4–5 / 7–8 / 10–12 / 14–16 / 20–24. (2) Toffee amounts DOUBLED across the board for pop — toffee solo, toffee_caramel's toffee column, toffee_choc's toffee column, and triple's toffee column (the triple stays one tier below toffee_choc to fit the Double-Shield budget). (3) Banana Nut + Chocolate and Bacon + Banana Nut slice/nut/bacon counts rescaled — slice ranges ¾–1 → 5–6, nut ramps 3–4 → 2 Tbsp, bacon ramps ⅝ tsp → 2 Tbsp. (4) New caramel sizing calibration note rendered in toppingsInnerHtml for any flavor with hasCaramel — "amounts assume Peter's ¼" cold-cut cubes; with Kraft Caramel Bits (uniform pre-formed) you may run the high end of each cell." Sits below the perimeter note, above the Batter Shield warn. rc.10.0.5.2 base: Flight Checklist .fcb-mode split into ↺ Reset views (view-option reset, single-click) + ✕ Clear checkmarks (state.flightChecklist wipe, two-stage in-DOM confirm). rc.10.0.5.1 base: defensive TDZ guard around boot-time sumMeasurements calls.
+const APP_VERSION = 'v3.2.0';  // v3.2.0 (m04 / p01.00) major minor bump consolidating slice 260607-48i (rc.10.0.10 → rc.10.0.10.2 — three-feature picker slice: conditional visibility for ADDITIONAL FULL BATCHES + PREDEFINED BULK MIX + Prep Bulk batch-size label rename to BULK DRY MIX SIZE; typeable quantity input replacing the multiplier stepper's read-only span; per-item recipe checkboxes across display + print on every Wet/Dry/FAT/Spices/Toppings row + Shared Cooking Instructions + per-flavor cook delta; clickable Quality Tier selector with bold + accent chosen-row treatment; Flight Checklist Clear-checkmarks extended to also wipe recipe + tier maps). State model adds state.recipeCheckmarks + state.qualityChosen as per-session maps (no localStorage, no URL). Test count 631 → 731 / 0 fail across the slice. VERSION file bumped to v3.2.0.0.0.0.0.0-dev-p01.00_m04. // rc.10.0.10.2 (slice 260607-48i Feature 3): per-item checkboxes on display + print across wet/dry/fat/spices/toppings/shared-cook/cook-delta sections; clickable Quality Tier selector with bold+accent chosen-row treatment; state stored in state.recipeCheckmarks + state.qualityChosen (per-session, no persistence, no URL); display strike-through + dim via CSS :has() on checked row; print glyph unconditional (empty box, never inherits display state); Clear-checkmarks control extended to wipe recipe + tier maps alongside FC state via clearRecipeCheckmarks() helper. New Suite 21 covers key generation, integration, toggle semantics, print emission. VERSION file unchanged per rc.10.0.x convention. // rc.10.0.10.1 (slice 260607-48i Feature 2): typeable batch-quantity input. The .batch-multiplier-value span is now an input type=number with size-dependent min/max synced from clampStoredMultiplier bounds (Full [1,40], non-Full [0,39]). Change/blur/Enter handlers parse + clamp via the same pipeline as the +/- buttons; invalid input (non-numeric, empty) reverts to the last valid value. +/- stepper handler unchanged. New pure helper parseAndClampTypedMultiplier returns { ok, value } so Suite 20 can test the parse/clamp pipeline without driving DOM events. Predefined-active gate mirrored from the +/- handler as defense-in-depth (Feature 1A's hide rule already prevents reaching the input under that state). VERSION file unchanged per rc.10.0.x convention. // rc.10.0.10.0.1 fix-patch (slice 260607-48i Feature 1 follow-up): CSS specificity bug — `.bcr-group { display: inline-flex }` at L1371 and `.bcr-group.bcr-standalone { display: flex }` at L1384 were overriding the UA's `[hidden] { display: none }` default (author specificity 0,1,0 / 0,2,0 wins against UA 0,1,0). The rc.10.0.10 JS visibility logic was correctly writing `multGroup.hidden` / `predefGroup.hidden`, but the attribute had no visual effect because CSS kept the element shown. Fix: two new selectors `.bcr-group[hidden]` and `.bcr-group.bcr-standalone[hidden]` declaring `display: none` at 0,2,0 / 0,3,0 specificity, beating the conflicting display rules without `!important`. Confirmed via user visual-verify on Opera + Safari that both sections were visible regardless of state pre-fix (predicates verified correct in Suite 20 — 658/0; the gap was display:none never taking effect). Covers `#multi-batch-group` (plain `.bcr-group`) too as defense — same latent specificity issue would have applied. No JS change. VERSION file unchanged per rc.10.0.x convention. // rc.10.0.10 (slice 260607-48i Feature 1): conditional visibility for #batch-multiplier-group + #batch-predefined-group + Prep Bulk batch-size label renamed to 'BULK DRY MIX SIZE'. Multiplier hidden in recipe mode until size picked; hidden in Prep Bulk unless size=Full AND predefined=null. Predefined-group hidden unless mode=bulk AND predefined non-null. Replaces the grey-disabled posture from rc.10.0.8.1. Pure predicates shouldShowMultiplierGroup + shouldShowPredefinedGroup factored out for direct Suite 20 coverage; bcrLabelBatchSizeText centralizes the label string. setupBatchSetNameSwitcher.setBatchSetName now routes through the helper, and the render-cycle gains a sibling write to #bcr-label-batch-size so mode-toggle (Plan-a-Flight ⇄ Prep Bulk) refreshes the label without needing the BSN setter to fire. VERSION file unchanged per rc.10.0.x convention. // rc.10.0.9.0.3 fix-patch (slice 260606-m4q follow-up): subcard bowl-list column layout. Inside a `.subcards-grid .subcard` the v2.2.0 rule at L3302 forces `<li>` to `display: block` (kills the horizontal name/amount squish — name above, amount below with bullet). Combined with the base bowl-list 2-track grid at L311 (`grid-template-columns: minmax(0,max-content) minmax(0,max-content); justify-content: space-between`), the `<li>` boxes auto-flow into two narrow columns with a WIDE horizontal gap between them, because space-between pushes the max-content tracks to opposite parent edges. This patch overrides the column template inside subcard context to `repeat(auto-fit, minmax(220px, 1fr))` with `justify-content: start` + explicit `column-gap: 24px`. Result: columns sit closer together (24px gap, not the visual ~40% whitespace from space-between), and when the subcard is narrow enough that two 220px columns don't fit (multiple flavor cards packed in subcards-grid, or viewport narrowing), the grid collapses to a single column and all ingredients stack vertically. Scope: ALL `.subcards-grid .subcard ul.list.bowl-list` — fatAndSpicesHtml + spicesHtml emit five such ULs per flavor card. Top-level Wet/Dry Ingredient Bowl blocks (NOT inside `.subcards-grid`) keep their pre-patch layout — the `.k`/`.v` 2-track grid with space-between is the correct posture there because the parent block is full-width. VERSION file unchanged per rc.10.0.x convention. // rc.10.0.9.0.2 fix-patch (slice 260606-m4q follow-up): Fat/Scant extension + named-amount alts. (1) MEASUREMENT_VOCAB gains 7 new entries — Fat Dash, Fat Pinch, Fat Smidgen, Scant Smidgen, Fat Drop, Scant Drop, Fat Hint. Fat-prefix listed BEFORE Scant-counterpart at colliding nums (3/16 / 3/32 / 3/64 / 3/128 / 3/256 tsp) so namedVocabToken's first-match picks Fat as the rendered primary; Scant-counterpart still surfaces as an alt. Scant Hint (3/512 tsp = 4.5 in 768-base) is NOT integer-representable and is excluded (would require expanding TSP_DENOM). (2) formatHierarchicalDisplay returns a new displayAlts: string[] field ordered tier-set Alt-1, tier-set Alt-2, name-swap (Scant counterpart), fractional decomposition (Fat X = X+X/2; Scant X = X/2+X/4). Dedupe vs primary. displayAlt1/displayAlt2 retained as back-compat aliases for displayAlts[0]/[1]. (3) Multi-token sums: named-amount substitution is in place — "1 cup + a fat dash" gets alts "1 cup + a scant tad" + "1 cup + ⅛ tsp + 1/16 tsp". (4) Four renderer call sites (renderAmount L9510, renderBatchAmount L9595, pbScaledAmount L10859, pbBatchAmount L10899) now iterate displayAlts — variable number of v-note spans inline (HTML) / parenthetical "; "-joined alts (print). // rc.10.0.9.0.1 fix-patch (slice 260606-m4q follow-up): NAMED_VOCAB rule correction. (1) NAMED_VOCAB derivation now reads from MEASUREMENT_VOCAB directly (filter to entries whose label is alphabetic and not a tier name) — adding a new named amount to MEASUREMENT_VOCAB now auto-extends NAMED_VOCAB without code changes. (2) Fat Tad promoted from hardcoded parser alias at L8215 to a real MEASUREMENT_VOCAB entry (num 288, after ⅜ tsp); MEASUREMENT_VOCAB lookup at L8210 handles the parse, so the hardcoded alias is removed. Fat Tad data rows now render named ('Fat Tad (⅜ tsp)' standalone, 'a fat tad (⅜ tsp)' as continuation) instead of falling back to ⅜ tsp. (3) namedVocabToken now takes (tspNum, isContinuation) — STANDALONE (no prior '+' token) emits BARE capitalized form 'Dash (⅛ tsp)' / 'Scant Tad (3/16 tsp)' / 'Smidgen (1/32 tsp)' / 'Fat Tad (⅜ tsp)'; CONTINUATION (after '+' in the decomposition) emits lowercase "a"-prefix form 'a dash (⅛ tsp)' / 'a scant tad (3/16 tsp)' / 'a smidgen (1/32 tsp)' / 'a fat tad (⅜ tsp)'. (4) _formatHierarchicalTokens caller passes parts.length > 0 as isContinuation. Closes the user-flagged inconsistency at rc.10.0.9 visual-verify where Locked-3 (tad/dash/pinch) always emitted "a"-prefix even standalone, conflicting with the Vanilla Extract reference layout where 'Dash' is the standalone primary. VERSION file at repo root unchanged. // rc.10.0.9 (slice 260606-m4q): tiered hierarchical measurement decomposition + NAMED_VOCAB inline translations + factor=1 / single-pass short-circuit removal + 5 broken `<ul class="list">` alt-slot layouts normalized to `list bowl-list`. New ladder Gallon → Quart → Pint → Cup [whole + ½ + ¼] → Tbsp [whole + ½] → tsp [any]; primary always renders, Alt-1 (no ½ Tbsp) + Alt-2 (no ½ Tbsp, no ¼ cup) emit only when materially different from primary via re-decompose-under-primary-rules. Closes the Patisserie Plain Sugar baked-alt bug (`1½ tsp (1 tsp + ½ tsp)` → `1½ tsp` with both alts suppressed). NAMED_VOCAB covers all 9 named tokens in MEASUREMENT_VOCAB (Tad/Scant Tad/Dash/Scant Dash/Pinch/Scant Pinch/Smidgen/Drop/Hint) — user-locked tad/dash/pinch render with the "a"-prefix form (`a dash (⅛ tsp)`); the extended six preserve the capitalized-bare form (`Smidgen (1/32 tsp)`). MEASUREMENT_VOCAB retained for sub-tsp granularity (drives the tsp-tier `granularity: 'any'` resolution via _formatTspTotal). All four factor=1 / single-pass short-circuits removed (renderAmount L9030 / renderBatchAmount L9095 / pbScaledAmount L10341 / pbBatchAmount L10369) so every render path runs through sumMeasurements + the new formatHierarchicalDisplay. Data tables scrubbed in Task A — DRY/WET/SPICE/TOPPINGS/DRY_HALF_GAL_FIT_A/WET_BANANA_IN_BATTER_MILK/MASHED_BANANA + three inline FLAVORS `amounts:` arrays now hold canonical base only (no baked numerical alts; named-vocab parentheticals stripped; lowercase tbsp → Tbsp normalization in WET_BANANA_IN_BATTER_MILK + MASHED_BANANA). CSS layout fix: 5 `<ul class="list">` declarations in fatAndSpicesHtml (L9219/L9223/L9231) + spicesHtml (L9252/L9260) extended to `list bowl-list` so alt .v-note cells sit directly below the primary, right-aligned, matching the Wet Ingredient Bowl reference. Fat Tad data rows now render as `⅜ tsp` post-slice (Fat Tad is a parseToTspNum-side alias, not a NAMED_VOCAB entry — acknowledged trade-off; future slice can add to NAMED_VOCAB if desired). VERSION file at repo root unchanged per rc.10.0.x convention. rc.10.0.8.0.1 fix-patch (no new feature; canonical correction): DRY_HALF_GAL_FIT_A baking soda + salt adjusted from ¾ tsp to 13/16 tsp so 2× Half-Gal Fit A = the recipe guide's Gallon Fit row 1⅝ tsp. Prior ¾ tsp summed to 1½ tsp at Jar-Fit index 2, conflicting with docs/recipe-guide/...html L316-333 (Gallon Fit row reads 1⅝ tsp, apparently derived from 13/16 tsp at half-gal scale). User decision: gallon row is authoritative; Fit A canonical adjusted to match. Recipe-guide HTML L299-300 baking soda + salt rows updated in lockstep (¾ tsp + "scant +" alt → 13/16 tsp). Slash-fraction tsp form parses via the existing fracTspMatch branch at HTML L8206 — no parser change needed. rc.10.0.8 (slice close after rc.10.0.8.1 + rc.10.0.8.2): Prep Bulk Dry Mix jar-fit picker — adds a Predefined option to the Prep-mode batch-size picker with two increment series. Series A "Nominal": 4× Full batch through 40× (index N = N × 4× Full); Series B "Jar-Fit": 1 × Half-Gal Fit A through 12 × (index N = N × Half-Gal Fit A ≈ 6.5N cups settled). Series B base unit canonical-sourced from docs/recipe-guide/🥞 Pancake_Recipe_-_Ultimate_Malted_Pancakes.html lines 281-303 (flour 4⅞ cups, corn flour 6½ Tbsp, malt 6½ Tbsp, buttermilk 13 Tbsp, baking pwd 4⅞ tsp, baking soda ¾ tsp, salt ¾ tsp); index 2 (= Gallon Fit by construction) matches docs lines 316-333. NEW state field state.batches[i].predefined: { series: 'A'|'B', index: N } | null, with clampPredefined helper (clamps A to [1,10], B to [1,12]). One-way coupling: selecting Predefined SETS the state and greys the Full Batch Multiplier stepper read-only (multiplier value retained for restore-on-Full). Persistence: localStorage stamps pred_v1: true per batch; URL emits ?pp=A:N or ?pp=B:N (active iff state.mode === 'bulk' AND active batch's predefined is non-null). Renderer wiring: new DRY_HALF_GAL_FIT_A constant (immediately after DRY) + renderPredefinedAmount + pbPredefinedAmount helpers; dryBowlHtml and pbDrySection gain Predefined branches (Series A: 4N × DRY[*][3]; Series B: N × DRY_HALF_GAL_FIT_A[*]); shared computePrepSublines helper drives both renderFlightOutput's .out-card[data-prep="1"] and renderPrintRoot's .pb-page[data-prep="1"] subline pair (primary "Predefined · Nominal/Jar-Fit index N = ..." + jar storage line for Series B only). New CSS .prep-sub-jar / .pb-prep-sub-jar (bumped weight, non-italic) for the jar-storage second line. Picker DOM: #batch-predefined-group .bcr-group between #batch-multiplier-group and #batch-combined-row (hidden in Plan-a-Flight); two stacked .opts rows (.predef-series-row | .predef-index-row) reusing the existing .opts/.opt pill styling, plus .predef-sublabel showing the human-readable interpretation. #batch-opts collapses to Full | Predefined in Prep mode only (Plan-a-Flight retains the 4-size picker). Click delegation on series-row clamps the index to the new series' upper bound on Series-A↔Series-B switch. rc.10.0.7.2: fractional batch quantity for non-Full sizes. Stored .multiplier semantics are now size-aware — for Full it stays an integer count [1,40] default 1; for non-Full it becomes a "qty" of ADDITIONAL Full batches on top of the size's base fraction, range [0,39] default 0. Quarter @ qty 1 = 1 Quarter base + 1 Full add-on = 1.25× Full equivalent; Half @ qty 2 = 2.5×; Three-Quarter @ qty 3 = 3.75×. Helpers (near BATCHES): baseFraction (Q=0.25 / H=0.5 / TQ=0.75 / F=1.0), clampStoredMultiplier (size-dependent clamp), effectiveFullBatches (display value — float), forEachBatchPass / forEachIngredientCell (integer-clean per-pass iteration: 1 base pass at b.batch + qty Full passes at idx 3), effectivePancakes (sum of per-pass yields). Display/print helpers: renderBatchAmount + pbBatchAmount sum a per-batchIdx amount array across the row's passes via sumMeasurements, returning a single rendered amount (e.g. Quarter @ qty 1 of flour = Quarter's flour + Full's flour summed). In Prep mode (state.mode === 'bulk') #batch-opts collapses to Full | Predefined; selecting Predefined opens a two-tier sub-picker — Series row (Nominal | Jar-Fit) above an Index row (10 pills A:1..10, 12 pills B:1..12). New state field state.batches[i].predefined: { series: 'A'|'B', index: N } | null seeded on first Predefined click, cleared on Full click. clampPredefined helper (after clampStoredMultiplier) clamps to series-specific bounds and returns null on malformed input (tampering defense parallel to clampStoredMultiplier). Multiplier stepper greyed (data-disabled="1" + .disabled on both buttons) when Predefined active; value retained for restore-on-Full. Persistence: localStorage stamps pred_v1: true on each batch (informational; clampPredefined tolerates absence), URL emits ?pp=A:N or ?pp=B:N (active only when state.mode === 'bulk' AND active batch's predefined non-null). Output card + print page UNCHANGED in this commit — rc.10.0.8.2 lands the DRY_HALF_GAL_FIT_A constant, renderPredefinedAmount + pbPredefinedAmount helpers, and the subline/dry-bowl wiring. rc.10.0.7.2: fractional batch quantity for non-Full sizes. Stored .multiplier semantics are now size-aware — for Full it stays an integer count [1,40] default 1; for non-Full it becomes a "qty" of ADDITIONAL Full batches on top of the size's base fraction, range [0,39] default 0. Quarter @ qty 1 = 1 Quarter base + 1 Full add-on = 1.25× Full equivalent; Half @ qty 2 = 2.5×; Three-Quarter @ qty 3 = 3.75×. Helpers (near BATCHES): baseFraction (Q=0.25 / H=0.5 / TQ=0.75 / F=1.0), clampStoredMultiplier (size-dependent clamp), effectiveFullBatches (display value — float), forEachBatchPass / forEachIngredientCell (integer-clean per-pass iteration: 1 base pass at b.batch + qty Full passes at idx 3), effectivePancakes (sum of per-pass yields). Display/print helpers: renderBatchAmount + pbBatchAmount sum a per-batchIdx amount array across the row's passes via sumMeasurements, returning a single rendered amount (e.g. Quarter @ qty 1 of flour = Quarter's flour + Full's flour summed). Consumer migration: buildShoppingList loops (DRY/WET+FAT/spices/finishing-salt/pickOne/toppings) iterate the new per-pass model; per-bowl/per-card live helpers (dryBowlHtml / wetBowlHtml / wetBowlSharedHtml / fatAndSpicesHtml) take batchObj directly; print pb*Section family (pbDrySection / pbWetSection / pbSpicesSection / pbYieldSection + renderFlavorHtml) drops factor arg and takes batchObj; per-pancake count sites (syrup totals, finishingInnerHtml, pbToppingsSection finishing-count, computeButterTotal) use effectivePancakes; per-batch totals UI replaces "x N" suffix with " ×eff" (e.g. " ×1.25" for Quarter @ qty 1) using effectiveFullBatches, flavorBatchCount denominator uses per-pass count, perFlavor uses effectivePancakes; Prep Bulk subline (display + print) uses BATCHES[3].oz × effectiveFullBatches for totalOz so Quarter @ qty 1 reads "= 20 oz"; print header uses " ×eff" annotation. scalingFactor() kept on its legacy "Full mult or 1" contract for back-compat — no consumer site reaches it anymore. Stepper widget active at every size with size-dependent bounds (Full [1,40], non-Full [0,39]); sublabel "= X.YZ× Full equivalent" shows on non-Full when qty > 0. batch-opts size-transition handler clamps .multiplier (Full→non-Full drops to 0 since non-Full mult now carries qty semantics, not an inert Full-mode value; non-Full→Full clamps to >=1; non-Full↔non-Full preserved). Persist shims: localStorage stamps `qty_v2: true` per batch on save; URL stamps top-level `?qv=2` on emit. Hydrate without the sentinel zeros non-Full multipliers (LD-2 was inert under pre-rc.10.0.7.2, so zero preserves the equivalent batch count = baseFraction); Full multiplier is forward-compatible across v1/v2. URL emit per-batch rule: Full mult>1 emits, non-Full qty>0 emits, bvar non-default force-emits the size-clamped mult. rc.10.0.7.1.1 fix-patch: three corrections to rc.10.0.7.1's Patisserie Plain after user verification. (1) Wet fat reverted Avocado Oil → Melted Unsalted Butter — the avocado-oil posture from the Triple was justified there by the candy load needing a neutral base; without candy, Plain's butter leads cleaner. (2) Vanilla Bean Paste removed; Vanilla Extract from Classic Plain restored. The bean-paste insertion at rc.10.0.7.1 was an unjustified flavor upgrade on top of the user's literal "Plain + Triple's anchors" spec — Triple has no vanilla, so the merge keeps Plain's vanilla unchanged. (3) Four renderer sites that hardcoded `flavor.id === 'plain'` for the "None inside" toppings display (toppingsInnerHtml, cookCardHtml, pbToppingsSection, pbCardHtml) widened to `flavor.id === 'plain' || flavor.id === 'plain_pat'` so Patisserie Plain also shows "None inside" everywhere Classic Plain does. Docs manual Section 1 + 3 updated to match (Vanilla Extract row replaces Vanilla Bean Paste; Wet Fat row reads "Melted (or browned) Butter" matching Classic Plain; Section 3 best/good/ok cells re-worded around butter rather than avocado oil / ghee). Tests updated: plain_pat fat assertion now expects "Melted Unsalted Butter". rc.10.0.7.1 base: Patisserie Plain — Classic Plain (the rev3-era "Plain", relabeled in this slice) gains a sibling card whose batter is Plain's posture but whose Spices/Sugar/Fat profile mirrors the Triple. New flavor id `plain_pat`, label "Patisserie Plain", cookGroup 'clean', inserted immediately after `plain` in FLAVORS. Spices: Sugar — White + Vanilla Bean Paste + Non-Diastatic Malt — additional (~50% bump for roasty backbone) + Espresso Powder (single scale — no chocolate to over-stack against) + Cultured Buttermilk Powder — additional (brightness; bump milk ½ tsp per ¼ tsp powder) + Salt (chocSalt with bump-to-taste note). Wet fat: Avocado Oil in batter (Triple's neutral-base posture; the brushed-on browned-butter finish provides the butter character). TOPPINGS.plain_pat = null (no toppings). Tests: FLAVORS count 12 → 13; cookGroup distribution 4 clean → 5 clean; finishing.salt list 8 → 9 (joins plain). Docs manual: Section 1 gains the Patisserie Plain card (renaming the Plain card's h4 to "Classic Plain"), Section 2 Finishing table gains the Patisserie Plain row + relabels Plain → Classic Plain, Section 3 Tier table same. rc.10.0.6.2 base: docs/recipe-guide Section 3 best-tier toffee references. — fix three "best" tier cells that were missing or generic about toffee. (1) Toffee + Chocolate best: "plain toffee + dark chips" → "plain Heath Bits O' Brickle + dark chips" (mirrors the Toffee row's "plain Heath Bits" naming; the "plain" qualifier flags uncoated bits vs. the "ok" row's "choc-toffee bits"). (2) Caramel + Toffee best: "Peter's ¼" cubes + fresh nutmeg" → "Peter's ¼" cubes + plain Heath Bits O' Brickle + fresh nutmeg" (toffee was wholly missing). (3) Toffee + Caramel + Chocolate best: "Peter's ¼" cubes + avocado-oil base" → "Peter's ¼" cubes + plain Heath Bits O' Brickle + avocado-oil base" (toffee was missing). The good-tier cells for the two Caramel + Toffee combos picked up "store-brand toffee" the same way, matching the Toffee row's "good" pattern. Picker is unchanged — docs-only patch. rc.10.0.6.1 base: revert the rc.10.0.6 docs/recipe-guide manual swap. The Downloads copy used at rc.10.0.6 was OLDER than the manual already committed in docs/ at 1b99357 — it regressed the four Section/Part-2 headers from the user-preferred "FAT, Spices & Sugar" / "FAT, Spices, Sugar, Topping & Finishing" naming back to "Spice, Sugar & Fat". Restored docs/recipe-guide manual from HEAD~1 (be0889d), preserving the FAT-cap convention per [[project-batch-set-naming-refactor]]. Picker section labels unchanged — they were already on the FAT-first naming. rc.10.0.6 base: TOPPINGS chart synced to Rev 5 manual Section 2. (1) New Chocolate Chip schedule across every chip-bearing flavor — choc 5–6 / 8–10 / 14–17 / 20–22 / 27–32 standard (mini eq on the two smallest sizes only); +something flavors (bnut_choc, toffee_choc, caramel_choc, triple) take 4–5 / 7–8 / 10–12 / 14–16 / 20–24. (2) Toffee amounts DOUBLED across the board for pop — toffee solo, toffee_caramel's toffee column, toffee_choc's toffee column, and triple's toffee column (the triple stays one tier below toffee_choc to fit the Double-Shield budget). (3) Banana Nut + Chocolate and Bacon + Banana Nut slice/nut/bacon counts rescaled — slice ranges ¾–1 → 5–6, nut ramps 3–4 → 2 Tbsp, bacon ramps ⅝ tsp → 2 Tbsp. (4) New caramel sizing calibration note rendered in toppingsInnerHtml for any flavor with hasCaramel — "amounts assume Peter's ¼" cold-cut cubes; with Kraft Caramel Bits (uniform pre-formed) you may run the high end of each cell." Sits below the perimeter note, above the Batter Shield warn. rc.10.0.5.2 base: Flight Checklist .fcb-mode split into ↺ Reset views (view-option reset, single-click) + ✕ Clear checkmarks (state.flightChecklist wipe, two-stage in-DOM confirm). rc.10.0.5.1 base: defensive TDZ guard around boot-time sumMeasurements calls.
 (function() {
   const el = document.getElementById('app-version');
   if (el) el.textContent = APP_VERSION;
@@ -5534,6 +5660,21 @@ const state = {
   flightChecklistMode: 'snippet',
   flightChecklistItemBody: {},
   flightChecklistItemSubs: {},
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-session recipe-row check
+  // marks and chosen-tier picks. Both are flat objects keyed by deterministic
+  // strings; both reset on page reload (NO localStorage, NO URL emit). The
+  // ✕ Clear checkmarks button at L14547+ wipes all three flight-state maps
+  // (flightChecklist + recipeCheckmarks + qualityChosen) in one motion via
+  // the clearRecipeCheckmarks() helper.
+  //   recipeCheckmarks keys:
+  //     per-flavor sections: `${flavorId}:${section}:${rowIdx}` where
+  //       section ∈ {wet, dry, fat, spices, toppings, cook-delta}.
+  //     shared cooking flow: `shared-cook:${stepIdx}` (no flavorId — the
+  //       sequence is flight-wide).
+  //   qualityChosen keys: `${flavorId}` → tier name string ∈ {best, good, ok, bad}.
+  //     Absence = no tier picked (all-equal rendering).
+  recipeCheckmarks: {},
+  qualityChosen: {},
 };
 
 // Restore persisted UI prefs (grouping/layouts/collapse) from localStorage
@@ -6416,8 +6557,14 @@ function updateUrlState() {
     // a stable label.
     const h2 = document.getElementById('batch-card-h2');
     if (h2) h2.textContent = name.toUpperCase() + ' & BATCH SIZE & DRY MIX SOURCE';
+    // rc.10.0.10 (slice 260607-48i Feature 1C): route through the canonical
+    // bcrLabelBatchSizeText helper. In Prep Bulk mode the label reads
+    // 'BULK DRY MIX SIZE'; otherwise the existing dynamic batch-set form
+    // 'BATCH SIZE FOR EACH FLAVOR IN THIS <NAME>' is restored. Reading from
+    // a temporary view (with name override) so the helper sees the new
+    // batch-set name before state.batchSetName is committed on first call.
     const bcrSize = document.getElementById('bcr-label-batch-size');
-    if (bcrSize) bcrSize.textContent = 'BATCH SIZE FOR EACH FLAVOR IN THIS ' + name.toUpperCase();
+    if (bcrSize) bcrSize.textContent = bcrLabelBatchSizeText({ mode: state.mode, batchSetName: name });
     const bcrMulti = document.getElementById('bcr-label-multi-batch');
     if (bcrMulti) bcrMulti.textContent = 'ALLOW SAME FLAVOR IN MULTIPLE ' + batchSetNamePlural(name).toUpperCase();
     try { localStorage.setItem(KEY, name); } catch (_) {}
@@ -6787,6 +6934,37 @@ function clampStoredMultiplier(b) {
   if (m > 39) return 39;
   return m;
 }
+// rc.10.0.10.1 (slice 260607-48i Feature 2): pure parse + clamp pipeline
+// for the typeable ADDITIONAL FULL BATCHES quantity input. Returns
+//   { ok: true, value: N }  on a parseable integer (floored + clamped via
+//                           clampStoredMultiplier against the active batch's
+//                           size-dependent bounds);
+//   { ok: false }           on empty / non-numeric / no-active-batch input
+//                           (caller reverts the field to the last-good value
+//                           without mutating state).
+// Fractional input ('2.5') is floored (parseInt strips the decimal) and
+// then clamped — matches the +/- stepper's integer-only contract while
+// being permissive about user keystrokes. Mirrors the L13310 click handler's
+// predefined-active gate so a synthetic input write under predef-active
+// (which Feature 1A normally hides anyway) still no-ops.
+function parseAndClampTypedMultiplier(raw, batch) {
+  if (!batch || !Number.isInteger(batch.batch)) return { ok: false };
+  // Predefined-active gate (defense-in-depth — input is hidden by
+  // shouldShowMultiplierGroup when predefined is non-null in bulk mode).
+  if (state.mode === 'bulk' && batch.predefined) return { ok: false };
+  const s = (raw == null) ? '' : String(raw);
+  if (s.trim() === '') return { ok: false };
+  const n = parseInt(s, 10);
+  if (!Number.isFinite(n)) return { ok: false };
+  // Round-trip through clampStoredMultiplier by writing n then re-reading.
+  // Preserves the source-of-truth bounds [Full: 1-40 / non-Full: 0-39] and
+  // tolerates a future bounds change in one place.
+  const prevMult = batch.multiplier;
+  batch.multiplier = n;
+  const clamped = clampStoredMultiplier(batch);
+  batch.multiplier = prevMult; // pure: caller decides whether to commit
+  return { ok: true, value: clamped };
+}
 // rc.10.0.8.1: clamp helper for the Predefined jar-fit picker. Returns null
 // for null / undefined / wrong-shape / out-of-range inputs; returns the
 // canonical { series: 'A'|'B', index: clampedN } shape on valid input. Series
@@ -6857,6 +7035,66 @@ function computePrepSublines(ab) {
     out.jar = 'Fits ' + parts.join(' + ');
   }
   return out;
+}
+// rc.10.0.10 (slice 260607-48i Feature 1A): canonical predicate for
+// ADDITIONAL FULL BATCHES (#batch-multiplier-group) visibility. Called from
+// the render-cycle block at L10307+ and exposed for direct Suite 20 test
+// coverage (the harness's fake DOM cannot round-trip `multGroup.hidden`
+// through getElementById, so the test idiom is to assert on the pure
+// predicate). Encodes the LOCKED rules from CONTEXT.md §Feature 1A:
+//   Plan-a-Flight (state.mode==='recipe'): show ONLY when active batch has a
+//     size actively chosen (Number.isInteger(ab.batch) in {0,1,2,3}). Initial
+//     no-size hides. Defensive predefined-null gate (recipe mode never has
+//     predefined, but consistent with the bulk gate).
+//   Prep Bulk    (state.mode==='bulk'):   show ONLY when size=Full AND
+//     predefined=null. Quarter/Half/3Q hide (non-Full has no meaningful
+//     "additional Full batches" semantic in Prep mode). Predefined-active
+//     hides (replaces the rc.10.0.8.1 data-disabled grey-out — now full hide).
+function shouldShowMultiplierGroup(s) {
+  if (!s || !Array.isArray(s.batches)) return false;
+  const idx = Number.isInteger(s.activeBatchIdx) ? s.activeBatchIdx : 0;
+  const ab = s.batches[idx];
+  if (!ab) return false;
+  const hasSize = Number.isInteger(ab.batch);
+  if (!hasSize) return false;
+  const isFull = ab.batch === 3;
+  if (s.mode === 'bulk') {
+    // Prep Bulk: only at Full + no predefined.
+    if (!isFull) return false;
+    if (ab.predefined != null) return false;
+    return true;
+  }
+  // Plan-a-Flight (recipe): any size is fine once chosen. Defensive
+  // predefined-null gate (recipe mode shouldn't carry a predefined ref).
+  if (ab.predefined != null) return false;
+  return true;
+}
+// rc.10.0.10 (slice 260607-48i Feature 1B): canonical predicate for
+// PREDEFINED BULK MIX (#batch-predefined-group) visibility. Mirrors the
+// existing in-line gate at L10399. Extracted to a pure helper so Suite 20
+// can lock the rule down regardless of DOM access. Encodes the LOCKED rule
+// from CONTEXT.md §Feature 1B: show ONLY when state.mode==='bulk' AND active
+// batch's predefined is non-null.
+function shouldShowPredefinedGroup(s) {
+  if (!s || s.mode !== 'bulk') return false;
+  if (!Array.isArray(s.batches)) return false;
+  const idx = Number.isInteger(s.activeBatchIdx) ? s.activeBatchIdx : 0;
+  const ab = s.batches[idx];
+  if (!ab) return false;
+  return ab.predefined != null;
+}
+// rc.10.0.10 (slice 260607-48i Feature 1C): canonical batch-size label text.
+// In Prep Bulk mode, reads 'BULK DRY MIX SIZE'. In Plan-a-Flight, restores
+// the existing dynamic batch-set form 'BATCH SIZE FOR EACH FLAVOR IN THIS
+// <BATCH-SET-NAME>'. Called from setupBatchSetNameSwitcher.setBatchSetName
+// (boot + BSN-change) AND from the render-cycle (mode toggle, where the
+// BSN setter doesn't fire). Reading state.batchSetName defensively — falls
+// back to the DEFAULT 'BATCH SET' literal if absent (matches the static
+// HTML L3914 fallback).
+function bcrLabelBatchSizeText(s) {
+  if (s && s.mode === 'bulk') return 'BULK DRY MIX SIZE';
+  const noun = (s && typeof s.batchSetName === 'string' && s.batchSetName) || 'Batch Set';
+  return 'BATCH SIZE FOR EACH FLAVOR IN THIS ' + noun.toUpperCase();
 }
 // rc.10.0.7.2: full-batch fraction this batch size represents.
 //   Q=0.25, H=0.5, TQ=0.75, F=1.0. Used by effectiveFullBatches() to convert
@@ -9646,35 +9884,47 @@ function dryBowlHtml(b, bulk) {
   // in Prep mode per slice 5P.4 so this branch should not see bulk=true in
   // practice; if it does, emit the dry-list anyway (the user's picked
   // jar-fit amounts are still meaningful).
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): the dry-bowl is a bulk-mix
+  // composition — there's one shared dry list per batch set (no per-flavor
+  // owner). Key the recipe checkmarks under the active batch's id so the
+  // user can independently tick rows across different batch tabs. The
+  // null-batch fallback degrades to a synthetic 'bulk' id so the helper
+  // still emits sane data-keys at boot/empty-state.
+  const dryOwnerId = (b && Number.isInteger(b.batch))
+    ? ('batch' + (state && Array.isArray(state.batches) ? state.batches.indexOf(b) : 0))
+    : 'bulk';
+  function dryCheck(rowIdx) {
+    return recipeRowCheckHtml(dryOwnerId, 'dry', rowIdx, false);
+  }
   if (state && state.mode === 'bulk' && b && b.predefined) {
     const p = clampPredefined(b.predefined);
     if (p) {
       return `<ul class="list bowl-list">
-        <li><span class="k">All-Purpose Flour</span><span class="v">${renderPredefinedAmount('flour', p)}</span></li>
-        <li><span class="k">Yellow Corn Flour</span><span class="v">${renderPredefinedAmount('cornFlour', p)}</span></li>
-        <li><span class="k">Non-Diastatic Malt Powder</span><span class="v">${renderPredefinedAmount('malt', p)}</span></li>
-        <li><span class="k">Cultured Buttermilk Powder</span><span class="v">${renderPredefinedAmount('buttermilk', p)}</span></li>
-        <li><span class="k">Baking Powder</span><span class="v">${renderPredefinedAmount('bakingPwd', p)}</span></li>
-        <li><span class="k">Baking Soda</span><span class="v">${renderPredefinedAmount('bakingSoda', p)}</span></li>
-        <li><span class="k">Salt</span><span class="v">${renderPredefinedAmount('salt', p)}</span></li>
+        <li><span class="k">${dryCheck(0)}All-Purpose Flour</span><span class="v">${renderPredefinedAmount('flour', p)}</span></li>
+        <li><span class="k">${dryCheck(1)}Yellow Corn Flour</span><span class="v">${renderPredefinedAmount('cornFlour', p)}</span></li>
+        <li><span class="k">${dryCheck(2)}Non-Diastatic Malt Powder</span><span class="v">${renderPredefinedAmount('malt', p)}</span></li>
+        <li><span class="k">${dryCheck(3)}Cultured Buttermilk Powder</span><span class="v">${renderPredefinedAmount('buttermilk', p)}</span></li>
+        <li><span class="k">${dryCheck(4)}Baking Powder</span><span class="v">${renderPredefinedAmount('bakingPwd', p)}</span></li>
+        <li><span class="k">${dryCheck(5)}Baking Soda</span><span class="v">${renderPredefinedAmount('bakingSoda', p)}</span></li>
+        <li><span class="k">${dryCheck(6)}Salt</span><span class="v">${renderPredefinedAmount('salt', p)}</span></li>
       </ul>`;
     }
   }
   if (bulk) {
-    return `<ul class="list bowl-list"><li><span class="k">Bulk Dry Mix</span><span class="v">${renderBatchAmount(BULK_SCOOP, b)}</span></li></ul>
+    return `<ul class="list bowl-list"><li><span class="k">${dryCheck(0)}Bulk Dry Mix</span><span class="v">${renderBatchAmount(BULK_SCOOP, b)}</span></li></ul>
        <p style="margin:8px 0 0;color:var(--muted);font-size:.85rem">Recipe for the bulk mix is in the reference section below.</p>`;
   }
   // rev5: Sugar removed from the dry-bowl render (was the 5th <li>). Sugar is
   // now a per-card wet-bowl row (Sugar — White or — Dark Brown via flavor.spices
   // + effectiveSpices()). The DRY.sugar array remains as a back-compat reference.
   return `<ul class="list bowl-list">
-        <li><span class="k">All-Purpose Flour</span><span class="v">${renderBatchAmount(DRY.flour, b)}</span></li>
-        <li><span class="k">Yellow Corn Flour</span><span class="v">${renderBatchAmount(DRY.cornFlour, b)}</span></li>
-        <li><span class="k">Non-Diastatic Malt Powder</span><span class="v">${renderBatchAmount(DRY.malt, b)}</span></li>
-        <li><span class="k">Cultured Buttermilk Powder</span><span class="v">${renderBatchAmount(DRY.buttermilk, b)}</span></li>
-        <li><span class="k">Baking Powder</span><span class="v">${renderBatchAmount(DRY.bakingPwd, b)}</span></li>
-        <li><span class="k">Baking Soda</span><span class="v">${renderBatchAmount(DRY.bakingSoda, b)}</span></li>
-        <li><span class="k">Salt</span><span class="v">${renderBatchAmount(DRY.salt, b)}</span></li>
+        <li><span class="k">${dryCheck(0)}All-Purpose Flour</span><span class="v">${renderBatchAmount(DRY.flour, b)}</span></li>
+        <li><span class="k">${dryCheck(1)}Yellow Corn Flour</span><span class="v">${renderBatchAmount(DRY.cornFlour, b)}</span></li>
+        <li><span class="k">${dryCheck(2)}Non-Diastatic Malt Powder</span><span class="v">${renderBatchAmount(DRY.malt, b)}</span></li>
+        <li><span class="k">${dryCheck(3)}Cultured Buttermilk Powder</span><span class="v">${renderBatchAmount(DRY.buttermilk, b)}</span></li>
+        <li><span class="k">${dryCheck(4)}Baking Powder</span><span class="v">${renderBatchAmount(DRY.bakingPwd, b)}</span></li>
+        <li><span class="k">${dryCheck(5)}Baking Soda</span><span class="v">${renderBatchAmount(DRY.bakingSoda, b)}</span></li>
+        <li><span class="k">${dryCheck(6)}Salt</span><span class="v">${renderBatchAmount(DRY.salt, b)}</span></li>
       </ul>`;
 }
 
@@ -9684,11 +9934,13 @@ function dryBowlHtml(b, bulk) {
 // rc.10.0.3 / rc.10.0.5). rc.10.0.7.2: takes batchObj; renderBatchAmount
 // sums per-pass.
 function wetBowlHtml(flavor, b) {
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row check inputs.
+  const fid = flavor.id;
   return `<ul class="list bowl-list">
-    <li><span class="k">2% Lactaid Milk</span><span class="v">${renderBatchAmount(WET.milk, b)}</span></li>
-    <li><span class="k">Egg</span><span class="v">${renderBatchAmount(WET.egg, b)}</span></li>
-    <li><span class="k">Vanilla Extract<span class="k-note">base floor — additional vanilla on cards is on top of this</span></span><span class="v">${renderBatchAmount(WET.vanillaBaseFloor, b)}</span></li>
-    <li><span class="k">${flavor.fat}</span><span class="v">${renderBatchAmount(FAT, b)}</span></li>
+    <li><span class="k">${recipeRowCheckHtml(fid, 'wet', 0, false)}2% Lactaid Milk</span><span class="v">${renderBatchAmount(WET.milk, b)}</span></li>
+    <li><span class="k">${recipeRowCheckHtml(fid, 'wet', 1, false)}Egg</span><span class="v">${renderBatchAmount(WET.egg, b)}</span></li>
+    <li><span class="k">${recipeRowCheckHtml(fid, 'wet', 2, false)}Vanilla Extract<span class="k-note">base floor — additional vanilla on cards is on top of this</span></span><span class="v">${renderBatchAmount(WET.vanillaBaseFloor, b)}</span></li>
+    <li><span class="k">${recipeRowCheckHtml(fid, 'wet', 3, false)}${flavor.fat}</span><span class="v">${renderBatchAmount(FAT, b)}</span></li>
   </ul>`;
 }
 
@@ -9714,13 +9966,23 @@ function wetBowlSharedHtml(b, flavorIds) {
   const milkNote = variantActive
     ? '<span class="k-note">banana-in-batter variant — milk pulled back to compensate for banana moisture</span>'
     : '';
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): shared wet bowl belongs to the
+  // batch set, not a single flavor — key the check inputs under the active
+  // batch's synthetic id ('batchN' or 'bulk' fallback), parallel to the
+  // dryBowlHtml owner-id convention.
+  const wetOwnerId = (b && Number.isInteger(b.batch))
+    ? ('batch' + (state && Array.isArray(state.batches) ? state.batches.indexOf(b) : 0))
+    : 'bulk';
+  function wetCheck(rowIdx) {
+    return recipeRowCheckHtml(wetOwnerId, 'wet', rowIdx, false);
+  }
   const mashedRow = variantActive
-    ? `<li><span class="k">Mashed Ripe Banana<span class="k-note">fork-mashed to chunky-applesauce; add to wet bowl</span></span><span class="v">${renderBatchAmount(MASHED_BANANA, b)}</span></li>`
+    ? `<li><span class="k">${wetCheck(3)}Mashed Ripe Banana<span class="k-note">fork-mashed to chunky-applesauce; add to wet bowl</span></span><span class="v">${renderBatchAmount(MASHED_BANANA, b)}</span></li>`
     : '';
   return `<ul class="list bowl-list">
-    <li><span class="k">2% Lactaid Milk${milkNote}</span><span class="v">${renderBatchAmount(milkSrc, b)}</span></li>
-    <li><span class="k">Egg</span><span class="v">${renderBatchAmount(WET.egg, b)}</span></li>
-    <li><span class="k">Vanilla Extract<span class="k-note">base floor — additional vanilla on cards is on top of this</span></span><span class="v">${renderBatchAmount(WET.vanillaBaseFloor, b)}</span></li>
+    <li><span class="k">${wetCheck(0)}2% Lactaid Milk${milkNote}</span><span class="v">${renderBatchAmount(milkSrc, b)}</span></li>
+    <li><span class="k">${wetCheck(1)}Egg</span><span class="v">${renderBatchAmount(WET.egg, b)}</span></li>
+    <li><span class="k">${wetCheck(2)}Vanilla Extract<span class="k-note">base floor — additional vanilla on cards is on top of this</span></span><span class="v">${renderBatchAmount(WET.vanillaBaseFloor, b)}</span></li>
     ${mashedRow}
   </ul>`;
 }
@@ -9740,20 +10002,24 @@ function fatAndSpicesHtml(flavor, b) {
   // (L260-274) which orphaned .v-note far-right of the row. Surfacing case
   // was Patisserie Plain Sugar; fix is pattern-wide.
   const effSpices = effectiveSpices(flavor, b);
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row check inputs.
+  const fid = flavor.id;
   let html = `<ul class="list bowl-list">
-    <li><span class="k">${flavor.fat}</span><span class="v">${renderBatchAmount(FAT, b)}</span></li>
+    <li><span class="k">${recipeRowCheckHtml(fid, 'fat', 0, false)}${flavor.fat}</span><span class="v">${renderBatchAmount(FAT, b)}</span></li>
   </ul>`;
   if (effSpices.length) {
-    html += `<ul class="list bowl-list" style="margin-top:6px">` + effSpices.map(s =>
-      `<li><span class="k">${s.name}${s.note ? `<span class="k-note">${s.note}</span>` : ''}</span><span class="v">${renderBatchAmount(s.amounts, b)}</span></li>`
+    html += `<ul class="list bowl-list" style="margin-top:6px">` + effSpices.map((s, i) =>
+      `<li><span class="k">${recipeRowCheckHtml(fid, 'spices', i, false)}${s.name}${s.note ? `<span class="k-note">${s.note}</span>` : ''}</span><span class="v">${renderBatchAmount(s.amounts, b)}</span></li>`
     ).join('') + `</ul>`;
   }
   if (flavor.pickOneSpices) {
     const grp = flavor.pickOneSpices;
+    // pick-one rows live in their own index space ('pick-one' section) so
+    // they don't collide with the main spices indices.
     html += `
         <p style="margin:10px 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700">${grp.label}</p>
-        <ul class="list bowl-list">` + grp.options.map(o =>
-          `<li><span class="k">${o.name}${o.note ? `<span class="k-note">${o.note}</span>` : ''}</span><span class="v">${renderBatchAmount(o.amounts, b)}</span></li>`
+        <ul class="list bowl-list">` + grp.options.map((o, i) =>
+          `<li><span class="k">${recipeRowCheckHtml(fid, 'pick-one', i, false)}${o.name}${o.note ? `<span class="k-note">${o.note}</span>` : ''}</span><span class="v">${renderBatchAmount(o.amounts, b)}</span></li>`
         ).join('') + `</ul>
         <p style="margin:6px 0 0;color:var(--muted);font-size:.82rem">Add <b>one</b> of these to the wet bowl — not both.</p>`;
   }
@@ -9774,18 +10040,20 @@ function spicesHtml(flavor, batchIdx, factor, batchObj) {
   // rc.10.0.9 (slice 260606-m4q Task C): same alt-orphan-right layout fix
   // as fatAndSpicesHtml above — extend `list` to `list bowl-list` so .v-note
   // alt cells sit directly below the primary, right-aligned.
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row check inputs.
+  const fid = flavor.id;
   let html = '';
   if (effSpices.length) {
-    html += `<ul class="list bowl-list">` + effSpices.map(s =>
-      `<li><span class="k">${s.name}${s.note ? `<span class="k-note">${s.note}</span>` : ''}</span><span class="v">${renderAmount(s.amounts[b], f)}</span></li>`
+    html += `<ul class="list bowl-list">` + effSpices.map((s, i) =>
+      `<li><span class="k">${recipeRowCheckHtml(fid, 'spices', i, false)}${s.name}${s.note ? `<span class="k-note">${s.note}</span>` : ''}</span><span class="v">${renderAmount(s.amounts[b], f)}</span></li>`
     ).join('') + `</ul>`;
   }
   if (flavor.pickOneSpices) {
     const grp = flavor.pickOneSpices;
     html += `
         <p style="margin:10px 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700">${grp.label}</p>
-        <ul class="list bowl-list">` + grp.options.map(o =>
-          `<li><span class="k">${o.name}${o.note ? `<span class="k-note">${o.note}</span>` : ''}</span><span class="v">${renderAmount(o.amounts[b], f)}</span></li>`
+        <ul class="list bowl-list">` + grp.options.map((o, i) =>
+          `<li><span class="k">${recipeRowCheckHtml(fid, 'pick-one', i, false)}${o.name}${o.note ? `<span class="k-note">${o.note}</span>` : ''}</span><span class="v">${renderAmount(o.amounts[b], f)}</span></li>`
         ).join('') + `</ul>
         <p style="margin:6px 0 0;color:var(--muted);font-size:.82rem">Add <b>one</b> of these to the wet bowl — not both.</p>`;
   }
@@ -9906,7 +10174,10 @@ function toppingsInnerHtml(flavor, sizeIdx, opts) {
     const maxLimitHtml = isSelfContained
       ? `<div class="max-limit">Max Combined Volume Limit: ${sizeInfo.maxCombined} <span style="font-weight:normal;font-style:italic;opacity:.85">— this row is self-contained (measured in crumbles, slices, and nuts), so it is not summed against the limit.</span></div>`
       : `<div class="max-limit">Max Combined Volume Limit: ${sizeInfo.maxCombined}</div>`;
-    inner = `<ul class="topping-list">${toppingsList[sizeIdx].map(t => `<li>${t}</li>`).join('')}</ul>
+    // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row check inputs on every
+    // topping line. Section 'toppings'; row index = position in the list.
+    const fid = flavor.id;
+    inner = `<ul class="topping-list">${toppingsList[sizeIdx].map((t, i) => `<li>${recipeRowCheckHtml(fid, 'toppings', i, false)}${t}</li>`).join('')}</ul>
       ${maxLimitHtml}
       <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Keep toppings tight in the center — leave a clean batter perimeter (needed for the Batter Shield seal).</p>`;
     // rev5 (rc.10.0.6): caramel sizing calibration note — matches the row
@@ -9978,13 +10249,64 @@ function flavorCallouts(flavor) {
   return callouts;
 }
 
+// rc.10.0.10.2 (slice 260607-48i Feature 3): per-row checkmark key generator.
+// Pure helper used by every recipe-row emitter (display + click delegate). When
+// flavorId is null, the key drops the prefix — used by the shared cooking
+// sequence (one sequence per flight, not per flavor).
+// Section vocabulary: 'wet' | 'dry' | 'fat' | 'spices' | 'toppings' |
+// 'cook-delta' (per-flavor) | 'shared-cook' (flight-wide, flavorId=null).
+function recipeCheckmarkKey(flavorId, section, rowIdx) {
+  if (flavorId === null || flavorId === undefined) {
+    return section + ':' + rowIdx;
+  }
+  return flavorId + ':' + section + ':' + rowIdx;
+}
+
+// rc.10.0.10.2 (slice 260607-48i Feature 3): wipes BOTH per-session maps
+// (recipeCheckmarks + qualityChosen) in one motion. Called by the
+// ✕ Clear checkmarks button alongside state.flightChecklist = {} so a single
+// armed-click clears every check on screen (FC panel + recipe rows + tier
+// picks). Pure mutation on state; no render() call here — callers re-render.
+function clearRecipeCheckmarks() {
+  state.recipeCheckmarks = {};
+  state.qualityChosen = {};
+}
+
+// rc.10.0.10.2 (slice 260607-48i Feature 3): emit the leading per-row
+// checkbox for a recipe item. For the display path (default), an
+// `<input class="ri-check">` with a deterministic data-key (and `checked`
+// when state holds the key) — wired into the document click delegate at
+// the bottom of the JS region. For the print path (printMode=true), an
+// always-empty `<span class="pb-check"></span>` glyph that prints as a
+// bordered box for the chef to tick by pen. Print never reads state —
+// the glyph is unconditionally empty. Returns the leading HTML fragment
+// the caller prepends to the row content.
+function recipeRowCheckHtml(flavorId, section, rowIdx, printMode) {
+  if (printMode) return '<span class="pb-check"></span>';
+  const key = recipeCheckmarkKey(flavorId, section, rowIdx);
+  const isChecked = !!(state && state.recipeCheckmarks && state.recipeCheckmarks[key]);
+  return '<input type="checkbox" class="ri-check" data-key="' + key + '"' +
+    (isChecked ? ' checked' : '') + '>';
+}
+
 function tierGridHtml(flavor) {
   const t = flavor.tiers;
+  // rc.10.0.10.2 (slice 260607-48i Feature 3B): tier rows are now clickable.
+  // data-tier-name + data-flavor-id let the document click delegate identify
+  // the targeted tier; state.qualityChosen[flavor.id] === tier name → the
+  // matching row gets a `chosen` class for the bold + accent treatment.
+  const chosen = (state && state.qualityChosen) ? state.qualityChosen[flavor.id] : undefined;
+  function cls(tier) {
+    return 'tier tier-' + tier + (chosen === tier ? ' chosen' : '');
+  }
+  function attrs(tier) {
+    return 'data-tier-name="' + tier + '" data-flavor-id="' + flavor.id + '"';
+  }
   return `<div class="tiers">
-    <div class="tier tier-best"><div class="tier-h">🥇 Best</div><span class="syr">${t.best[0]}</span><span class="ing">${t.best[1]}</span></div>
-    <div class="tier tier-good"><div class="tier-h">🥈 Good</div><span class="syr">${t.good[0]}</span><span class="ing">${t.good[1]}</span></div>
-    <div class="tier tier-ok"><div class="tier-h">🥉 OK in a pinch</div><span class="syr">${t.ok[0]}</span><span class="ing">${t.ok[1]}</span></div>
-    <div class="tier tier-bad"><div class="tier-h">❌ Avoid</div><span class="syr">${t.bad[0]}</span><span class="ing">${t.bad[1]}</span></div>
+    <div class="${cls('best')}" ${attrs('best')}><div class="tier-h">🥇 Best</div><span class="syr">${t.best[0]}</span><span class="ing">${t.best[1]}</span></div>
+    <div class="${cls('good')}" ${attrs('good')}><div class="tier-h">🥈 Good</div><span class="syr">${t.good[0]}</span><span class="ing">${t.good[1]}</span></div>
+    <div class="${cls('ok')}" ${attrs('ok')}><div class="tier-h">🥉 OK in a pinch</div><span class="syr">${t.ok[0]}</span><span class="ing">${t.ok[1]}</span></div>
+    <div class="${cls('bad')}" ${attrs('bad')}><div class="tier-h">❌ Avoid</div><span class="syr">${t.bad[0]}</span><span class="ing">${t.bad[1]}</span></div>
   </div>`;
 }
 
@@ -10110,11 +10432,23 @@ function flavorDeltaCardHtml(flavor, sizeIdx, opts) {
     lines.push(`<li><b>🧂 Finishing:</b> ${parts.join(' → ')} &mdash; see the Toppings &amp; Finishing card above for amounts and order.</li>`);
   }
 
-  return `<ul class="flavor-deltas">${lines.join('')}</ul>`;
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): prepend a per-row check input
+  // to every cook-delta line. Section 'cook-delta'; row index = position in
+  // the assembled lines[] array (assembly order = render order). The input
+  // is the leading child of the <li>; the existing <b> labels follow.
+  const fid = flavor.id;
+  const linesWithChecks = lines.map((li, i) =>
+    li.replace(/^<li>/, '<li>' + recipeRowCheckHtml(fid, 'cook-delta', i, false))
+  );
+  return `<ul class="flavor-deltas">${linesWithChecks.join('')}</ul>`;
 }
 
 // Shared universal cooking flow (deduped — per-flavor specifics in delta cards)
-function sharedCookingFlowHtml(flavors, sizeIdx) {
+// rc.10.0.10.2 (slice 260607-48i Feature 3): optional printMode flag. When
+// true, every step gets a leading <span class="pb-check"></span> empty-box
+// glyph instead of an <input class="ri-check">. Print is stateless — the
+// glyph is unconditionally empty. Default false preserves display behavior.
+function sharedCookingFlowHtml(flavors, sizeIdx, printMode) {
   const sizeInfo = SIZES[sizeIdx];
   const sv = SHIELD_VOLUMES[sizeInfo.id];
   const anyBacon = flavors.some(f => f.id === 'bacon' || f.id === 'bnut_bacon');
@@ -10151,7 +10485,16 @@ function sharedCookingFlowHtml(flavors, sizeIdx) {
   steps.push(`<li>Flip when surface bubbles pop and stay open + edges look matte. Lift 1–2" with the spatula, gentle wrist flip. Cook ~1 min on the second side.</li>`);
   steps.push(`<li>Between every pancake: scrape → use the ice trick if sticky → wipe → re-oil. Cook the full batch within 40 minutes of mixing.</li>`);
 
-  return steps.join('');
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): prepend a per-step check input
+  // (display) or empty-box glyph (print) as the leading child of every <li>.
+  // Shared cook keys are flight-wide → null flavorId → 'shared-cook:N'.
+  // The leading <li> tag is rewritten via a simple find-replace; the inner
+  // content is untouched. Always emit (display + print).
+  const stepsWithChecks = steps.map((stepHtml, i) =>
+    stepHtml.replace(/^<li>/, '<li>' + recipeRowCheckHtml(null, 'shared-cook', i, !!printMode))
+  );
+
+  return stepsWithChecks.join('');
 }
 
 // =========================================================================
@@ -10275,6 +10618,15 @@ function render() {
   // Both Prep-mode opts emit data-batch="3" (Full) since selecting either
   // keeps ab.batch === 3; the discriminator is the synthetic data-prep-opt
   // attribute the click handler reads to distinguish "Full" from "Predefined".
+  // rc.10.0.10 (slice 260607-48i Feature 1C): refresh #bcr-label-batch-size
+  // every render cycle so a state.mode toggle (Plan-a-Flight ⇄ Prep Bulk)
+  // updates the label without requiring the BSN setter to fire. The label
+  // is canonical-sourced from bcrLabelBatchSizeText(state) — 'BULK DRY MIX
+  // SIZE' in bulk mode, dynamic 'BATCH SIZE FOR EACH FLAVOR IN THIS <NAME>'
+  // in recipe mode. Cheap DOM write, runs once per render cycle.
+  const bcrSizeEl = document.getElementById('bcr-label-batch-size');
+  if (bcrSizeEl) bcrSizeEl.textContent = bcrLabelBatchSizeText(state);
+
   const batchOptsEl = document.getElementById('batch-opts');
   if (state.mode === 'bulk') {
     const predActive = !!(_activeBatch && _activeBatch.predefined);
@@ -10312,9 +10664,27 @@ function render() {
     const activeBatchObj = _activeBatch;
     const hasSize = activeBatchObj && Number.isInteger(activeBatchObj.batch);
     const isFull = hasSize && activeBatchObj.batch === 3;
-    multGroup.hidden = false;
+    // rc.10.0.10 (slice 260607-48i Feature 1A): conditional visibility.
+    // Plan-a-Flight: hide until size picked. Prep Bulk: hide unless
+    // size=Full + predefined=null (predefined-active fully hides, replacing
+    // the rc.10.0.8.1 data-disabled grey-out). The pure predicate
+    // shouldShowMultiplierGroup encodes the locked rule and is testable
+    // directly from Suite 20. When hidden, short-circuit the rest of the
+    // block — the inner label/bounds/sublabel state doesn't need refreshing
+    // for a hidden widget.
+    const shouldShowMult = shouldShowMultiplierGroup(state);
+    multGroup.hidden = !shouldShowMult;
+    if (!shouldShowMult) {
+      // Hidden — skip label/bounds/sublabel work. The predefined-group block
+      // below runs independently.
+    } else {
     const mv = getActiveMultiplier();
-    multValueEl.textContent = String(mv);
+    // rc.10.0.10.1 (slice 260607-48i Feature 2): the .batch-multiplier-value
+    // span is now an <input type=number>. Use .value (not .textContent) and
+    // also sync .min/.max from the size-dependent bounds computed below
+    // (deferred to the post-`lower`/`upper`-compute block so all three attrs
+    // land together with a single source of truth).
+    multValueEl.value = String(mv);
     const batchSetUpper = state.batchSetName.toUpperCase();
     if (!hasSize) {
       // No size yet — the stepper has nothing meaningful to surface. Label
@@ -10332,6 +10702,13 @@ function render() {
     // Bounds: Full [1,40], non-Full [0,39]. Pre-size: same as Full.
     const lower = (hasSize && !isFull) ? 0 : 1;
     const upper = (hasSize && !isFull) ? 39 : 40;
+    // rc.10.0.10.1 (slice 260607-48i Feature 2): keep the input's native
+    // min/max validation aligned with the +/- stepper bounds (and with
+    // clampStoredMultiplier's Full [1,40] / non-Full [0,39]). The handler
+    // re-clamps via clampStoredMultiplier so this is belt-and-braces — the
+    // native attrs surface the bounds to spinbox UI + assistive tech.
+    multValueEl.min = String(lower);
+    multValueEl.max = String(upper);
     if (decBtn) {
       decBtn.classList.toggle('disabled', mv <= lower);
       if (mv <= lower) decBtn.setAttribute('disabled', '');
@@ -10366,6 +10743,11 @@ function render() {
     // the Full Batch Multiplier stepper is greyed read-only. Value retained
     // for restore-on-Full (clicking the upper Full opt re-enables the stepper
     // at its last value).
+    // rc.10.0.10 (slice 260607-48i Feature 1A): vestigial under the new hide
+    // rule — shouldShowMultiplierGroup returns false when predefined-active,
+    // so the group is already hidden when this branch would fire. Retained
+    // behind the visible-guard as defense-in-depth in case a future predicate
+    // change re-shows the group with predefined active.
     if (state.mode === 'bulk' && _activeBatch && _activeBatch.predefined) {
       multGroup.setAttribute('data-disabled', '1');
       const decBtnPd = multRow.querySelector('[data-multiplier-action="dec"]');
@@ -10379,6 +10761,7 @@ function render() {
         incBtnPd.setAttribute('disabled', '');
       }
     }
+    } // end: shouldShowMult visible-branch (rc.10.0.10 Feature 1A)
   }
 
   // rc.10.0.8.1: Predefined jar-fit sub-picker mount. The DOM scaffold lives
@@ -10396,7 +10779,12 @@ function render() {
     const predefIndexRow = document.getElementById('predef-index-row');
     const predefSublabel = document.getElementById('predef-sublabel');
     if (predefGroup && predefSeriesRow && predefIndexRow && predefSublabel) {
-      const showPredef = state.mode === 'bulk' && _activeBatch && _activeBatch.predefined !== null && _activeBatch.predefined !== undefined;
+      // rc.10.0.10 (slice 260607-48i Feature 1B): canonical gate factored to
+      // shouldShowPredefinedGroup. Locked rule: state.mode==='bulk' AND active
+      // batch's predefined is non-null. Equivalent to the rc.10.0.8.1 inline
+      // predicate; lifted to a pure helper so Suite 20 can lock it down
+      // independently of DOM access.
+      const showPredef = shouldShowPredefinedGroup(state);
       predefGroup.hidden = !showPredef;
       if (showPredef) {
         const p = clampPredefined(_activeBatch.predefined);
@@ -10988,16 +11376,18 @@ function pbSpicesSection(flavor, batchObj) {
   // kept as a defensive guard.
   const hasFat = !!flavor.fat;
   if (!hasFat && !hasSpices && !hasPickOne) return '';
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row empty-box glyphs.
+  const PB = '<span class="pb-check"></span>';
   // FAT row first — mirrors fatAndSpicesHtml.
   let body = '';
   if (hasFat) {
-    body += '<ul><li>' + pbBatchAmount(FAT, batchObj) + ' &middot; ' +
+    body += '<ul><li>' + PB + pbBatchAmount(FAT, batchObj) + ' &middot; ' +
       pbEscapeHtml(flavor.fat) + '</li></ul>';
   }
   if (hasSpices) {
     body += '<ul>' + effSpices.map(function(s) {
       const note = s.note ? ' <em>(' + pbEscapeHtml(s.note) + ')</em>' : '';
-      return '<li>' + pbBatchAmount(s.amounts, batchObj) + ' &middot; ' +
+      return '<li>' + PB + pbBatchAmount(s.amounts, batchObj) + ' &middot; ' +
         pbEscapeHtml(s.name) + note + '</li>';
     }).join('') + '</ul>';
   }
@@ -11007,7 +11397,7 @@ function pbSpicesSection(flavor, batchObj) {
       pbEscapeHtml(grp.label) + '</div>';
     body += '<ul>' + grp.options.map(function(o) {
       const note = o.note ? ' <em>(' + pbEscapeHtml(o.note) + ')</em>' : '';
-      return '<li>' + pbBatchAmount(o.amounts, batchObj) + ' &middot; ' +
+      return '<li>' + PB + pbBatchAmount(o.amounts, batchObj) + ' &middot; ' +
         pbEscapeHtml(o.name) + note + '</li>';
     }).join('') + '</ul>';
   }
@@ -11035,26 +11425,30 @@ function pbDrySection(flavor, batchObj) {
   // cards never consult the predefined field. Emits pbPredefinedAmount for
   // each of the 7 dry ingredients (Series A: 4N × DRY[*][3]; Series B: N ×
   // DRY_HALF_GAL_FIT_A[*]). Mirrors dryBowlHtml's Predefined branch.
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): every print row gets a
+  // leading empty-box glyph for the chef to tick with a pen. Print is
+  // stateless — the glyph never reflects state.recipeCheckmarks.
+  const PB = '<span class="pb-check"></span>';
   if (flavor === null && state && state.mode === 'bulk' && batchObj && batchObj.predefined) {
     const p = clampPredefined(batchObj.predefined);
     if (p) {
       return '<div class="pb-section">' +
         '<div class="pb-section-title">' + title + '</div>' +
         '<ul>' +
-          '<li>' + pbPredefinedAmount('flour', p) + ' &middot; All-Purpose Flour</li>' +
-          '<li>' + pbPredefinedAmount('cornFlour', p) + ' &middot; Yellow Corn Flour</li>' +
-          '<li>' + pbPredefinedAmount('malt', p) + ' &middot; Non-Diastatic Malt Powder</li>' +
-          '<li>' + pbPredefinedAmount('buttermilk', p) + ' &middot; Cultured Buttermilk Powder</li>' +
-          '<li>' + pbPredefinedAmount('bakingPwd', p) + ' &middot; Baking Powder</li>' +
-          '<li>' + pbPredefinedAmount('bakingSoda', p) + ' &middot; Baking Soda</li>' +
-          '<li>' + pbPredefinedAmount('salt', p) + ' &middot; Salt</li>' +
+          '<li>' + PB + pbPredefinedAmount('flour', p) + ' &middot; All-Purpose Flour</li>' +
+          '<li>' + PB + pbPredefinedAmount('cornFlour', p) + ' &middot; Yellow Corn Flour</li>' +
+          '<li>' + PB + pbPredefinedAmount('malt', p) + ' &middot; Non-Diastatic Malt Powder</li>' +
+          '<li>' + PB + pbPredefinedAmount('buttermilk', p) + ' &middot; Cultured Buttermilk Powder</li>' +
+          '<li>' + PB + pbPredefinedAmount('bakingPwd', p) + ' &middot; Baking Powder</li>' +
+          '<li>' + PB + pbPredefinedAmount('bakingSoda', p) + ' &middot; Baking Soda</li>' +
+          '<li>' + PB + pbPredefinedAmount('salt', p) + ' &middot; Salt</li>' +
         '</ul></div>';
     }
   }
   if (state && state.bulk) {
     return '<div class="pb-section">' +
       '<div class="pb-section-title">' + title + '</div>' +
-      '<ul><li>' + pbBatchAmount(BULK_SCOOP, batchObj) + ' &middot; Bulk Dry Mix</li></ul>' +
+      '<ul><li>' + PB + pbBatchAmount(BULK_SCOOP, batchObj) + ' &middot; Bulk Dry Mix</li></ul>' +
       '</div>';
   }
   // rev5: Sugar removed from the print dry-bowl (was the 5th <li>). Sugar is
@@ -11062,13 +11456,13 @@ function pbDrySection(flavor, batchObj) {
   return '<div class="pb-section">' +
     '<div class="pb-section-title">' + title + '</div>' +
     '<ul>' +
-      '<li>' + pbBatchAmount(DRY.flour, batchObj) + ' &middot; All-Purpose Flour</li>' +
-      '<li>' + pbBatchAmount(DRY.cornFlour, batchObj) + ' &middot; Yellow Corn Flour</li>' +
-      '<li>' + pbBatchAmount(DRY.malt, batchObj) + ' &middot; Non-Diastatic Malt Powder</li>' +
-      '<li>' + pbBatchAmount(DRY.buttermilk, batchObj) + ' &middot; Cultured Buttermilk Powder</li>' +
-      '<li>' + pbBatchAmount(DRY.bakingPwd, batchObj) + ' &middot; Baking Powder</li>' +
-      '<li>' + pbBatchAmount(DRY.bakingSoda, batchObj) + ' &middot; Baking Soda</li>' +
-      '<li>' + pbBatchAmount(DRY.salt, batchObj) + ' &middot; Salt</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.flour, batchObj) + ' &middot; All-Purpose Flour</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.cornFlour, batchObj) + ' &middot; Yellow Corn Flour</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.malt, batchObj) + ' &middot; Non-Diastatic Malt Powder</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.buttermilk, batchObj) + ' &middot; Cultured Buttermilk Powder</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.bakingPwd, batchObj) + ' &middot; Baking Powder</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.bakingSoda, batchObj) + ' &middot; Baking Soda</li>' +
+      '<li>' + PB + pbBatchAmount(DRY.salt, batchObj) + ' &middot; Salt</li>' +
     '</ul></div>';
 }
 
@@ -11102,15 +11496,17 @@ function pbWetSection(flavor, batchObj) {
     && flavor.isBananaFamily;
   const milkSrc = variantActive ? WET_BANANA_IN_BATTER_MILK : WET.milk;
   const milkNote = variantActive ? ' <em>(banana-in-batter variant)</em>' : '';
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row empty-box glyphs.
+  const PB = '<span class="pb-check"></span>';
   let lis =
-    '<li>' + pbBatchAmount(milkSrc, batchObj) + ' &middot; 2% Lactaid Milk' + milkNote + '</li>' +
-    '<li>' + pbBatchAmount(WET.egg, batchObj)  + ' &middot; Egg</li>' +
-    '<li>' + pbBatchAmount(WET.vanillaBaseFloor, batchObj) + ' &middot; Vanilla Extract <em>(base floor)</em></li>';  // rev3: universal wet-base floor.
+    '<li>' + PB + pbBatchAmount(milkSrc, batchObj) + ' &middot; 2% Lactaid Milk' + milkNote + '</li>' +
+    '<li>' + PB + pbBatchAmount(WET.egg, batchObj)  + ' &middot; Egg</li>' +
+    '<li>' + PB + pbBatchAmount(WET.vanillaBaseFloor, batchObj) + ' &middot; Vanilla Extract <em>(base floor)</em></li>';  // rev3: universal wet-base floor.
   if (variantActive) {
-    lis += '<li>' + pbBatchAmount(MASHED_BANANA, batchObj) + ' &middot; Mashed Ripe Banana <em>(fork-mashed; add to wet bowl)</em></li>';
+    lis += '<li>' + PB + pbBatchAmount(MASHED_BANANA, batchObj) + ' &middot; Mashed Ripe Banana <em>(fork-mashed; add to wet bowl)</em></li>';
   }
   if (flavor.panGrease) {
-    lis += '<li><em>Pan grease:</em> ' + pbEscapeHtml(flavor.panGrease) + '</li>';
+    lis += '<li>' + PB + '<em>Pan grease:</em> ' + pbEscapeHtml(flavor.panGrease) + '</li>';
   }
   return '<div class="pb-section">' +
     '<div class="pb-section-title">Wet Ingredient Bowl</div>' +
@@ -11140,11 +11536,13 @@ function pbToppingsSection(flavor, b, batchObj) {
   // print section bailed for Plain because there was no row to emit. With
   // Finishing added, we only bail when BOTH halves are empty.
   if (!toppingsHasContent && !finHasContent) return '';
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): per-row empty-box glyphs.
+  const PB = '<span class="pb-check"></span>';
   let body = '';
   if (toppingsHasContent) {
     body += '<div class="pb-subsection-title">Toppings <em>(on the wet top)</em></div>';
     body += '<ul>' + row.map(function(t) {
-      return '<li>' + pbEscapeHtml(t) + '</li>';
+      return '<li>' + PB + pbEscapeHtml(t) + '</li>';
     }).join('') + '</ul>';
   } else if ((flavor.id === 'plain' || flavor.id === 'plain_pat')) {
     body += '<div class="pb-subsection-title">Toppings <em>(on the wet top)</em></div>';
@@ -11181,14 +11579,14 @@ function pbToppingsSection(flavor, b, batchObj) {
           if (r && r.displayString) totalStr = ' = ~' + r.displayString + ' total';
         } catch (_) { /* TDZ at boot — skip total this pass */ }
       }
-      finLines.push('<li><b>' + step + '. ' + pbEscapeHtml(label) + '</b>' +
+      finLines.push('<li>' + PB + '<b>' + step + '. ' + pbEscapeHtml(label) + '</b>' +
         (amt ? ' &mdash; ~' + pbEscapeHtml(amt) + ' per pancake' : '') +
         countTag + totalStr + '</li>');
       step++;
     }
     if (fin.salt) {
       const saltText = fin.salt === 'generous' ? FINISHING_SALT_GENEROUS : FINISHING_SALT_DEFAULT;
-      finLines.push('<li><b>' + step + '. Finishing salt &mdash; ground sea salt</b> &mdash; ' +
+      finLines.push('<li>' + PB + '<b>' + step + '. Finishing salt &mdash; ground sea salt</b> &mdash; ' +
         pbEscapeHtml(saltText) + ' per pancake' + countTag + '</li>');
       step++;
     }
@@ -11197,7 +11595,7 @@ function pbToppingsSection(flavor, b, batchObj) {
       const plateNote = (isVariant && fin.plate === 'bruleed_banana' && flavor.id === 'bnut')
         ? ' &mdash; most useful here (this card cooks pale at 350&deg;F)'
         : '';
-      finLines.push('<li><b>' + step + '. ' + pbEscapeHtml(plateBase) + plateNote + '</b></li>');
+      finLines.push('<li>' + PB + '<b>' + step + '. ' + pbEscapeHtml(plateBase) + plateNote + '</b></li>');
       step++;
     }
     body += '<ul>' + finLines.join('') + '</ul>';
@@ -11326,9 +11724,16 @@ function pbCookSection(flavor, b, batchObj) {
 
   if (lines.length === 0) return '';
 
+  // rc.10.0.10.2 (slice 260607-48i Feature 3): prepend empty-box glyphs to
+  // every Cook step. Print is stateless — glyphs are always empty.
+  const PB = '<span class="pb-check"></span>';
+  const linesWithGlyphs = lines.map(function(li) {
+    return li.replace(/^<li>/, '<li>' + PB);
+  });
+
   return '<div class="pb-section">' +
     '<div class="pb-section-title">Cook' + titleSuffix + '</div>' +
-    '<ul>' + lines.join('') + '</ul>' +
+    '<ul>' + linesWithGlyphs.join('') + '</ul>' +
     '</div>';
 }
 
@@ -11857,7 +12262,9 @@ function renderPrintRoot() {
       return tdzSafe(function() { return flavorById(fid); });
     }).filter(function(f) { return !!f; });
     if (flavors.length === 0) return '';
-    const stepsHtml = tdzSafe(function() { return sharedCookingFlowHtml(flavors, sIdx); }) || '';
+    // rc.10.0.10.2 (slice 260607-48i Feature 3): printMode=true so the
+    // print appendix emits empty-box glyphs, not live <input> checkboxes.
+    const stepsHtml = tdzSafe(function() { return sharedCookingFlowHtml(flavors, sIdx, true); }) || '';
     if (!stepsHtml) return '';
     return '<div class="pb-appendix" data-appendix="cooking-instructions">' +
       '<h3 class="pb-appendix-title">Shared Cooking Instructions</h3>' +
@@ -13220,6 +13627,54 @@ document.getElementById('batch-multiplier-row').addEventListener('click', e => {
   ab.multiplier = next;
   render();
 });
+// rc.10.0.10.1 (slice 260607-48i Feature 2): typeable batch-quantity input.
+// The .batch-multiplier-value span at L3938 is now <input type=number>. Wire
+// change + blur + Enter to a shared commit pipeline that parses + clamps
+// via parseAndClampTypedMultiplier (which delegates the bounds to
+// clampStoredMultiplier). Listeners are registered on the input element
+// directly (NOT delegated through #batch-multiplier-row) so input keystrokes
+// never fire the +/- click handler. Three trigger events:
+//   - 'change'    — fires when a number-spinbox arrow click or Enter commits
+//                   the field (most reliable cross-browser commit signal).
+//   - 'blur'      — covers tab-out / focus-loss after typing.
+//   - 'keydown'   — Enter blurs the field so the blur handler runs the same
+//                   commit pipeline (avoids form-submit semantics + keeps the
+//                   pipeline single-sourced through blur).
+// Revert semantics: invalid input (empty / non-numeric / no active batch /
+// predefined-active) restores the input's .value to getActiveMultiplier()'s
+// current snapshot without mutating state. Valid input commits the clamped
+// integer and re-renders (which also re-syncs .value via the render-cycle
+// .value = String(mv) write at L10421).
+(function wireTypedMultiplierInput() {
+  const input = document.getElementById('batch-multiplier-value');
+  if (!input) return;
+  function commit() {
+    const ab = getActiveBatch();
+    const result = parseAndClampTypedMultiplier(input.value, ab);
+    if (!result.ok) {
+      // Revert: re-display the last-good value, no state mutation, no render.
+      input.value = String(getActiveMultiplier());
+      return;
+    }
+    if (result.value === clampStoredMultiplier(ab)) {
+      // No-op commit (e.g. typed the same number, or clamped down to the
+      // current value) — keep state untouched but re-sync the field in case
+      // the user typed an out-of-band value that clamped back to current.
+      input.value = String(result.value);
+      return;
+    }
+    ab.multiplier = result.value;
+    render();
+  }
+  input.addEventListener('change', commit);
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.blur(); // routes through the blur handler → commit()
+    }
+  });
+})();
 
 // rc.10.0.8.1: Predefined jar-fit sub-picker click delegation. Wired via two
 // listeners — one on the series-row, one on the index-row — both calling the
@@ -13479,6 +13934,50 @@ document.getElementById('output').addEventListener('click', e => {
     const action = actionBtn.dataset.acatAction;
     if (action === 'all') state.activeCategories = COOK_GROUP_ORDER.slice();
     else if (action === 'clear') state.activeCategories = [];
+    render();
+    return;
+  }
+});
+
+// rc.10.0.10.2 (slice 260607-48i Feature 3): delegated click handler for
+// per-row recipe checkmarks + clickable Quality Tier rows. One handler
+// covers BOTH because they live on the same #output subtree.
+//
+// Recipe check (.ri-check input):
+//   - Read data-key, mirror checkbox state into state.recipeCheckmarks.
+//   - NO render() — CSS `:has(input.ri-check:checked)` flips the row
+//     visuals in-place; reconstructing the entire output tree for a single
+//     check toggle would be needlessly expensive on dense flights.
+//
+// Quality tier (.tier with data-tier-name):
+//   - Toggle: clicking the currently-chosen row UN-chooses it (delete);
+//     clicking a different row swaps the choice; first click on any row
+//     sets it.
+//   - render() IS called — the chosen class needs to flip across all four
+//     tier rows of the targeted flavor, and reusing the render-cycle keeps
+//     the data flow consistent with the rest of the per-flavor state.
+document.getElementById('output').addEventListener('click', e => {
+  // Recipe-row check toggle. Handler reads .checked AFTER the browser has
+  // flipped it (delegated click runs post-default), so state mirrors UI.
+  const cb = e.target.closest('input.ri-check');
+  if (cb) {
+    const key = cb.getAttribute('data-key');
+    if (!key) return;
+    if (cb.checked) state.recipeCheckmarks[key] = true;
+    else delete state.recipeCheckmarks[key];
+    return;  // no render; CSS :has() handles the row visuals
+  }
+  // Quality tier selector.
+  const tierRow = e.target.closest('.tier[data-tier-name][data-flavor-id]');
+  if (tierRow) {
+    const tier = tierRow.getAttribute('data-tier-name');
+    const fid = tierRow.getAttribute('data-flavor-id');
+    if (!tier || !fid) return;
+    if (state.qualityChosen[fid] === tier) {
+      delete state.qualityChosen[fid];
+    } else {
+      state.qualityChosen[fid] = tier;
+    }
     render();
     return;
   }
@@ -14342,8 +14841,18 @@ window.addEventListener('resize', updateStickyHeights);
     }
     disarm();
     state.flightChecklist = {};
+    // rc.10.0.10.2 (slice 260607-48i Feature 3): Clear-checkmarks now wipes
+    // the per-session recipe-row check map + the chosen-tier map alongside
+    // the Flight Checklist state. clearRecipeCheckmarks() reassigns both
+    // state.recipeCheckmarks and state.qualityChosen to {}; the trailing
+    // render() repaints the main output so all <input class="ri-check">
+    // checkboxes lose their `checked` attribute and tier rows lose their
+    // `chosen` class. persistFlightChecklist + renderFlightChecklist cover
+    // the FC panel below.
+    clearRecipeCheckmarks();
     persistFlightChecklist();
     renderFlightChecklist();
+    render();
   });
 })();
 
