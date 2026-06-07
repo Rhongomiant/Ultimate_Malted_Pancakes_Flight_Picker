@@ -4,7 +4,7 @@ A single-file, zero-dependency web app that turns the **Master Pancake Flight Ma
 
 Two files in this project:
 
-- `Ultimate_Malted_Pancakes_Flight_Picker.html` — the picker app (current: v3.1.0)
+- `Ultimate_Malted_Pancakes_Flight_Picker.html` — the picker app (current: v3.2.0)
 - `docs/recipe-guide/🥞 Pancake_Recipe_-_Ultimate_Malted_Pancakes.html` — the companion reference manual (full prose, Word-import friendly)
 
 ## Quick start
@@ -16,7 +16,7 @@ xdg-open Ultimate_Malted_Pancakes_Flight_Picker.html # Linux
 start Ultimate_Malted_Pancakes_Flight_Picker.html   # Windows
 ```
 
-No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~13,800 lines as of v3.1.0) with inline CSS and vanilla JS.
+No server, no install, no internet. Works on Mac, Windows, Linux, iOS Safari, Android Chrome. The entire app is one HTML file (~14,900 lines as of v3.2.0) with inline CSS and vanilla JS.
 
 ## Project layout
 
@@ -155,9 +155,9 @@ Based on **The Master Pancake Flight Manual** (24-page PDF, malted-diner profile
 
 `X.Y.Z` — `Z` bumps **only** for bug fixes or items previously shipped buggy/incomplete; `Y` bumps for layout changes, UX restructures, new features, or anything user-visibly different; `X` is major. When a release bundles both, the higher bump wins.
 
-**Current: v3.1.0** (active development on `_local_dev`, latest tag `v3.0.0-rc.10.0.8.0.1`). The v3.0.0 final shipped 2026-05-30; polish release **v3.0.0.1** (2026-05-31) added a sanitization sweep with no user-visible changes. v3.1.0 introduces a new flavor (Patisserie Plain), fractional batch quantity for non-Full sizes, a Prep Bulk Predefined picker (Nominal / Jar-Fit), a Flight Checklist mode split, and a TOPPINGS chart sync to Rev 5 of the source manual.
+**Current: v3.2.0**. The v3.0.0 final shipped 2026-05-30; polish release **v3.0.0.1** (2026-05-31) added a sanitization sweep with no user-visible changes. v3.1.0 introduced a new flavor (Patisserie Plain), fractional batch quantity for non-Full sizes, a Prep Bulk Predefined picker (Nominal / Jar-Fit), a Flight Checklist mode split, and a TOPPINGS chart sync to Rev 5 of the source manual. v3.2.0 (2026-06-07) adds conditional visibility for the ADDITIONAL FULL BATCHES and PREDEFINED BULK MIX picker sections (each only shown when relevant), a typeable quantity input replacing the multiplier stepper's read-only span, and per-item checkboxes on every recipe row (Wet / Dry / FAT / Spices / Toppings + Shared Cooking Instructions + per-flavor cook delta) on display + print, plus a clickable Quality Tier selector that promotes the chosen tier with bold + accent treatment. Recipe checkbox state is per-session (no persistence), and the existing Flight Checklist "✕ Clear checkmarks" control now wipes recipe checkmarks + chosen tiers alongside the FC state in one motion.
 
-The 8-segment internal scheme (`vA.B.C.D.E.F.G.H-branch-pXX.YY_mZZ`) and the rc.9 development-cycle history are bookkeeping kept in the private archive, not in this README.
+The 8-segment internal scheme (`vA.B.C.D.E.F.G.H-branch-pXX.YY_mZZ`) and the rc.9 development-cycle history are bookkeeping kept in the `.planning/` archive, not in this README.
 
 ## License
 
