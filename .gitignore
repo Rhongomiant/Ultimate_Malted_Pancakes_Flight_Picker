@@ -1,0 +1,6 @@
+# Node tooling — never committed on the deploy branch.
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

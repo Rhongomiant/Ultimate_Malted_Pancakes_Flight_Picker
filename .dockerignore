@@ -1,0 +1,10 @@
+node_modules
+.git
+*.md
+LICENSE
+docs
+__tests__
+test-results
+tests
+tests-visual
+.DS_Store
