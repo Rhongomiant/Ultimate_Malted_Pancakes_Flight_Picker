@@ -1,0 +1,21 @@
+{
+  "name": "ultimate-malted-pancakes-flight-picker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Production server wrapper for the Ultimate Malted Pancakes Flight Picker — serves the static picker behind HTTPS enforcement and a flapjacks->pancakes canonical-host redirect.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "test": "node --test __tests__/wrapper.test.mjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@psc/https": "file:./vendor/psc-https-0.1.0.tgz",
+    "hono": "^4.12.0"
+  }
+}
