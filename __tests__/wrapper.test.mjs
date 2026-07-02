@@ -2,7 +2,8 @@
 //
 // Imports the Hono `app` (no port binding) and exercises the four behaviors the
 // wrapper guarantees: HTTPS enforcement, the @psc/https version endpoint, the
-// flapjacks->pancakes canonical redirect, and path-traversal rejection.
+// env-driven alias->canonical redirect (incl. fail-safe when CANONICAL_HOST is
+// unset), and path-traversal rejection.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { app } from '../server.mjs';
@@ -57,6 +58,23 @@ test('redirects an env-driven multi-apex alias (.info) to pancakes (301)', async
   );
   assert.equal(res.status, 301);
   assert.equal(res.headers.get('location'), 'https://pancakes.gallifreyans.com/x?y=2');
+});
+
+// (c3) Fail-safe: with CANONICAL_HOST unset there is NO hardcoded fallback, so an
+// alias host is NOT redirected (it degrades to plain serving, never a wrong-host loop).
+test('does NOT redirect an alias when CANONICAL_HOST is unset (fail-safe)', async () => {
+  const saved = process.env.CANONICAL_HOST;
+  delete process.env.CANONICAL_HOST;
+  try {
+    const res = await app.fetch(
+      new Request('https://flapjacks.gallifreyans.info/', {
+        headers: { 'X-Forwarded-Proto': 'https', host: 'flapjacks.gallifreyans.info' },
+      }),
+    );
+    assert.notEqual(res.status, 301);
+  } finally {
+    process.env.CANONICAL_HOST = saved;
+  }
 });
 
 // (d) Parent-directory traversal must not resolve to a served file (no 200).
