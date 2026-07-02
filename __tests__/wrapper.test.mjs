@@ -1,18 +1,22 @@
-// Smoke test for the production server wrapper. Runs via `node --test`.
+// Smoke test for the managed-app server wrapper. Runs via `node --test`.
 //
-// Imports the Hono `app` (no port binding) and exercises the four behaviors the
-// wrapper guarantees: HTTPS enforcement, the @psc/https version endpoint, the
-// env-driven alias->canonical redirect (incl. fail-safe when CANONICAL_HOST is
-// unset), and path-traversal rejection.
+// Sets the env vars FIRST, then imports the Hono `app` via a top-level-await
+// dynamic import (no port binding): STATIC_INDEX is captured ONCE at module
+// load, so it MUST be in the environment before `server.mjs` is evaluated.
+// The suite exercises the behaviors the wrapper guarantees: HTTPS
+// enforcement, the @psc/https version endpoint, the env-driven
+// alias->canonical redirect (incl. the fail-safe when CANONICAL_HOST is
+// unset), path-traversal rejection, and env-driven static entry serving.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { app } from '../server.mjs';
 
-// The canonical redirect reads CANONICAL_HOST + ALIAS_HOSTS from the environment
-// per request (PSC apps-deploy sets both on the Railway service). Set them here
-// so the alias-redirect tests exercise the real env-driven code path.
-process.env.CANONICAL_HOST = 'pancakes.gallifreyans.com';
-process.env.ALIAS_HOSTS = 'flapjacks.gallifreyans.com,flapjacks.gallifreyans.info';
+// CANONICAL_HOST + ALIAS_HOSTS are read per request (the control plane sets
+// both on every deploy), but STATIC_INDEX is a module-load const — all three
+// go into the environment before the import below.
+process.env.CANONICAL_HOST = 'canonical.example.com';
+process.env.ALIAS_HOSTS = 'alias.example.com,alias.example.net';
+process.env.STATIC_INDEX = '__tests__/fixture.html';
+const { app } = await import('../server.mjs');
 
 // (a) Plain-HTTP request (X-Forwarded-Proto: http) is redirected to HTTPS.
 // A Host header is required: the middleware builds the redirect target from it
@@ -21,11 +25,11 @@ process.env.ALIAS_HOSTS = 'flapjacks.gallifreyans.com,flapjacks.gallifreyans.inf
 test('redirects HTTP to HTTPS (301)', async () => {
   const res = await app.fetch(
     new Request('http://localhost/', {
-      headers: { 'X-Forwarded-Proto': 'http', host: 'pancakes.gallifreyans.com' },
+      headers: { 'X-Forwarded-Proto': 'http', host: 'canonical.example.com' },
     }),
   );
   assert.equal(res.status, 301);
-  assert.equal(res.headers.get('location'), 'https://pancakes.gallifreyans.com/');
+  assert.equal(res.headers.get('location'), 'https://canonical.example.com/');
 });
 
 // (b) /__psc/version is served by @psc/https with the package identity.
@@ -37,27 +41,34 @@ test('serves /__psc/version with @psc/https identity', async () => {
   assert.match(body.version, /^\d+\.\d+\.\d+/);
 });
 
-// (c) flapjacks host is redirected to pancakes, preserving path and query.
-test('redirects flapjacks host to pancakes (301; path + query preserved)', async () => {
+// (c) An alias host is redirected to the canonical host, preserving path and
+// query.
+test('redirects an alias host to the canonical host (301; path + query preserved)', async () => {
   const res = await app.fetch(
-    new Request('https://flapjacks.gallifreyans.com/foo?bar=1', {
-      headers: { 'X-Forwarded-Proto': 'https', host: 'flapjacks.gallifreyans.com' },
+    new Request('https://alias.example.com/foo?bar=1', {
+      headers: { 'X-Forwarded-Proto': 'https', host: 'alias.example.com' },
     }),
   );
   assert.equal(res.status, 301);
-  assert.equal(res.headers.get('location'), 'https://pancakes.gallifreyans.com/foo?bar=1');
+  assert.equal(
+    res.headers.get('location'),
+    'https://canonical.example.com/foo?bar=1',
+  );
 });
 
-// (c2) A multi-apex alias in ALIAS_HOSTS also redirects to the canonical host,
+// (c2) The second alias in ALIAS_HOSTS also redirects to the canonical host,
 // proving the redirect is env-driven (not a single hardcoded host).
-test('redirects an env-driven multi-apex alias (.info) to pancakes (301)', async () => {
+test('redirects the second env-driven alias (.net) to the canonical host (301)', async () => {
   const res = await app.fetch(
-    new Request('https://flapjacks.gallifreyans.info/x?y=2', {
-      headers: { 'X-Forwarded-Proto': 'https', host: 'flapjacks.gallifreyans.info' },
+    new Request('https://alias.example.net/x?y=2', {
+      headers: { 'X-Forwarded-Proto': 'https', host: 'alias.example.net' },
     }),
   );
   assert.equal(res.status, 301);
-  assert.equal(res.headers.get('location'), 'https://pancakes.gallifreyans.com/x?y=2');
+  assert.equal(
+    res.headers.get('location'),
+    'https://canonical.example.com/x?y=2',
+  );
 });
 
 // (c3) Fail-safe: with CANONICAL_HOST unset there is NO hardcoded fallback, so an
@@ -67,8 +78,8 @@ test('does NOT redirect an alias when CANONICAL_HOST is unset (fail-safe)', asyn
   delete process.env.CANONICAL_HOST;
   try {
     const res = await app.fetch(
-      new Request('https://flapjacks.gallifreyans.info/', {
-        headers: { 'X-Forwarded-Proto': 'https', host: 'flapjacks.gallifreyans.info' },
+      new Request('https://alias.example.net/', {
+        headers: { 'X-Forwarded-Proto': 'https', host: 'alias.example.net' },
       }),
     );
     assert.notEqual(res.status, 301);
@@ -81,4 +92,18 @@ test('does NOT redirect an alias when CANONICAL_HOST is unset (fail-safe)', asyn
 test('rejects path traversal (no 200)', async () => {
   const res = await app.fetch(new Request('https://localhost/../../etc/passwd'));
   assert.notEqual(res.status, 200);
+});
+
+// (e) The root path serves the STATIC_INDEX-named entry (env-driven end to
+// end: the preamble points it at the fixture, and the body proves the rewrite
+// resolved that exact file).
+test('serves the STATIC_INDEX-named entry at the root path (env-driven)', async () => {
+  const res = await app.fetch(
+    new Request('https://canonical.example.com/', {
+      headers: { 'X-Forwarded-Proto': 'https', host: 'canonical.example.com' },
+    }),
+  );
+  assert.equal(res.status, 200);
+  const body = await res.text();
+  assert.match(body, /managed-app-template-fixture/);
 });
