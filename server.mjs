@@ -25,21 +25,21 @@ app.use('*', pscHttpsHono({ hsts: defaultHstsOptions }));
 app.get('/healthz', (c) => c.json({ ok: true, data: { db: 'up' } }));
 
 // 3. Canonical-host redirect: any host in ALIAS_HOSTS -> CANONICAL_HOST (301,
-//    path + query preserved). Env-driven so the redirect set tracks every alias
-//    the platform provisions instead of hardcoding one. CANONICAL_HOST and the
-//    comma-separated ALIAS_HOSTS are supplied by the environment; a missing
-//    CANONICAL_HOST falls back to the primary host, and an empty ALIAS_HOSTS
-//    redirects nothing. Read per request so tests can drive it via the
-//    environment. Lowercased compare defends against mixed-case Host headers;
-//    the split strips an edge-appended :port.
+//    path + query preserved). Fully env-driven, NO hardcoded domain: CANONICAL_HOST
+//    and the comma-separated ALIAS_HOSTS are supplied by the environment (PSC's
+//    apps-deploy set-env-vars step derives both from the app config). Fail-safe —
+//    if CANONICAL_HOST is unset (or ALIAS_HOSTS empty) nothing is redirected, so a
+//    missing var degrades to plain serving rather than a wrong-host loop. Read per
+//    request so tests can drive it via the environment. Lowercased compare defends
+//    against mixed-case Host headers; the split strips an edge-appended :port.
 app.use('*', async (c, next) => {
-  const canonical = process.env.CANONICAL_HOST ?? 'pancakes.gallifreyans.com';
+  const canonical = process.env.CANONICAL_HOST;
   const aliases = (process.env.ALIAS_HOSTS ?? '')
     .split(',')
     .map((h) => h.trim().toLowerCase())
     .filter(Boolean);
   const host = (c.req.header('host') ?? '').toLowerCase().split(':')[0];
-  if (host && aliases.includes(host)) {
+  if (canonical && host && aliases.includes(host)) {
     const url = new URL(c.req.url);
     return c.redirect(`https://${canonical}${url.pathname}${url.search}`, 301);
   }
