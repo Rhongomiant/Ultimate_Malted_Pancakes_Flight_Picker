@@ -7,6 +7,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { app } from '../server.mjs';
 
+// The canonical redirect reads CANONICAL_HOST + ALIAS_HOSTS from the environment
+// per request (PSC apps-deploy sets both on the Railway service). Set them here
+// so the alias-redirect tests exercise the real env-driven code path.
+process.env.CANONICAL_HOST = 'pancakes.gallifreyans.com';
+process.env.ALIAS_HOSTS = 'flapjacks.gallifreyans.com,flapjacks.gallifreyans.info';
+
 // (a) Plain-HTTP request (X-Forwarded-Proto: http) is redirected to HTTPS.
 // A Host header is required: the middleware builds the redirect target from it
 // and defensively passes through when Host is absent (real edge traffic always
@@ -39,6 +45,18 @@ test('redirects flapjacks host to pancakes (301; path + query preserved)', async
   );
   assert.equal(res.status, 301);
   assert.equal(res.headers.get('location'), 'https://pancakes.gallifreyans.com/foo?bar=1');
+});
+
+// (c2) A multi-apex alias in ALIAS_HOSTS also redirects to the canonical host,
+// proving the redirect is env-driven (not a single hardcoded host).
+test('redirects an env-driven multi-apex alias (.info) to pancakes (301)', async () => {
+  const res = await app.fetch(
+    new Request('https://flapjacks.gallifreyans.info/x?y=2', {
+      headers: { 'X-Forwarded-Proto': 'https', host: 'flapjacks.gallifreyans.info' },
+    }),
+  );
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get('location'), 'https://pancakes.gallifreyans.com/x?y=2');
 });
 
 // (d) Parent-directory traversal must not resolve to a served file (no 200).
